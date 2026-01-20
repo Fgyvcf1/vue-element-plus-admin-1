@@ -14,7 +14,7 @@ export type RemoveReadonly<T> = {
   -readonly [P in keyof T]: T[P]
 }
 
-export type ComponentRef<T> = InstanceType<T>
+export type ComponentRef<T extends abstract new (...args: any) => any> = InstanceType<T>
 
 export type TimeoutHandle = ReturnType<typeof setTimeout>
 

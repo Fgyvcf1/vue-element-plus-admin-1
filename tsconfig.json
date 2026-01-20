@@ -13,8 +13,35 @@
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "strictFunctionTypes": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["apps/admin/src/*"]
+    },
+    "types": [
+      "@intlify/unplugin-vue-i18n/types",
+      "vite/client",
+      "element-plus/global",
+      "@types/qrcode"
+    ]
   },
-  "include": [],
+  "include": [
+    "apps/admin/src/**/*.ts",
+    "apps/admin/src/**/*.tsx",
+    "apps/admin/src/**/*.vue",
+    "apps/admin/types/**/*.d.ts",
+    "apps/admin/mock/**/*.ts",
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "packages/**/*.vue"
+  ],
   "exclude": ["node_modules", "dist"]
 }
