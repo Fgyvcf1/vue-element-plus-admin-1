@@ -228,6 +228,13 @@ module.exports = {
           }
         ]
       }
+    },
+    {
+      files: ['*.less', '**/*.less'],
+      customSyntax: 'postcss-less',
+      rules: {
+        'declaration-property-value-no-unknown': null
+      }
     }
   ]
 }
