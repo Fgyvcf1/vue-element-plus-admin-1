@@ -1,0 +1,16 @@
+{
+  "name": "@vea/styles",
+  "version": "1.0.0",
+  "description": "Vue Element Plus Admin 公用样式",
+  "type": "module",
+  "main": "./src/index.less",
+  "exports": {
+    ".": "./src/index.less",
+    "./var.css": "./src/var.css",
+    "./variables.module.less": "./src/variables.module.less"
+  },
+  "files": [
+    "src"
+  ],
+  "license": "MIT"
+}

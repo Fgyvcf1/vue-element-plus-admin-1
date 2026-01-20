@@ -7,3 +7,4 @@ dist-ssr
 pnpm-debug
 stats.html
 .idea
+.pnpm-store

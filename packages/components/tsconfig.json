@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@vea/components/*": ["./src/*"],
+      "@vea/utils": ["../utils/src"],
+      "@vea/utils/*": ["../utils/src/*"],
+      "@vea/hooks": ["../hooks/src"],
+      "@vea/hooks/*": ["../hooks/src/*"],
+      "@vea/styles": ["../styles/src"],
+      "@vea/styles/*": ["../styles/src/*"]
+    },
+    "types": [
+      "element-plus/global",
+      "@types/qrcode"
+    ]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/**/*.d.ts"],
+  "references": [
+    { "path": "../utils" },
+    { "path": "../hooks" }
+  ]
+}

@@ -18,6 +18,7 @@ module.exports = {
     ],
     'media-query-no-invalid': null,
     'function-no-unknown': null,
+    'declaration-property-value-no-unknown': null,
     'no-empty-source': null,
     'named-grid-areas-no-invalid': null,
     'no-descending-specificity': null,
@@ -213,6 +214,7 @@ module.exports = {
         'keyframes-name-pattern': null,
         'selector-class-pattern': null,
         'no-duplicate-selectors': null,
+        'declaration-property-value-no-unknown': null,
         'selector-pseudo-class-no-unknown': [
           true,
           {

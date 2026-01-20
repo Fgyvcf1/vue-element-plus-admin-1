@@ -1,0 +1,50 @@
+{
+  "name": "@vea/hooks",
+  "version": "1.0.0",
+  "description": "Vue Element Plus Admin 通用 Hooks",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./useWatermark": {
+      "import": "./src/useWatermark.ts",
+      "types": "./src/useWatermark.ts"
+    },
+    "./useClipboard": {
+      "import": "./src/useClipboard.ts",
+      "types": "./src/useClipboard.ts"
+    },
+    "./useNetwork": {
+      "import": "./src/useNetwork.ts",
+      "types": "./src/useNetwork.ts"
+    },
+    "./useStorage": {
+      "import": "./src/useStorage.ts",
+      "types": "./src/useStorage.ts"
+    },
+    "./useEventBus": {
+      "import": "./src/useEventBus.ts",
+      "types": "./src/useEventBus.ts"
+    },
+    "./useScrollTo": {
+      "import": "./src/useScrollTo.ts",
+      "types": "./src/useScrollTo.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "mitt": "^3.0.1"
+  },
+  "peerDependencies": {
+    "vue": ">=3.4.0"
+  },
+  "license": "MIT"
+}
