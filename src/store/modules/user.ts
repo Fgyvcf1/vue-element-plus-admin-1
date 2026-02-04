@@ -69,10 +69,10 @@ export const useUserStore = defineStore('user', {
         type: 'warning'
       })
         .then(async () => {
-          const res = await loginOutApi().catch(() => {})
-          if (res) {
-            this.reset()
-          }
+          // 先执行本地退出，无论 API 是否成功
+          this.reset()
+          // 调用退出 API（不阻塞）
+          loginOutApi().catch(() => {})
         })
         .catch(() => {})
     },
@@ -82,7 +82,11 @@ export const useUserStore = defineStore('user', {
       this.setToken('')
       this.setUserInfo(undefined)
       this.setRoleRouters([])
-      router.replace('/login')
+      // 使用 replace 跳转到登录页，避免历史记录问题
+      router.replace('/login').catch(() => {
+        // 如果路由跳转失败，强制刷新页面
+        window.location.href = '/#/login'
+      })
     },
     logout() {
       this.reset()

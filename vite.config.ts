@@ -174,7 +174,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         'vue-json-pretty',
         '@zxcvbn-ts/core',
         'dayjs',
-        'cropperjs'
+        'cropperjs',
+        '@element-plus/icons-vue'
       ]
     }
   }

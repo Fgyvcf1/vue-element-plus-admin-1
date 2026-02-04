@@ -1,7 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import type { App } from 'vue'
-import { Layout, getParentLayout } from '@/utils/routerHelper'
+import Layout from '@/layout/Layout.vue'
+import { getParentLayout } from '@/utils/routerHelper'
 import { useI18n } from '@/hooks/web/useI18n'
 import { NO_RESET_WHITE_LIST } from '@/constants'
 
@@ -11,7 +12,7 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard/analysis',
+    redirect: '/dashboard',
     name: 'Root',
     meta: {
       hidden: true
@@ -66,16 +67,6 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
-  },
-  {
-    path: '/404',
-    component: () => import('@/views/Error/404.vue'),
-    name: 'NoFind',
-    meta: {
-      hidden: true,
-      title: '404',
-      noTagsView: true
-    }
   }
 ]
 
@@ -83,30 +74,38 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
   {
     path: '/dashboard',
     component: Layout,
-    redirect: '/dashboard/analysis',
+    redirect: '/dashboard/index',
     name: 'Dashboard',
     meta: {
-      title: t('router.dashboard'),
-      icon: 'vi-ant-design:dashboard-filled',
-      alwaysShow: true
+      title: '仪表盘',
+      icon: 'dashboard'
     },
     children: [
       {
-        path: 'analysis',
-        component: () => import('@/views/Dashboard/Analysis.vue'),
-        name: 'Analysis',
+        path: 'index',
+        component: () => import('@/views/Dashboard/index.vue'),
+        name: 'DashboardIndex',
         meta: {
-          title: t('router.analysis'),
+          title: '仪表盘',
           noCache: true,
           affix: true
         }
       },
       {
+        path: 'analysis',
+        component: () => import('@/views/Dashboard/Analysis.vue'),
+        name: 'DashboardAnalysis',
+        meta: {
+          title: '分析页',
+          noCache: true
+        }
+      },
+      {
         path: 'workplace',
         component: () => import('@/views/Dashboard/Workplace.vue'),
-        name: 'Workplace',
+        name: 'DashboardWorkplace',
         meta: {
-          title: t('router.workplace'),
+          title: '工作台',
           noCache: true
         }
       }
@@ -727,13 +726,23 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    component: () => import('@/views/Error/404.vue'),
+    name: 'NoFind',
+    meta: {
+      hidden: true,
+      title: '404',
+      noTagsView: true
+    }
   }
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
   strict: true,
-  routes: constantRouterMap as RouteRecordRaw[],
+  routes: [...constantRouterMap, ...asyncRouterMap] as RouteRecordRaw[],
   scrollBehavior: () => ({ left: 0, top: 0 })
 })
 

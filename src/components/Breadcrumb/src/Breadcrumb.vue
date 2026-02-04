@@ -11,18 +11,14 @@ import { Icon } from '@/components/Icon'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 
-const { getPrefixCls } = useDesign()
-
-const prefixCls = getPrefixCls('breadcrumb')
-
-const appStore = useAppStore()
-
-// 面包屑图标
-const breadcrumbIcon = computed(() => appStore.getBreadcrumbIcon)
-
 export default defineComponent({
   name: 'Breadcrumb',
   setup() {
+    const { getPrefixCls } = useDesign()
+    const prefixCls = getPrefixCls('breadcrumb')
+    const appStore = useAppStore()
+    const breadcrumbIcon = computed(() => appStore.getBreadcrumbIcon)
+
     const { currentRoute } = useRouter()
 
     const { t } = useI18n()

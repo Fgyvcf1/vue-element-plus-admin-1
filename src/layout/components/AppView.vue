@@ -5,11 +5,9 @@ import { Footer } from '@/components/Footer'
 import { computed } from 'vue'
 
 const appStore = useAppStore()
-
 const footer = computed(() => appStore.getFooter)
 
 const tagsViewStore = useTagsViewStore()
-
 const getCaches = computed((): string[] => {
   return tagsViewStore.getCachedViews
 })

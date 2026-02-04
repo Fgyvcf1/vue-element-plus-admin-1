@@ -220,7 +220,13 @@ const redirect = ref<string>('')
 watch(
   () => currentRoute.value,
   (route: RouteLocationNormalizedLoaded) => {
-    redirect.value = route?.query?.redirect as string
+    const rawRedirect = route?.query?.redirect as string
+    // 如果 redirect 是 /dashboard/analysis，强制改为 /dashboard
+    if (rawRedirect && rawRedirect.startsWith('/dashboard')) {
+      redirect.value = '/dashboard'
+    } else {
+      redirect.value = rawRedirect
+    }
   },
   {
     immediate: true
@@ -259,7 +265,11 @@ const signIn = async () => {
               addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
             })
             permissionStore.setIsAddRouters(true)
-            push({ path: redirect.value || permissionStore.addRouters[0].path })
+            // 强制跳转到 /dashboard
+            console.log('准备跳转到:', '/dashboard')
+            console.log('redirect 的值:', redirect.value)
+            push({ path: '/dashboard' })
+            console.log('已执行 push')
           }
         }
       } finally {
@@ -290,7 +300,11 @@ const getRole = async () => {
       addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
     })
     permissionStore.setIsAddRouters(true)
-    push({ path: redirect.value || permissionStore.addRouters[0].path })
+    // 强制跳转到 /dashboard
+    console.log('准备跳转到:', '/dashboard')
+    console.log('redirect 的值:', redirect.value)
+    push({ path: '/dashboard' })
+    console.log('已执行 push')
   }
 }
 

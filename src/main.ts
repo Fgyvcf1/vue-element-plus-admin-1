@@ -34,8 +34,6 @@ import { createApp } from 'vue'
 
 import App from './App.vue'
 
-import './permission'
-
 // 创建实例
 const setupAll = async () => {
   const app = createApp(App)
@@ -43,6 +41,9 @@ const setupAll = async () => {
   await setupI18n(app)
 
   setupStore(app)
+
+  // 在 store 初始化后导入权限控制
+  await import('./permission')
 
   setupGlobCom(app)
 
