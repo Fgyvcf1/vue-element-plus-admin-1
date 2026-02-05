@@ -1,7 +1,8 @@
 /**
  * 请求成功状态码
+ * 原项目后端返回 20000 表示成功
  */
-export const SUCCESS_CODE = 0
+export const SUCCESS_CODE = 20000
 
 /**
  * 请求contentType

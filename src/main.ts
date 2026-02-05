@@ -42,14 +42,14 @@ const setupAll = async () => {
 
   setupStore(app)
 
-  // 在 store 初始化后导入权限控制
+  setupRouter(app)
+
+  // 在路由设置后导入权限控制
   await import('./permission')
 
   setupGlobCom(app)
 
   setupElementPlus(app)
-
-  setupRouter(app)
 
   setupPermission(app)
 

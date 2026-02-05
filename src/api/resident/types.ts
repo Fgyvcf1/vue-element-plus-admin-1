@@ -1,57 +1,56 @@
-export interface ResidentItem {
-  id: string | number
-  name: string
-  idCard: string
-  gender: string
-  dateOfBirth: string
-  age: number
-  villageGroup: string
-  address: string
-  householdHeadName?: string
-  household_head_name?: string
-  relationshipToHead?: string
-  relationship_to_head?: string
-  phoneNumber?: string
-  phone_number?: string
-  bankCard?: string
-  equityShares?: number
-  equity_shares?: number
-  status: 'active' | 'migrated_out' | 'deceased'
-}
-
+// 居民列表查询参数
 export interface ResidentListParams {
-  pageNum?: number
-  pageSize?: number
+  page: number
+  limit: number
   name?: string
   idCard?: string
-  householdHeadName?: string
-  isHouseholdHead?: boolean
+  householderName?: string
   gender?: string
   villageGroup?: string
   birthYear?: string
-  phoneNumber?: string
+  phone?: string
   status?: string
 }
 
-export interface ResidentListResponse {
-  code: number
-  data: {
-    data: ResidentItem[]
-    total: number
-    totalHouseholds: number
-    totalPersons: number
-  }
-  message?: string
+// 居民列表结果
+export interface ResidentListResult {
+  list: ResidentItem[]
+  total: number
+  households: number
 }
 
-export interface SearchSuggestionParams {
-  keyword: string
-  type: 'residentNames' | 'householdHeadNames'
+// 居民列表项
+export interface ResidentItem {
+  id: string
+  name: string
+  gender: string
+  idCard: string
+  birthDate: string
+  villageGroup: string
+  address: string
+  phone: string
+  householderName: string
+  relation: string
+  status: string
+  nation?: string
+  createTime?: string
 }
 
-export interface SearchSuggestionResponse {
-  code: number
-  residentNames?: { value: string }[]
-  householdHeadNames?: { value: string }[]
-  message?: string
+// 居民详情
+export interface ResidentDetail {
+  id: string
+  name: string
+  gender: string
+  idCard: string
+  birthDate: string
+  nation: string
+  villageGroup: string
+  address: string
+  phone: string
+  householderName: string
+  relation: string
+  status: string
+  createTime: string
+  updateTime?: string
+  remark?: string
 }

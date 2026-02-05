@@ -28,7 +28,7 @@ export default defineComponent({
     const permissionStore = usePermissionStore()
 
     const menuRouters = computed(() => {
-      const routers = permissionStore.getRouters
+      const routers = permissionStore.getRouters as AppRouteRecordRaw[]
       return filterBreadcrumb(routers)
     })
 

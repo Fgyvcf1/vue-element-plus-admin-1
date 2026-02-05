@@ -5,7 +5,7 @@ import { ElMessageBox } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { loginOutApi } from '@/api/login'
 import { useTagsViewStore } from './tagsView'
-import router from '@/router'
+import { usePermissionStore } from './permission'
 
 interface UserState {
   userInfo?: UserType
@@ -23,7 +23,6 @@ export const useUserStore = defineStore('user', {
       tokenKey: 'Authorization',
       token: '',
       roleRouters: undefined,
-      // 记住我
       rememberMe: true,
       loginInfo: undefined
     }
@@ -68,25 +67,44 @@ export const useUserStore = defineStore('user', {
         cancelButtonText: t('common.cancel'),
         type: 'warning'
       })
-        .then(async () => {
-          // 先执行本地退出，无论 API 是否成功
+        .then(() => {
+          // 立即执行本地退出
           this.reset()
-          // 调用退出 API（不阻塞）
+          // 后台调用退出 API（不阻塞）
           loginOutApi().catch(() => {})
         })
         .catch(() => {})
     },
     reset() {
       const tagsViewStore = useTagsViewStore()
-      tagsViewStore.delAllViews()
-      this.setToken('')
+      const permissionStore = usePermissionStore()
+
+      console.log('开始退出流程...')
+
+      // 1. 先清空用户信息（确保 tagsViewStore.delAllViews 能正确清空非固定标签）
       this.setUserInfo(undefined)
+      
+      // 2. 清除所有标签视图
+      tagsViewStore.delAllViews()
+      
+      // 3. 清除其他状态
+      this.setToken('')
       this.setRoleRouters([])
-      // 使用 replace 跳转到登录页，避免历史记录问题
-      router.replace('/login').catch(() => {
-        // 如果路由跳转失败，强制刷新页面
-        window.location.href = '/#/login'
-      })
+
+      // 2. 重置权限状态
+      permissionStore.setIsAddRouters(false)
+
+      // 3. 清除 localStorage 中的持久化状态
+      localStorage.removeItem('pinia-state-user')
+      localStorage.removeItem('pinia-state-permission')
+      localStorage.removeItem('pinia-state-tagsView')
+      localStorage.removeItem('pinia-state-app')
+      localStorage.removeItem('pinia-state-lock')
+
+      console.log('状态已清除，准备跳转到登录页')
+
+      // 4. 跳转到登录页，使用 window.location 确保页面刷新
+      window.location.replace('/#/login')
     },
     logout() {
       this.reset()

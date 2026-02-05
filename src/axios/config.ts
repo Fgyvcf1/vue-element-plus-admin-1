@@ -47,6 +47,8 @@ const defaultResponseInterceptors = (response: AxiosResponse) => {
       const userStore = useUserStoreWithOut()
       userStore.logout()
     }
+    // 返回数据，让前端可以处理错误
+    return response.data
   }
 }
 

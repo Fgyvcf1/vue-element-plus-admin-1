@@ -17,7 +17,9 @@ export interface PermissionState {
 
 export const usePermissionStore = defineStore('permission', {
   state: (): PermissionState => ({
-    routers: [],
+    // 默认显示 constantRouterMap + asyncRouterMap 中的所有路由
+    // 这样静态路由模式下也能显示所有菜单
+    routers: cloneDeep(constantRouterMap).concat(cloneDeep(asyncRouterMap)),
     addRouters: [],
     isAddRouters: false,
     menuTabRouters: []
@@ -28,6 +30,10 @@ export const usePermissionStore = defineStore('permission', {
     },
     getAddRouters(): AppRouteRecordRaw[] {
       return flatMultiLevelRoutes(cloneDeep(this.addRouters))
+    },
+    // 用于 router.addRoute 的原始路由（保留 component）
+    getRawAddRouters(): AppRouteRecordRaw[] {
+      return cloneDeep(this.addRouters)
     },
     getIsAddRouters(): boolean {
       return this.isAddRouters
@@ -75,22 +81,19 @@ export const usePermissionStore = defineStore('permission', {
     },
     setMenuTabRouters(routers: AppRouteRecordRaw[]): void {
       this.menuTabRouters = routers
+    },
+    // 重置路由状态，强制重新加载
+    resetRouters(): void {
+      // 重置时合并 constantRouterMap 和 asyncRouterMap，确保所有菜单都显示
+      this.routers = cloneDeep(constantRouterMap).concat(cloneDeep(asyncRouterMap))
+      this.addRouters = []
+      this.isAddRouters = false
     }
   },
-  persist: [
-    {
-      pick: ['routers'],
-      storage: localStorage
-    },
-    {
-      pick: ['addRouters'],
-      storage: localStorage
-    },
-    {
-      pick: ['menuTabRouters'],
-      storage: localStorage
-    }
-  ]
+  persist: {
+    // 只持久化部分状态，routers 不持久化，确保每次都能重新加载
+    paths: ['isAddRouters', 'menuTabRouters']
+  }
 })
 
 export const usePermissionStoreWithOut = () => {

@@ -7,7 +7,8 @@
   "type": "module",
   "scripts": {
     "i": "npm install",
-    "dev": "vite --mode base",
+    "dev": "npx --yes kill-port 4000 && vite --mode base",
+    "dev:win": "powershell -Command \"Get-NetTCPConnection -LocalPort 4000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }\" && vite --mode base",
     "ts:check": "vue-tsc --noEmit --skipLibCheck",
     "build:pro": "vite build --mode pro",
     "build:gitee": "vite build --mode gitee",
@@ -58,7 +59,8 @@
     "vue-json-pretty": "^2.4.0",
     "vue-router": "^4.5.0",
     "vue-types": "^5.1.3",
-    "xgplayer": "^3.0.20"
+    "xgplayer": "^3.0.20",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",

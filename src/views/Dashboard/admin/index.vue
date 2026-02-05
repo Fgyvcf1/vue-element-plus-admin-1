@@ -57,7 +57,7 @@
     </el-row>
 
     <!-- 图表区域 -->
-    <el-row :gutter="24" style="margin-bottom: 24px;">
+    <el-row :gutter="24" style="margin-bottom: 24px">
       <el-col :xs="24" :lg="8">
         <el-card>
           <template #header>
@@ -65,10 +65,14 @@
               <span>人口结构</span>
             </div>
           </template>
-          <div class="chart-container" style="position: relative;">
-            <canvas ref="populationChart" width="280" height="280" />
+          <div class="chart-container" style="position: relative">
+            <canvas ref="populationChart" width="280" height="280"></canvas>
             <!-- 鼠标悬停提示 -->
-            <div v-if="populationTooltip.visible" class="chart-tooltip" :style="{ left: populationTooltip.x + 'px', top: populationTooltip.y + 'px' }">
+            <div
+              v-if="populationTooltip.visible"
+              class="chart-tooltip"
+              :style="{ left: populationTooltip.x + 'px', top: populationTooltip.y + 'px' }"
+            >
               <div class="tooltip-title">{{ populationTooltip.ageGroup }}</div>
               <div class="tooltip-value">人口数量: {{ populationTooltip.count }}人</div>
               <div class="tooltip-value">占比: {{ populationTooltip.percentage }}%</div>
@@ -84,7 +88,7 @@
             </div>
           </template>
           <div class="chart-container">
-            <canvas ref="matterChart" width="280" height="280" />
+            <canvas ref="matterChart" width="280" height="280"></canvas>
           </div>
         </el-card>
       </el-col>
@@ -96,7 +100,7 @@
             </div>
           </template>
           <div class="chart-container">
-            <canvas ref="disputeChart" width="280" height="280" />
+            <canvas ref="disputeChart" width="280" height="280"></canvas>
           </div>
         </el-card>
       </el-col>
@@ -104,7 +108,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, nextTick, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElRow, ElCol, ElCard, ElIcon } from 'element-plus'
@@ -144,63 +148,70 @@ const matterChart = ref(null)
 const disputeChart = ref(null)
 
 // 获取统计数据
-const getStats = () => {
+const getStats = async () => {
   // 获取居民总数（状态为正常的）
-  request.get('/residents', { params: { status: 'active' }}).then(response => {
-    if (response.code === 20000) {
-      stats.value.villagerTotal = response.totalPersons || 0
+  try {
+    const residentsRes = await request.get('/residents', { params: { status: 'active', pageNum: 1, pageSize: 1 } })
+    if (residentsRes.code === 20000) {
+      stats.value.villagerTotal = residentsRes.totalPersons || residentsRes.total || 0
     }
-  }).catch(error => {
+  } catch (error) {
     console.error('获取居民总数失败:', error)
-  })
-
-  // 获取低收入人数（状态为在享的）
-  request.get('/low-income-persons', { params: { status: 'active' }}).then(response => {
-    if (response.code === 20000) {
-      stats.value.lowIncomeTotal = response.data ? response.data.length : 0
-    }
-  }).catch(error => {
-    console.error('获取低收入人数失败:', error)
-  })
-
-  // 获取残疾人数
-  request.get('/disabled-persons').then(response => {
-    if (response.code === 20000) {
-      stats.value.disabledTotal = response.data ? response.data.length : 0
-    }
-  }).catch(error => {
-    console.error('获取残疾人数失败:', error)
-  })
-
-  // 获取当月通知总数
-  const now = new Date()
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-
-  const formatDate = (date) => {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
   }
 
-  const startDate = formatDate(startOfMonth)
-  const endDate = formatDate(endOfMonth)
-
-  request.get('/notification', { params: { start_date: startDate, end_date: endDate }}).then(response => {
-    if (response.code === 20000) {
-      stats.value.notificationTotal = response.data ? response.data.length : 0
+  // 获取低收入人数
+  try {
+    const lowIncomeRes = await request.get('/low-income-persons')
+    if (lowIncomeRes.code === 20000) {
+      stats.value.lowIncomeTotal = lowIncomeRes.total || (lowIncomeRes.data ? lowIncomeRes.data.length : 0)
     }
-  }).catch(error => {
+  } catch (error) {
+    console.error('获取低收入人数失败:', error)
+  }
+
+  // 获取残疾人数
+  try {
+    const disabledRes = await request.get('/disabled-persons')
+    if (disabledRes.code === 20000) {
+      stats.value.disabledTotal = disabledRes.total || (disabledRes.data ? disabledRes.data.length : 0)
+    }
+  } catch (error) {
+    console.error('获取残疾人数失败:', error)
+  }
+
+  // 获取当月通知总数
+  try {
+    const now = new Date()
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
+
+    const startDate = formatDate(startOfMonth)
+    const endDate = formatDate(endOfMonth)
+
+    const notificationRes = await request.get('/notification', {
+      params: { start_date: startDate, end_date: endDate }
+    })
+    if (notificationRes.code === 20000) {
+      stats.value.notificationTotal = notificationRes.total || (notificationRes.data ? notificationRes.data.length : 0)
+    }
+  } catch (error) {
     console.error('获取通知总数失败:', error)
-  })
+  }
 }
 
 // 获取人口结构数据
-const getPopulationStructure = () => {
+const getPopulationStructure = async () => {
   const customColors = ['#AFF5CD', '#4888E0', '#22E0AE', '#542E7F', '#55C3E6', '#C89BF5', '#313CE1', '#6B61E6']
 
-  request.get('/population-structure').then(response => {
+  try {
+    const response = await request.get('/population-structure')
     if (response.code === 20000 && response.data) {
       const filteredData = response.data.filter(item => item.count > 0)
 
@@ -216,20 +227,11 @@ const getPopulationStructure = () => {
         initPopulationChart()
       })
     }
-  }).catch(error => {
+  } catch (error) {
     console.error('获取人口结构统计失败:', error)
-    populationData.value = [
-      { value: 200, name: '0-6岁', color: '#AFF5CD' },
-      { value: 450, name: '7-17岁', color: '#4888E0' },
-      { value: 350, name: '18-59岁', color: '#22E0AE' },
-      { value: 234, name: '60-69岁', color: '#542E7F' },
-      { value: 100, name: '70-79岁', color: '#55C3E6' },
-      { value: 50, name: '80-89岁', color: '#C89BF5' }
-    ]
-    nextTick(() => {
-      initPopulationChart()
-    })
-  })
+    // 使用空数据
+    populationData.value = []
+  }
 }
 
 // 人口结构饼图
@@ -240,25 +242,19 @@ const initPopulationChart = () => {
 }
 
 // 获取调解档案状态统计
-const getMatterStats = () => {
-  request.get('/archives/status-stats').then(response => {
+const getMatterStats = async () => {
+  try {
+    const response = await request.get('/archives/status-stats')
     if (response.code === 20000 && response.data) {
       matterData.value = response.data
       nextTick(() => {
         initMatterChart()
       })
     }
-  }).catch(error => {
+  } catch (error) {
     console.error('获取调解状态统计失败:', error)
-    matterData.value = [
-      { name: '已完成', value: 0, color: '#67C23A' },
-      { name: '处理中', value: 0, color: '#E6A23C' },
-      { name: '待处理', value: 0, color: '#F56C6C' }
-    ]
-    nextTick(() => {
-      initMatterChart()
-    })
-  })
+    matterData.value = []
+  }
 }
 
 // 事项进度柱状图
@@ -269,28 +265,19 @@ const initMatterChart = () => {
 }
 
 // 获取调解档案月度统计
-const getMediationStats = () => {
-  request.get('/archives/mediation-monthly-stats').then(response => {
+const getMediationStats = async () => {
+  try {
+    const response = await request.get('/archives/mediation-monthly-stats')
     if (response.code === 20000 && response.data) {
       mediationData.value = response.data
       nextTick(() => {
         initDisputeChart()
       })
     }
-  }).catch(error => {
+  } catch (error) {
     console.error('获取调解月度统计失败:', error)
-    mediationData.value = [
-      { month: '1月', count: 0 },
-      { month: '2月', count: 0 },
-      { month: '3月', count: 0 },
-      { month: '4月', count: 0 },
-      { month: '5月', count: 0 },
-      { month: '6月', count: 0 }
-    ]
-    nextTick(() => {
-      initDisputeChart()
-    })
-  })
+    mediationData.value = []
+  }
 }
 
 // 纠纷处理趋势图

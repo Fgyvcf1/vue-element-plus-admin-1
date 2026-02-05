@@ -1,0 +1,89 @@
+import request from '@/axios'
+import type { ResidentListParams, ResidentListResult, ResidentDetail } from './types'
+
+// 获取居民列表
+export const getResidentList = (params: ResidentListParams) => {
+  return request.get<ResidentListResult>({
+    url: '/residents',
+    params
+  })
+}
+
+// 获取居民详情
+export const getResidentDetail = (id: string) => {
+  return request.get<ResidentDetail>({
+    url: `/residents/${id}`
+  })
+}
+
+// 导出居民信息
+export const exportResidents = (params: Partial<ResidentListParams>) => {
+  return request.get<Blob>({
+    url: '/residents/export',
+    params,
+    responseType: 'blob'
+  })
+}
+
+// 新增居民
+export const addResident = (data: Partial<ResidentDetail>) => {
+  return request.post({
+    url: '/residents',
+    data
+  })
+}
+
+// 更新居民
+export const updateResident = (id: string, data: Partial<ResidentDetail>) => {
+  return request.put({
+    url: `/residents/${id}`,
+    data
+  })
+}
+
+// 删除居民
+export const deleteResident = (id: string) => {
+  return request.delete({
+    url: `/residents/${id}`
+  })
+}
+
+// 批量删除居民
+export const batchDeleteResidents = (ids: string[]) => {
+  return request.post({
+    url: '/residents/batch-delete',
+    data: { ids }
+  })
+}
+
+// 获取村组列表
+export const getVillageGroups = () => {
+  return request.get<{ label: string; value: string }[]>({
+    url: '/dictionaries',
+    params: { category: 'village_group' }
+  })
+}
+
+// 获取搜索建议
+export const getSearchSuggestions = (params: { keyword: string; type: string }) => {
+  return request.get<{ value: string }[]>({
+    url: '/search-suggestions',
+    params
+  })
+}
+
+// 导入居民数据
+export const importResidents = (data: { headers: string[]; data: any[][]; mapping: { excelField: string; dbField: string }[] }) => {
+  return request.post({
+    url: '/import-residents',
+    data
+  })
+}
+
+// 新增户主
+export const addHousehold = (data: any) => {
+  return request.post({
+    url: '/households',
+    data
+  })
+}

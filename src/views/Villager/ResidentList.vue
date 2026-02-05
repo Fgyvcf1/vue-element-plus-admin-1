@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { ref, reactive, computed, onMounted, onActivated, onBeforeUnmount, nextTick, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -272,14 +272,14 @@ const crudSchemas = reactive<CrudSchema[]>([
         default: (data: any) => {
           const row = data.row as ResidentItem
           return (
-            <>
+            <div>
               <BaseButton type="primary" size="small" onClick={() => handleRowClick(row)}>
                 查看
               </BaseButton>
               <BaseButton type="danger" size="small" onClick={() => handleDelete(row)}>
                 删除
               </BaseButton>
-            </>
+            </div>
           )
         }
       }

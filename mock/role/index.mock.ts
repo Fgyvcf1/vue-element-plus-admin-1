@@ -19,7 +19,7 @@ const adminList = [
       {
         path: 'analysis',
         component: 'views/Dashboard/Analysis',
-        name: 'Analysis',
+        name: 'DashboardAnalysis',
         meta: {
           title: 'router.analysis',
           noCache: true,
@@ -29,7 +29,7 @@ const adminList = [
       {
         path: 'workplace',
         component: 'views/Dashboard/Workplace',
-        name: 'Workplace',
+        name: 'DashboardWorkplace',
         meta: {
           title: 'router.workplace',
           noCache: true,
@@ -777,7 +777,7 @@ const menus = [
         {
           path: 'analysis',
           component: 'views/Dashboard/Analysis',
-          name: 'Analysis',
+          name: 'DashboardAnalysis',
           status: Mock.Random.integer(0, 1),
           id: 2,
           meta: {
@@ -788,7 +788,7 @@ const menus = [
         {
           path: 'workplace',
           component: 'views/Dashboard/Workplace',
-          name: 'Workplace',
+          name: 'DashboardWorkplace',
           status: Mock.Random.integer(0, 1),
           id: 3,
           meta: {
@@ -1005,7 +1005,7 @@ const menus = [
         {
           path: 'analysis',
           component: 'views/Dashboard/Analysis',
-          name: 'Analysis',
+          name: 'DashboardAnalysis',
           status: Mock.Random.integer(0, 1),
           id: 2,
           meta: {
@@ -1016,7 +1016,7 @@ const menus = [
         {
           path: 'workplace',
           component: 'views/Dashboard/Workplace',
-          name: 'Workplace',
+          name: 'DashboardWorkplace',
           status: Mock.Random.integer(0, 1),
           id: 3,
           meta: {

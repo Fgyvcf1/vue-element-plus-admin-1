@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人民调解协议书</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "SimSun", "宋体", serif;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #000;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .archive-id {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #000;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            min-width: 100px;
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .agreement-content {
+            text-indent: 2em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+        
+        .signatures {
+            margin-top: 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            text-align: center;
+        }
+        
+        .signature-item {
+            margin-top: 40px;
+        }
+        
+        .signature-title {
+            font-weight: bold;
+            margin-bottom: 60px;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #000;
+            margin-bottom: 10px;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">人民调解协议书</div>
+        <div class="archive-id">档案编号：{{archive_id}}</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">一、协议基本信息</div>
+        <div class="info-row">
+            <span class="info-label">协议日期：</span>
+            <span class="info-content">{{agreement_date}}</span>
+        </div>
+        {{#if performance_period}}
+        <div class="info-row">
+            <span class="info-label">履行期限：</span>
+            <span class="info-content">{{performance_period}}</span>
+        </div>
+        {{/if}}
+    </div>
+    
+    <div class="section">
+        <div class="section-title">二、协议内容</div>
+        <div class="agreement-content">
+            {{agreement_content}}
+        </div>
+    </div>
+    
+    {{#if breach_liability}}
+    <div class="section">
+        <div class="section-title">三、违约责任</div>
+        <div class="agreement-content">
+            {{breach_liability}}
+        </div>
+    </div>
+    {{/if}}
+    
+    <div class="signatures">
+        <div class="signature-item">
+            <div class="signature-title">甲方（当事人）</div>
+            <div class="signature-line">{{party_a_sign}}</div>
+        </div>
+        <div class="signature-item">
+            <div class="signature-title">乙方（当事人）</div>
+            <div class="signature-line">{{party_b_sign}}</div>
+        </div>
+        <div class="signature-item">
+            <div class="signature-title">人民调解员</div>
+            <div class="signature-line">{{mediator_sign}}</div>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 60px; font-size: 14px; color: #666;">
+        {{agreement_date}}
+    </div>
+</body>
+</html>

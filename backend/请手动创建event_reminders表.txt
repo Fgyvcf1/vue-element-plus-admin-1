@@ -1,0 +1,59 @@
+========================================
+请手动创建 event_reminders 表
+========================================
+
+由于环境限制，无法自动执行数据库操作，请按以下步骤手动创建表：
+
+步骤1：停止后端服务
+- 如果后端正在运行，请先停止它（关闭命令窗口或按 Ctrl+C）
+
+步骤2：使用数据库工具创建表
+推荐使用以下任一工具：
+- DB Browser for SQLite (免费开源工具)
+- SQLiteStudio
+- DBeaver
+
+步骤3：打开数据库文件
+- 打开工具
+- 文件 -> 打开数据库
+- 选择：d:\vue-element-admin-master\backend\app.db
+
+步骤4：执行 SQL
+在 SQL 编辑器中执行以下 SQL：
+
+CREATE TABLE IF NOT EXISTS event_reminders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  event_type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  event_date TEXT NOT NULL,
+  event_time TEXT,
+  location TEXT,
+  description TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+步骤5：插入示例数据（可选）
+
+INSERT INTO event_reminders (event_type, title, event_date, event_time, location, description) VALUES
+  ('meeting', '村委会例会', '2026-01-20', '14:00', '村委会会议室', '每月例行会议'),
+  ('inspection', '安全生产检查', '2026-01-25', '09:00', '全村', '季度安全生产大检查'),
+  ('training', '消防知识培训', '2026-01-30', '15:00', '村委会广场', '组织村民参加消防知识培训');
+
+步骤6：保存并关闭数据库工具
+
+步骤7：重启后端服务
+cd d:\vue-element-admin-master\backend
+node app.js
+
+步骤8：测试功能
+- 打开浏览器
+- 进入：通知管理 -> 事件提醒
+- 应该能看到示例数据
+- 可以点击"新增事件提醒"创建新事件
+
+========================================
+下载 DB Browser for SQLite:
+https://sqlitebrowser.org/dl/
+========================================

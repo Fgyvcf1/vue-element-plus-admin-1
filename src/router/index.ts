@@ -6,16 +6,21 @@ import { getParentLayout } from '@/utils/routerHelper'
 import { useI18n } from '@/hooks/web/useI18n'
 import { NO_RESET_WHITE_LIST } from '@/constants'
 
+// 导入模块路由
+import residentRouter from './modules/resident'
+
 const { t } = useI18n()
 
 export const constantRouterMap: AppRouteRecordRaw[] = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/dashboard/index',
     name: 'Root',
     meta: {
-      hidden: true
+      hidden: true,
+      title: '首页',
+      affix: true
     }
   },
   {
@@ -67,7 +72,9 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
-  }
+  },
+  // 合并居民模块路由（无需权限，直接显示）
+  ...residentRouter
 ]
 
 export const asyncRouterMap: AppRouteRecordRaw[] = [
@@ -86,7 +93,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         component: () => import('@/views/Dashboard/index.vue'),
         name: 'DashboardIndex',
         meta: {
-          title: '仪表盘',
+          title: '首页',
           noCache: true,
           affix: true
         }

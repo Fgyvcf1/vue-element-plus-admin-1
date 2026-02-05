@@ -142,12 +142,13 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     },
     server: {
       port: 4000,
+      strictPort: true, // 严格模式，端口被占用时报错而不是自动切换
       proxy: {
         // 选项写法
         '/api': {
-          target: 'http://127.0.0.1:8000',
+          target: 'http://localhost:3002',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
+          rewrite: (path) => path.replace(/^\/api/, '/api')
         }
       },
       hmr: {
@@ -176,7 +177,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         'dayjs',
         'cropperjs',
         '@element-plus/icons-vue'
-      ]
+      ],
+      exclude: ['backend']
     }
   }
 }
