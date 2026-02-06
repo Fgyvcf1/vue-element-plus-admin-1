@@ -83,10 +83,10 @@ export const useUserStore = defineStore('user', {
 
       // 1. 先清空用户信息（确保 tagsViewStore.delAllViews 能正确清空非固定标签）
       this.setUserInfo(undefined)
-      
+
       // 2. 清除所有标签视图
       tagsViewStore.delAllViews()
-      
+
       // 3. 清除其他状态
       this.setToken('')
       this.setRoleRouters([])

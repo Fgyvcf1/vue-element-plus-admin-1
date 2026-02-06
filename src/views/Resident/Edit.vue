@@ -4,7 +4,7 @@
       <template #header>
         <span>编辑居民信息</span>
       </template>
-      
+
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-row :gutter="20">
           <el-col :span="8">
@@ -22,7 +22,12 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="身份证号" prop="idCard">
-              <el-input v-model="form.idCard" placeholder="请输入身份证号" maxlength="18" disabled />
+              <el-input
+                v-model="form.idCard"
+                placeholder="请输入身份证号"
+                maxlength="18"
+                disabled
+              />
             </el-form-item>
           </el-col>
         </el-row>
@@ -41,7 +46,12 @@
           <el-col :span="8">
             <el-form-item label="村组" prop="villageGroup">
               <el-select v-model="form.villageGroup" placeholder="请选择村组" style="width: 100%">
-                <el-option v-for="item in villageGroupOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-option
+                  v-for="item in villageGroupOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -55,7 +65,12 @@
           <el-col :span="8">
             <el-form-item label="民族" prop="nation">
               <el-select v-model="form.nation" placeholder="请选择民族" style="width: 100%">
-                <el-option v-for="item in ethnicityOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-option
+                  v-for="item in ethnicityOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -154,7 +169,7 @@ const rules: FormRules = {
 // 获取居民详情
 const fetchDetail = async () => {
   if (!residentId) return
-  
+
   try {
     const res = await getResidentDetail(residentId)
     if (res.data) {

@@ -151,7 +151,9 @@ const disputeChart = ref(null)
 const getStats = async () => {
   // 获取居民总数（状态为正常的）
   try {
-    const residentsRes = await request.get('/residents', { params: { status: 'active', pageNum: 1, pageSize: 1 } })
+    const residentsRes = await request.get('/residents', {
+      params: { status: 'active', pageNum: 1, pageSize: 1 }
+    })
     if (residentsRes.code === 20000) {
       stats.value.villagerTotal = residentsRes.totalPersons || residentsRes.total || 0
     }
@@ -163,7 +165,8 @@ const getStats = async () => {
   try {
     const lowIncomeRes = await request.get('/low-income-persons')
     if (lowIncomeRes.code === 20000) {
-      stats.value.lowIncomeTotal = lowIncomeRes.total || (lowIncomeRes.data ? lowIncomeRes.data.length : 0)
+      stats.value.lowIncomeTotal =
+        lowIncomeRes.total || (lowIncomeRes.data ? lowIncomeRes.data.length : 0)
     }
   } catch (error) {
     console.error('获取低收入人数失败:', error)
@@ -173,7 +176,8 @@ const getStats = async () => {
   try {
     const disabledRes = await request.get('/disabled-persons')
     if (disabledRes.code === 20000) {
-      stats.value.disabledTotal = disabledRes.total || (disabledRes.data ? disabledRes.data.length : 0)
+      stats.value.disabledTotal =
+        disabledRes.total || (disabledRes.data ? disabledRes.data.length : 0)
     }
   } catch (error) {
     console.error('获取残疾人数失败:', error)
@@ -199,7 +203,8 @@ const getStats = async () => {
       params: { start_date: startDate, end_date: endDate }
     })
     if (notificationRes.code === 20000) {
-      stats.value.notificationTotal = notificationRes.total || (notificationRes.data ? notificationRes.data.length : 0)
+      stats.value.notificationTotal =
+        notificationRes.total || (notificationRes.data ? notificationRes.data.length : 0)
     }
   } catch (error) {
     console.error('获取通知总数失败:', error)
@@ -208,12 +213,21 @@ const getStats = async () => {
 
 // 获取人口结构数据
 const getPopulationStructure = async () => {
-  const customColors = ['#AFF5CD', '#4888E0', '#22E0AE', '#542E7F', '#55C3E6', '#C89BF5', '#313CE1', '#6B61E6']
+  const customColors = [
+    '#AFF5CD',
+    '#4888E0',
+    '#22E0AE',
+    '#542E7F',
+    '#55C3E6',
+    '#C89BF5',
+    '#313CE1',
+    '#6B61E6'
+  ]
 
   try {
     const response = await request.get('/population-structure')
     if (response.code === 20000 && response.data) {
-      const filteredData = response.data.filter(item => item.count > 0)
+      const filteredData = response.data.filter((item) => item.count > 0)
 
       populationData.value = filteredData.map((item, index) => {
         const color = customColors[index % customColors.length]
@@ -295,7 +309,7 @@ const drawPieChart = (ctx, data, centerX, centerY, radius) => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   data.forEach((item, index) => {
-    const sliceAngle = 2 * Math.PI * item.value / total
+    const sliceAngle = (2 * Math.PI * item.value) / total
 
     ctx.beginPath()
     ctx.moveTo(centerX, centerY)
@@ -332,9 +346,7 @@ const drawPieChart = (ctx, data, centerX, centerY, radius) => {
       let angle = Math.atan2(dy, dx)
       if (angle < 0) angle += 2 * Math.PI
 
-      const hoveredItem = data.find(item =>
-        angle >= item._startAngle && angle < item._endAngle
-      )
+      const hoveredItem = data.find((item) => angle >= item._startAngle && angle < item._endAngle)
 
       if (hoveredItem) {
         const percentage = ((hoveredItem.value / total) * 100).toFixed(2)
@@ -385,7 +397,7 @@ const drawPieChart = (ctx, data, centerX, centerY, radius) => {
 const drawBarChart = (ctx, data, width, height) => {
   const padding = 40
   const barWidth = (width - 2 * padding) / data.length
-  const maxValue = Math.max(...data.map(item => item.value))
+  const maxValue = Math.max(...data.map((item) => item.value))
   const scale = (height - 2 * padding) / maxValue
 
   ctx.beginPath()
@@ -416,7 +428,7 @@ const drawLineChart = (ctx, data, width, height) => {
   const padding = 40
   const pointRadius = 4
   const stepX = (width - 2 * padding) / (data.length - 1)
-  const maxValue = Math.max(...data.map(item => item.count))
+  const maxValue = Math.max(...data.map((item) => item.count))
   const scale = (height - 2 * padding) / maxValue
 
   ctx.beginPath()

@@ -9,6 +9,9 @@ export const getResidentList = (params: ResidentListParams) => {
   })
 }
 
+// 别名 - 兼容旧代码
+export const getResidents = getResidentList
+
 // 获取居民详情
 export const getResidentDetail = (id: string) => {
   return request.get<ResidentDetail>({
@@ -73,7 +76,11 @@ export const getSearchSuggestions = (params: { keyword: string; type: string }) 
 }
 
 // 导入居民数据
-export const importResidents = (data: { headers: string[]; data: any[][]; mapping: { excelField: string; dbField: string }[] }) => {
+export const importResidents = (data: {
+  headers: string[]
+  data: any[][]
+  mapping: { excelField: string; dbField: string }[]
+}) => {
   return request.post({
     url: '/import-residents',
     data

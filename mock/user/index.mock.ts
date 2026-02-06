@@ -28,7 +28,7 @@ const List: {
 export default [
   // 列表接口
   {
-    url: '/mock/user/list',
+    url: '/api/mock/user/list',
     method: 'get',
     response: ({ query }) => {
       const { username, pageIndex, pageSize } = query
@@ -52,7 +52,7 @@ export default [
   },
   // 登录接口
   {
-    url: '/mock/user/login',
+    url: '/api/mock/user/login',
     method: 'post',
     timeout,
     response: ({ body }) => {
@@ -77,7 +77,7 @@ export default [
   },
   // 退出接口
   {
-    url: '/mock/user/loginOut',
+    url: '/api/mock/user/loginOut',
     method: 'get',
     timeout,
     response: () => {

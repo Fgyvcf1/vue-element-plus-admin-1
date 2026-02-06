@@ -144,11 +144,17 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       port: 4000,
       strictPort: true, // 严格模式，端口被占用时报错而不是自动切换
       proxy: {
-        // 选项写法
+        // 选项写法 - 排除mock路径
         '/api': {
           target: 'http://localhost:3002',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '/api')
+          rewrite: (path) => path.replace(/^\/api/, '/api'),
+          bypass: (req) => {
+            // 如果请求是mock路径，不代理，让vite-plugin-mock处理
+            if (req.url?.startsWith('/api/mock')) {
+              return req.url
+            }
+          }
         }
       },
       hmr: {

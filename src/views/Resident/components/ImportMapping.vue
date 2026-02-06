@@ -46,9 +46,19 @@
               <el-select v-model="row.dbField" placeholder="请选择" size="small">
                 <el-option label="- 跳过此字段 -" value="" />
                 <el-option label="=== 户主表字段 ===" value="" disabled />
-                <el-option v-for="field in householdFields" :key="field.value" :label="field.label" :value="field.value" />
+                <el-option
+                  v-for="field in householdFields"
+                  :key="field.value"
+                  :label="field.label"
+                  :value="field.value"
+                />
                 <el-option label="=== 居民表字段 ===" value="" disabled />
-                <el-option v-for="field in residentFields" :key="field.value" :label="field.label" :value="field.value" />
+                <el-option
+                  v-for="field in residentFields"
+                  :key="field.value"
+                  :label="field.label"
+                  :value="field.value"
+                />
               </el-select>
             </template>
           </el-table-column>
@@ -71,7 +81,12 @@
           </div>
         </template>
         <el-table :data="previewData" border style="width: 100%">
-          <el-table-column v-for="column in previewColumns" :key="column.prop" :prop="column.prop" :label="column.label" />
+          <el-table-column
+            v-for="column in previewColumns"
+            :key="column.prop"
+            :prop="column.prop"
+            :label="column.label"
+          />
         </el-table>
       </el-card>
       <div style="margin-top: 20px; text-align: right">
@@ -83,21 +98,31 @@
     <!-- 步骤4: 导入完成 -->
     <div v-if="activeStep === 3" style="text-align: center; padding: 40px">
       <div v-if="importSuccess">
-        <el-icon style="font-size: 64px; color: #67C23A; margin-bottom: 20px"><circle-check /></el-icon>
+        <el-icon style="font-size: 64px; color: #67c23a; margin-bottom: 20px"
+          ><circle-check
+        /></el-icon>
         <h2 style="margin: 0 0 10px 0">导入成功</h2>
         <p style="color: #909399; margin: 0 0 30px 0">数据已成功导入系统</p>
         <el-button type="primary" @click="$emit('close')">关闭</el-button>
         <el-button @click="reset">再次导入</el-button>
       </div>
       <div v-else>
-        <el-icon style="font-size: 64px; color: #F56C6C; margin-bottom: 20px"><circle-close /></el-icon>
+        <el-icon style="font-size: 64px; color: #f56c6c; margin-bottom: 20px"
+          ><circle-close
+        /></el-icon>
         <h2 style="margin: 0 0 10px 0">导入失败</h2>
         <p style="color: #909399; margin: 0 0 30px 0">数据导入过程中出现错误</p>
         <el-button type="primary" @click="$emit('close')">关闭</el-button>
         <el-button @click="reset">重新导入</el-button>
       </div>
       <div v-if="importError" style="margin-top: 20px; text-align: left">
-        <el-alert :title="'错误详情'" :description="importError" type="error" show-icon :closable="false" />
+        <el-alert
+          :title="'错误详情'"
+          :description="importError"
+          type="error"
+          show-icon
+          :closable="false"
+        />
       </div>
     </div>
   </div>
@@ -105,7 +130,21 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ElMessage, ElSteps, ElStep, ElUpload, ElButton, ElCard, ElTable, ElTableColumn, ElSelect, ElOption, ElTag, ElIcon, ElAlert } from 'element-plus'
+import {
+  ElMessage,
+  ElSteps,
+  ElStep,
+  ElUpload,
+  ElButton,
+  ElCard,
+  ElTable,
+  ElTableColumn,
+  ElSelect,
+  ElOption,
+  ElTag,
+  ElIcon,
+  ElAlert
+} from 'element-plus'
 import { UploadFilled, CircleCheck, CircleClose } from '@element-plus/icons-vue'
 import * as XLSX from 'xlsx'
 import { importResidents } from '@/api/resident'
@@ -274,34 +313,34 @@ const parseExcel = () => {
 // 获取推荐映射
 const getRecommendedMapping = (excelField: string) => {
   const mapping: Record<string, string> = {
-    '姓名': 'name',
-    '户主姓名': 'household_head_name',
-    '与户主关系': 'relationship_to_head',
-    '性别': 'gender',
-    '民族': 'ethnicity',
-    '组别': 'village_group',
-    '户籍详细地址': 'Home_address',
-    '出生日期': 'date_of_birth',
-    '身份证号码': 'id_card',
-    '联系方式': 'phone_number',
-    '文化程度': 'education_level',
-    '婚姻状况': 'marital_status',
-    '兵役状况': 'military_service',
-    '政治面貌': 'political_status',
-    '开户银行': 'bank_name',
-    '银行账号': 'bank_card',
-    '股权数量': 'equity_shares',
-    '住址': 'Home_address',
-    '地址': 'Home_address',
-    '电话': 'phone_number',
-    '联系电话': 'phone_number'
+    姓名: 'name',
+    户主姓名: 'household_head_name',
+    与户主关系: 'relationship_to_head',
+    性别: 'gender',
+    民族: 'ethnicity',
+    组别: 'village_group',
+    户籍详细地址: 'Home_address',
+    出生日期: 'date_of_birth',
+    身份证号码: 'id_card',
+    联系方式: 'phone_number',
+    文化程度: 'education_level',
+    婚姻状况: 'marital_status',
+    兵役状况: 'military_service',
+    政治面貌: 'political_status',
+    开户银行: 'bank_name',
+    银行账号: 'bank_card',
+    股权数量: 'equity_shares',
+    住址: 'Home_address',
+    地址: 'Home_address',
+    电话: 'phone_number',
+    联系电话: 'phone_number'
   }
   return mapping[excelField] || ''
 }
 
 // 自动映射
 const autoMap = () => {
-  mappingList.value = mappingList.value.map(item => ({
+  mappingList.value = mappingList.value.map((item) => ({
     ...item,
     dbField: getRecommendedMapping(item.excelField)
   }))
@@ -338,33 +377,33 @@ const generatePreviewData = () => {
 // 获取字段标签
 const getFieldLabel = (dbField: string) => {
   const fieldMap: Record<string, string> = {
-    'household_head_name': '户主姓名',
-    'household_village_group': '组别(户主)',
-    'household_address': '家庭地址',
-    'household_phone_number': '联系电话(户主)',
-    'household_ethnicity': '民族(户主)',
-    'household_gender': '性别(户主)',
-    'household_head_id_card': '户主身份证号',
-    'householdType': '户口类型',
-    'housingType': '住房类型',
-    'name': '姓名',
-    'relationship_to_head': '与户主关系',
-    'gender': '性别',
-    'ethnicity': '民族',
-    'date_of_birth': '出生日期',
-    'id_card': '身份证号码',
-    'village_group': '组别',
-    'phone_number': '联系电话',
-    'education_level': '文化程度',
-    'marital_status': '婚姻状况',
-    'military_service': '兵役状况',
-    'political_status': '政治面貌',
-    'bank_name': '开户银行',
-    'bank_card': '银行账号',
-    'equity_shares': '股权数量',
-    'occupation': '职业',
-    'health_status': '健康状况',
-    'Home_address': '家庭地址'
+    household_head_name: '户主姓名',
+    household_village_group: '组别(户主)',
+    household_address: '家庭地址',
+    household_phone_number: '联系电话(户主)',
+    household_ethnicity: '民族(户主)',
+    household_gender: '性别(户主)',
+    household_head_id_card: '户主身份证号',
+    householdType: '户口类型',
+    housingType: '住房类型',
+    name: '姓名',
+    relationship_to_head: '与户主关系',
+    gender: '性别',
+    ethnicity: '民族',
+    date_of_birth: '出生日期',
+    id_card: '身份证号码',
+    village_group: '组别',
+    phone_number: '联系电话',
+    education_level: '文化程度',
+    marital_status: '婚姻状况',
+    military_service: '兵役状况',
+    political_status: '政治面貌',
+    bank_name: '开户银行',
+    bank_card: '银行账号',
+    equity_shares: '股权数量',
+    occupation: '职业',
+    health_status: '健康状况',
+    Home_address: '家庭地址'
   }
   return fieldMap[dbField] || dbField
 }
@@ -379,7 +418,7 @@ const importData = async () => {
     const importData = {
       headers: headerRow.value,
       data: excelData.value,
-      mapping: mappingList.value.map(item => ({
+      mapping: mappingList.value.map((item) => ({
         excelField: item.excelField,
         dbField: item.dbField
       }))

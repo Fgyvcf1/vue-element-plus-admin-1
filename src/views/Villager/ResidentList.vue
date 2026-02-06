@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import { ref, reactive, computed, onMounted, onActivated, onBeforeUnmount, nextTick, h } from 'vue'
+import { ref, reactive, computed, onMounted, onActivated, onBeforeUnmount, nextTick, h, unref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
@@ -13,6 +13,7 @@ import { getResidents, getSearchSuggestions } from '@/api/resident'
 import { useI18n } from '@/hooks/web/useI18n'
 import { export_json_to_excel } from '@/utils/export2excel'
 import type { ResidentItem } from '@/api/resident/types'
+import ResidentDetailDialog from './components/ResidentDetailDialog.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -61,13 +62,13 @@ const { tableRegister, tableState, tableMethods } = useTable({
     if (!params.isHouseholdHead) {
       delete (params as any).isHouseholdHead
     }
-    
+
     const res = await getResidents(params)
-    
+
     // 处理响应数据
     let residents: ResidentItem[] = []
     let total = 0
-    
+
     if (res && res.data) {
       if (Array.isArray(res.data.data)) {
         residents = res.data.data.map((item: any) => ({
@@ -75,20 +76,22 @@ const { tableRegister, tableState, tableMethods } = useTable({
           householdHeadName: item.household_head_name || item.householdHeadName,
           relationshipToHead: item.relationship_to_head || item.relationshipToHead,
           phoneNumber: item.phone_number || item.phoneNumber,
-          equityShares: item.equity_shares !== undefined ? item.equity_shares : (item.equityShares || 0),
+          equityShares:
+            item.equity_shares !== undefined ? item.equity_shares : item.equityShares || 0,
           relationship_to_head: item.relationship_to_head || item.relationshipToHead,
           phone_number: item.phone_number || item.phoneNumber,
-          equity_shares: item.equity_shares !== undefined ? item.equity_shares : (item.equityShares || 0)
+          equity_shares:
+            item.equity_shares !== undefined ? item.equity_shares : item.equityShares || 0
         }))
       }
-      
+
       total = parseInt(res.data.total) || 0
       totalHouseholds.value = parseInt(res.data.totalHouseholds) || 0
       totalPersons.value = parseInt(res.data.totalPersons) || total
     }
-    
+
     showResult.value = true
-    
+
     return {
       list: residents,
       total: total
@@ -98,6 +101,11 @@ const { tableRegister, tableState, tableMethods } = useTable({
 
 const { total, loading, dataList, pageSize, currentPage } = tableState
 const { getList } = tableMethods
+
+// 刷新列表方法
+const refreshList = () => {
+  getList()
+}
 
 // CRUD Schema
 const crudSchemas = reactive<CrudSchema[]>([
@@ -295,7 +303,7 @@ const fetchResidentNameSuggestions = async (queryString: string, callback: Funct
     callback([])
     return
   }
-  
+
   try {
     const res = await getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
     if (res && res.code === 20000) {
@@ -314,7 +322,7 @@ const fetchHouseholdHeadNameSuggestions = async (queryString: string, callback: 
     callback([])
     return
   }
-  
+
   try {
     const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
     if (res && res.code === 20000) {
@@ -376,7 +384,7 @@ const handleDelete = (row: ResidentItem) => {
 const handleRowContextMenu = (row: ResidentItem, column: any, event: MouseEvent) => {
   event.preventDefault()
   event.stopPropagation()
-  
+
   selectedRow.value = row
   contextMenuPosition.x = event.clientX
   contextMenuPosition.y = event.clientY
@@ -418,10 +426,24 @@ const handleExport = () => {
     ElMessage.warning('没有数据可导出')
     return
   }
-  
-  const headers = ['序号', '居民姓名', '身份证号', '性别', '户主姓名', '与户主关系', '出生日期', '年龄', '村组', '家庭地址', '联系电话', '银行帐号', '状态']
+
+  const headers = [
+    '序号',
+    '居民姓名',
+    '身份证号',
+    '性别',
+    '户主姓名',
+    '与户主关系',
+    '出生日期',
+    '年龄',
+    '村组',
+    '家庭地址',
+    '联系电话',
+    '银行帐号',
+    '状态'
+  ]
   const textColumns = [2, 11] // 身份证号、银行账号设置为文本格式
-  
+
   const data = dataList.value.map((item, index) => [
     index + 1,
     item.name || '',
@@ -435,9 +457,15 @@ const handleExport = () => {
     item.address || '',
     item.phoneNumber || item.phone_number || '',
     item.bankCard || '',
-    item.status === 'active' ? '正常' : item.status === 'migrated_out' ? '迁出' : item.status === 'deceased' ? '死亡' : item.status || ''
+    item.status === 'active'
+      ? '正常'
+      : item.status === 'migrated_out'
+        ? '迁出'
+        : item.status === 'deceased'
+          ? '死亡'
+          : item.status || ''
   ])
-  
+
   export_json_to_excel({
     header: headers,
     data: data,
@@ -446,7 +474,7 @@ const handleExport = () => {
     autoWidth: true,
     bookType: 'xlsx'
   })
-  
+
   ElMessage.success('导出成功')
 }
 
@@ -459,7 +487,7 @@ const loadVillageGroups = async () => {
     //   label: item.value,
     //   value: item.value
     // }))
-    
+
     // 使用默认值
     villageGroups.value = [
       { label: '一组', value: '一组' },
@@ -483,14 +511,14 @@ const generateBirthYears = () => {
   const currentYear = new Date().getFullYear()
   const startYear = currentYear - 100
   const years = []
-  
+
   for (let year = startYear; year <= currentYear; year++) {
     years.push({
       label: year.toString(),
       value: year.toString()
     })
   }
-  
+
   birthYears.value = years
 }
 
@@ -514,24 +542,20 @@ onBeforeUnmount(() => {
 
 <template>
   <ContentWrap>
-    <Search
-      :schema="allSchemas.searchSchema"
-      @reset="resetQuery"
-      @search="setSearchParams"
-    />
-    
+    <Search :schema="allSchemas.searchSchema" @reset="resetQuery" @search="setSearchParams" />
+
     <!-- 查询结果统计 -->
     <div v-if="showResult" class="result-summary">
       查询结果：{{ totalHouseholds }}户{{ totalPersons }}人
     </div>
-    
+
     <!-- 操作按钮 -->
     <div class="mb-10px">
       <BaseButton type="primary" @click="getList">搜索</BaseButton>
       <BaseButton @click="resetQuery">重置</BaseButton>
       <BaseButton type="success" @click="handleExport">导出</BaseButton>
     </div>
-    
+
     <!-- 表格 -->
     <Table
       v-model:current-page="currentPage"
@@ -544,28 +568,15 @@ onBeforeUnmount(() => {
       @row-click="handleRowClick"
       @row-contextmenu="handleRowContextMenu"
     />
-    
+
     <!-- 居民详情模态框 -->
-    <Dialog v-model="dialogVisible" title="居民详情" width="800px">
-      <div v-if="selectedResident" class="resident-detail">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="姓名">{{ selectedResident.name }}</el-descriptions-item>
-          <el-descriptions-item label="身份证号">{{ selectedResident.idCard }}</el-descriptions-item>
-          <el-descriptions-item label="性别">{{ selectedResident.gender }}</el-descriptions-item>
-          <el-descriptions-item label="出生日期">{{ selectedResident.dateOfBirth }}</el-descriptions-item>
-          <el-descriptions-item label="年龄">{{ selectedResident.age }}</el-descriptions-item>
-          <el-descriptions-item label="村组">{{ selectedResident.villageGroup }}</el-descriptions-item>
-          <el-descriptions-item label="户主姓名">{{ selectedResident.householdHeadName || selectedResident.household_head_name }}</el-descriptions-item>
-          <el-descriptions-item label="与户主关系">{{ selectedResident.relationship_to_head || selectedResident.relationshipToHead }}</el-descriptions-item>
-          <el-descriptions-item label="家庭地址" :span="2">{{ selectedResident.address }}</el-descriptions-item>
-          <el-descriptions-item label="联系电话">{{ selectedResident.phoneNumber || selectedResident.phone_number }}</el-descriptions-item>
-          <el-descriptions-item label="银行账号">{{ selectedResident.bankCard }}</el-descriptions-item>
-          <el-descriptions-item label="股权数量">{{ selectedResident.equity_shares || selectedResident.equityShares || 0 }}</el-descriptions-item>
-          <el-descriptions-item label="状态">{{ selectedResident.status === 'active' ? '正常' : selectedResident.status === 'migrated_out' ? '迁出' : '死亡' }}</el-descriptions-item>
-        </el-descriptions>
-      </div>
-    </Dialog>
-    
+    <ResidentDetailDialog
+      v-model="dialogVisible"
+      :resident-id="selectedResident?.id || null"
+      :household-id="selectedResident?.householdId || selectedResident?.household_id || null"
+      @refresh-list="refreshList"
+    />
+
     <!-- 右键菜单 -->
     <div
       v-if="contextMenuVisible"

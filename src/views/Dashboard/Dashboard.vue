@@ -142,13 +142,16 @@ const handleMatter = (id: number) => {
 const getStats = async () => {
   try {
     // 获取居民总数（状态为正常的）
-    const villagerRes = await request.get({ url: '/residents', params: { status: 'active' }})
+    const villagerRes = await request.get({ url: '/residents', params: { status: 'active' } })
     if (villagerRes.code === 20000) {
       stats.villagerTotal = villagerRes.totalPersons || 0
     }
 
     // 获取低收入人数（状态为在享的）
-    const lowIncomeRes = await request.get({ url: '/low-income-persons', params: { status: 'active' }})
+    const lowIncomeRes = await request.get({
+      url: '/low-income-persons',
+      params: { status: 'active' }
+    })
     if (lowIncomeRes.code === 20000) {
       stats.lowIncomeTotal = lowIncomeRes.data ? lowIncomeRes.data.length : 0
     }
@@ -174,7 +177,10 @@ const getStats = async () => {
     const startDate = formatDate(startOfMonth)
     const endDate = formatDate(endOfMonth)
 
-    const notificationRes = await request.get({ url: '/notification', params: { start_date: startDate, end_date: endDate }})
+    const notificationRes = await request.get({
+      url: '/notification',
+      params: { start_date: startDate, end_date: endDate }
+    })
     if (notificationRes.code === 20000) {
       stats.notificationTotal = notificationRes.data ? notificationRes.data.length : 0
     }
@@ -185,7 +191,16 @@ const getStats = async () => {
 
 // 获取人口结构数据
 const getPopulationStructure = async () => {
-  const customColors = ['#AFF5CD', '#4888E0', '#22E0AE', '#542E7F', '#55C3E6', '#C89BF5', '#313CE1', '#6B61E6']
+  const customColors = [
+    '#AFF5CD',
+    '#4888E0',
+    '#22E0AE',
+    '#542E7F',
+    '#55C3E6',
+    '#C89BF5',
+    '#313CE1',
+    '#6B61E6'
+  ]
 
   try {
     const res = await request.get({ url: '/population-structure' })
@@ -284,14 +299,20 @@ const initDisputeChart = () => {
 }
 
 // 绘制饼图
-const drawPieChart = (ctx: CanvasRenderingContext2D, data: any[], centerX: number, centerY: number, radius: number) => {
+const drawPieChart = (
+  ctx: CanvasRenderingContext2D,
+  data: any[],
+  centerX: number,
+  centerY: number,
+  radius: number
+) => {
   let startAngle = 0
   const total = data.reduce((sum, item) => sum + item.value, 0)
 
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   data.forEach((item) => {
-    const sliceAngle = 2 * Math.PI * item.value / total
+    const sliceAngle = (2 * Math.PI * item.value) / total
 
     ctx.beginPath()
     ctx.moveTo(centerX, centerY)
@@ -328,9 +349,7 @@ const drawPieChart = (ctx: CanvasRenderingContext2D, data: any[], centerX: numbe
       let angle = Math.atan2(dy, dx)
       if (angle < 0) angle += 2 * Math.PI
 
-      const hoveredItem = data.find(item =>
-        angle >= item._startAngle && angle < item._endAngle
-      )
+      const hoveredItem = data.find((item) => angle >= item._startAngle && angle < item._endAngle)
 
       if (hoveredItem) {
         const percentage = ((hoveredItem.value / total) * 100).toFixed(2)
@@ -365,7 +384,7 @@ const drawPieChart = (ctx: CanvasRenderingContext2D, data: any[], centerX: numbe
   if ((canvas as any)._populationChartHandler) {
     canvas.removeEventListener('mousemove', (canvas as any)._populationChartHandler)
   }
-  (canvas as any)._populationChartHandler = handleMouseMove
+  ;(canvas as any)._populationChartHandler = handleMouseMove
   canvas.addEventListener('mousemove', handleMouseMove)
 
   canvas.onmouseleave = () => {
@@ -374,10 +393,15 @@ const drawPieChart = (ctx: CanvasRenderingContext2D, data: any[], centerX: numbe
 }
 
 // 绘制柱状图
-const drawBarChart = (ctx: CanvasRenderingContext2D, data: any[], width: number, height: number) => {
+const drawBarChart = (
+  ctx: CanvasRenderingContext2D,
+  data: any[],
+  width: number,
+  height: number
+) => {
   const padding = 40
   const barWidth = (width - 2 * padding) / data.length
-  const maxValue = Math.max(...data.map(item => item.value))
+  const maxValue = Math.max(...data.map((item) => item.value))
   const scale = (height - 2 * padding) / (maxValue || 1)
 
   ctx.clearRect(0, 0, width, height)
@@ -405,11 +429,16 @@ const drawBarChart = (ctx: CanvasRenderingContext2D, data: any[], width: number,
 }
 
 // 绘制折线图
-const drawLineChart = (ctx: CanvasRenderingContext2D, data: any[], width: number, height: number) => {
+const drawLineChart = (
+  ctx: CanvasRenderingContext2D,
+  data: any[],
+  width: number,
+  height: number
+) => {
   const padding = 40
   const pointRadius = 4
   const stepX = (width - 2 * padding) / (data.length - 1 || 1)
-  const maxValue = Math.max(...data.map(item => item.count))
+  const maxValue = Math.max(...data.map((item) => item.count))
   const scale = (height - 2 * padding) / (maxValue || 1)
 
   ctx.clearRect(0, 0, width, height)
@@ -457,7 +486,7 @@ onMounted(() => {
 <template>
   <div class="dashboard-container">
     <!-- 顶部统计面板 -->
-    <el-row :gutter="16" style="margin-bottom: 24px;">
+    <el-row :gutter="16" style="margin-bottom: 24px">
       <el-col :xs="24" :sm="12" :lg="6">
         <el-card class="stat-card" @click="goToResidents">
           <div class="stat-item">
@@ -513,7 +542,7 @@ onMounted(() => {
     </el-row>
 
     <!-- 图表区域 -->
-    <el-row :gutter="24" style="margin-bottom: 24px;">
+    <el-row :gutter="24" style="margin-bottom: 24px">
       <el-col :xs="24" :sm="12" :lg="8">
         <el-card>
           <template #header>
@@ -567,7 +596,12 @@ onMounted(() => {
       <el-col :xs="24" :sm="24" :md="12" :lg="12">
         <ContentWrap title="快捷菜单">
           <div class="quick-menu-grid">
-            <div v-for="menu in quickMenus" :key="menu.name" class="quick-menu-item" @click="handleQuickMenu(menu.path)">
+            <div
+              v-for="menu in quickMenus"
+              :key="menu.name"
+              class="quick-menu-item"
+              @click="handleQuickMenu(menu.path)"
+            >
               <div class="quick-menu-icon" :class="menu.iconClass">
                 <el-icon :icon="'ep:' + menu.icon.toLowerCase()" />
               </div>

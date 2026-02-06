@@ -192,12 +192,19 @@ const signIn = async () => {
       }
 
       console.log('准备跳转到: /dashboard/index')
-      console.log('permissionStore.routers:', permissionStore.getRouters?.map(r => ({ path: r.path, name: r.name, childrenCount: r.children?.length })))
-      
+      console.log(
+        'permissionStore.routers:',
+        permissionStore.getRouters?.map((r) => ({
+          path: r.path,
+          name: r.name,
+          childrenCount: r.children?.length
+        }))
+      )
+
       // 方案1: 使用 nextTick 等待路由注册完成后跳转（尝试修复动态路由时序问题）
       await nextTick()
       await router.replace('/dashboard/index')
-      
+
       // 方案2: 如果方案1不工作，使用硬刷新（备用方案）
       // window.location.replace('/#/dashboard/index')
     } catch (error) {

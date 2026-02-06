@@ -4,7 +4,7 @@ import { Layout } from '@/utils/routerHelper'
 /**
  * 居民管理模块路由
  * 模块独立，便于后期维护
- * 
+ *
  * 原项目结构：
  * - 居民管理（一级菜单）
  *   - 居民查询（二级菜单）
@@ -20,7 +20,7 @@ const residentRouter: AppRouteRecordRaw[] = [
     meta: {
       title: '居民管理',
       icon: 'user',
-      orderNo: 100  // 菜单排序，放在首页之后
+      orderNo: 100 // 菜单排序，放在首页之后
     },
     children: [
       {
@@ -51,7 +51,7 @@ const residentRouter: AppRouteRecordRaw[] = [
           title: '编辑居民',
           noCache: true,
           activeMenu: '/resident/list',
-          hidden: true  // 不在菜单显示
+          hidden: true // 不在菜单显示
         }
       }
     ]

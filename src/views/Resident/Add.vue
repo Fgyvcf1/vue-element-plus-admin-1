@@ -2,7 +2,20 @@
   <div class="resident-add-container">
     <el-card style="padding: 10px">
       <!-- 表单提示信息和导入按钮 -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 12px 20px; background-color: #ecf5ff; border-radius: 4px; border-left: 4px solid #409eff; font-size: 14px; line-height: 1.5">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+          padding: 12px 20px;
+          background-color: #ecf5ff;
+          border-radius: 4px;
+          border-left: 4px solid #409eff;
+          font-size: 14px;
+          line-height: 1.5;
+        "
+      >
         <span>提示：同户新增时，输入户主姓名后系统会自动填充户主信息和家庭ID</span>
         <el-button type="primary" size="small" @click="handleImport">导入</el-button>
       </div>
@@ -14,10 +27,7 @@
         width="800px"
         :close-on-click-modal="false"
       >
-        <ImportMapping
-          @close="importDialogVisible = false"
-          @import-success="handleImportSuccess"
-        />
+        <ImportMapping @close="importDialogVisible = false" @import-success="handleImportSuccess" />
       </el-dialog>
 
       <!-- 户主信息部分 -->
@@ -45,12 +55,21 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="户编号">
-                <el-input v-model="householdForm.household_number" disabled placeholder="自动生成" />
+                <el-input
+                  v-model="householdForm.household_number"
+                  disabled
+                  placeholder="自动生成"
+                />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="性别">
-                <el-select v-model="householdForm.gender" placeholder="请选择性别" size="small" style="width: 100%">
+                <el-select
+                  v-model="householdForm.gender"
+                  placeholder="请选择性别"
+                  size="small"
+                  style="width: 100%"
+                >
                   <el-option label="男" value="男" />
                   <el-option label="女" value="女" />
                 </el-select>
@@ -58,14 +77,29 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="民族">
-                <el-select v-model="householdForm.ethnicity" placeholder="请选择民族" size="small" style="width: 100%">
-                  <el-option v-for="item in ethnicityOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="householdForm.ethnicity"
+                  placeholder="请选择民族"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in ethnicityOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="身份证号">
-                <el-input v-model="householdForm.householdHeadIdCard" placeholder="请输入身份证号" maxlength="18" @input="handleHouseholdIdCardInput" />
+                <el-input
+                  v-model="householdForm.householdHeadIdCard"
+                  placeholder="请输入身份证号"
+                  maxlength="18"
+                  @input="handleHouseholdIdCardInput"
+                />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -75,22 +109,52 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="户口类型">
-                <el-select v-model="householdForm.householdType" placeholder="请选择户口类型" size="small" style="width: 100%">
-                  <el-option v-for="item in householdTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="householdForm.householdType"
+                  placeholder="请选择户口类型"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in householdTypeOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="住房类型">
-                <el-select v-model="householdForm.housingType" placeholder="请选择住房类型" size="small" style="width: 100%">
-                  <el-option v-for="item in housingTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="householdForm.housingType"
+                  placeholder="请选择住房类型"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in housingTypeOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="村组">
-                <el-select v-model="householdForm.villageGroup" placeholder="请选择村组" size="small" style="width: 100%">
-                  <el-option v-for="item in villageGroupOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="householdForm.villageGroup"
+                  placeholder="请选择村组"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in villageGroupOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -110,7 +174,13 @@
             <span>居民信息</span>
           </div>
         </template>
-        <el-form ref="residentFormRef" :model="residentForm" label-width="100px" size="small" :rules="residentRules">
+        <el-form
+          ref="residentFormRef"
+          :model="residentForm"
+          label-width="100px"
+          size="small"
+          :rules="residentRules"
+        >
           <el-row :gutter="10">
             <el-col :span="6">
               <el-form-item label="居民姓名" prop="name">
@@ -119,7 +189,12 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="性别" prop="gender">
-                <el-select v-model="residentForm.gender" placeholder="请选择性别" size="small" style="width: 100%">
+                <el-select
+                  v-model="residentForm.gender"
+                  placeholder="请选择性别"
+                  size="small"
+                  style="width: 100%"
+                >
                   <el-option label="男" value="男" />
                   <el-option label="女" value="女" />
                 </el-select>
@@ -141,12 +216,22 @@
           <el-row :gutter="10">
             <el-col :span="6">
               <el-form-item label="身份证号" prop="id_card">
-                <el-input v-model="residentForm.id_card" placeholder="请输入身份证号" maxlength="18" @input="handleIdCardInput" />
+                <el-input
+                  v-model="residentForm.id_card"
+                  placeholder="请输入身份证号"
+                  maxlength="18"
+                  @input="handleIdCardInput"
+                />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="与户主关系" prop="relationship_to_head">
-                <el-select v-model="residentForm.relationship_to_head" placeholder="请选择与户主关系" size="small" style="width: 100%">
+                <el-select
+                  v-model="residentForm.relationship_to_head"
+                  placeholder="请选择与户主关系"
+                  size="small"
+                  style="width: 100%"
+                >
                   <el-option label="本人" value="本人" />
                   <el-option label="配偶" value="配偶" />
                   <el-option label="子" value="子" />
@@ -178,29 +263,69 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="民族" prop="ethnicity">
-                <el-select v-model="residentForm.ethnicity" placeholder="请选择民族" size="small" style="width: 100%">
-                  <el-option v-for="item in ethnicityOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.ethnicity"
+                  placeholder="请选择民族"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in ethnicityOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="婚姻状况" prop="marital_status">
-                <el-select v-model="residentForm.marital_status" placeholder="请选择婚姻状况" size="small" style="width: 100%">
-                  <el-option v-for="item in maritalStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.marital_status"
+                  placeholder="请选择婚姻状况"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in maritalStatusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="政治面貌" prop="political_status">
-                <el-select v-model="residentForm.political_status" placeholder="请选择政治面貌" size="small" style="width: 100%">
-                  <el-option v-for="item in politicalStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.political_status"
+                  placeholder="请选择政治面貌"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in politicalStatusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="兵役状况" prop="military_service">
-                <el-select v-model="residentForm.military_service" placeholder="请选择兵役状况" size="small" style="width: 100%">
-                  <el-option v-for="item in militaryServiceOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.military_service"
+                  placeholder="请选择兵役状况"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in militaryServiceOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -216,15 +341,35 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="村组" prop="village_group">
-                <el-select v-model="residentForm.village_group" placeholder="请选择村组" size="small" style="width: 100%">
-                  <el-option v-for="item in villageGroupOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.village_group"
+                  placeholder="请选择村组"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in villageGroupOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="文化程度" prop="education_level">
-                <el-select v-model="residentForm.education_level" placeholder="请选择文化程度" size="small" style="width: 100%">
-                  <el-option v-for="item in educationLevelOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.education_level"
+                  placeholder="请选择文化程度"
+                  size="small"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in educationLevelOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -280,7 +425,12 @@
             </el-col>
             <el-col v-show="false" :span="6">
               <el-form-item label="状态" prop="status">
-                <el-select v-model="residentForm.status" placeholder="请选择状态" size="small" style="width: 100%">
+                <el-select
+                  v-model="residentForm.status"
+                  placeholder="请选择状态"
+                  size="small"
+                  style="width: 100%"
+                >
                   <el-option label="正常" value="active" />
                   <el-option label="迁出" value="migrated_out" />
                   <el-option label="死亡" value="deceased" />
@@ -298,7 +448,9 @@
 
       <!-- 操作按钮 -->
       <div class="action-buttons" style="text-align: center; margin-top: 10px">
-        <el-button type="primary" :loading="loading" size="small" @click="submitForm">提交</el-button>
+        <el-button type="primary" :loading="loading" size="small" @click="submitForm"
+          >提交</el-button
+        >
         <el-button size="small" @click="resetForm">重置</el-button>
         <el-button size="small" @click="goBack">返回</el-button>
       </div>
@@ -500,7 +652,11 @@ const residentRules: FormRules = {
   date_of_birth: [{ required: true, message: '请选择出生日期', trigger: 'change' }],
   id_card: [
     { required: true, message: '请输入身份证号', trigger: 'blur' },
-    { pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, message: '请输入正确的身份证号码', trigger: 'blur' }
+    {
+      pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/,
+      message: '请输入正确的身份证号码',
+      trigger: 'blur'
+    }
   ],
   relationship_to_head: [{ required: true, message: '请选择与户主关系', trigger: 'change' }],
   ethnicity: [{ required: true, message: '请选择民族', trigger: 'change' }],
@@ -535,7 +691,10 @@ const handleHouseholdIdCardInput = (value: string) => {
 }
 
 // 获取户主姓名搜索建议
-const fetchHouseholdHeadSuggestions = async (queryString: string, callback: (data: { value: string }[]) => void) => {
+const fetchHouseholdHeadSuggestions = async (
+  queryString: string,
+  callback: (data: { value: string }[]) => void
+) => {
   if (!queryString || queryString.trim().length < 1) {
     callback([])
     return
