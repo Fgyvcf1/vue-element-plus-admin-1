@@ -6,7 +6,7 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "i": "npm install",
+    "i": "pnpm install",
     "dev": "npx --yes kill-port 4000 && vite --mode base",
     "dev:win": "powershell -Command \"Get-NetTCPConnection -LocalPort 4000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }\" && vite --mode base",
     "ts:check": "vue-tsc --noEmit --skipLibCheck",
