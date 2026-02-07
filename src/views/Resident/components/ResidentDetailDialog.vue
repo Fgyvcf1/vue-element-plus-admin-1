@@ -3,9 +3,10 @@
     v-model="dialogVisible"
     width="80%"
     :close-on-click-modal="true"
-    top="5%"
+    top="50px"
+    :append-to-body="true"
+    :modal-append-to-body="true"
     class="resident-detail-dialog"
-    destroy-on-close
   >
     <template #header>
       <div class="dialog-header">
@@ -268,17 +269,13 @@
       <template #header>
         <div class="clearfix">
           <span>迁途改销</span>
-          <el-button
-            type="primary"
-            link
-            size="small"
-            class="header-button"
+          <el-icon
+            class="header-button toggle-arrow-icon"
+            :class="{ 'is-expanded': isMigrationExpanded }"
             @click="toggleMigration"
           >
-            <el-icon>
-              <component :is="isMigrationExpanded ? 'ArrowUp' : 'ArrowDown'" />
-            </el-icon>
-          </el-button>
+            <ArrowDown />
+          </el-icon>
         </div>
       </template>
       <div v-if="isMigrationExpanded" class="migration-form">
@@ -424,7 +421,7 @@ import {
   ElTableColumn,
   ElIcon
 } from 'element-plus'
-import { ArrowUp, ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown } from '@element-plus/icons-vue'
 import { getResidentDetail, addResident, updateResident } from '@/api/resident'
 import { getHouseholdDetail, getHouseholdMembers, updateHousehold, createHousehold } from '@/api/household'
 import { getDictApi } from '@/api/common'
@@ -578,6 +575,7 @@ watch(() => props.modelValue, (val) => {
   if (val) {
     currentResidentId.value = null
     currentHouseholdId.value = null
+    isMigrationExpanded.value = false
     initData()
   } else {
     resetFormData()
@@ -597,8 +595,22 @@ watch(() => props.residentId, (newVal) => {
 const initData = async () => {
   loading.value = true
   try {
-    let residentId = currentResidentId.value || props.residentId
-    let householdId = currentHouseholdId.value || props.householdId
+    let residentId, householdId
+
+    // 优先使用currentResidentId（如果存在的话，比如点击家庭成员列表中的成员时设置的）
+    // 否则从props中获取ID（比如点击居民列表中的居民时设置的）
+    if (currentResidentId.value && currentHouseholdId.value) {
+      // 如果已经通过点击家庭成员列表设置了currentResidentId和currentHouseholdId，则使用它们
+      residentId = currentResidentId.value
+      householdId = currentHouseholdId.value
+    } else if (props.residentId && props.householdId) {
+      // 否则从props中获取ID
+      residentId = props.residentId
+      householdId = props.householdId
+      // 更新currentResidentId和currentHouseholdId
+      currentResidentId.value = residentId
+      currentHouseholdId.value = householdId
+    }
 
     if (residentId && householdId) {
       isAddingNew.value = false
@@ -1289,89 +1301,116 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-.resident-detail-dialog {
-  :deep(.el-dialog__body) {
-    padding: 10px 20px;
-    max-height: calc(90vh - 120px);
-    overflow-y: auto;
+/* 提高对话框 z-index，确保在 fixed header 之上 */
+:deep(.el-dialog) {
+  z-index: 10001 !important;
+}
+
+:deep(.el-overlay) {
+  z-index: 10000 !important;
+}
+
+/* 对话框头部样式，将标题和按钮放在同一行 */
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  .dialog-title {
+    font-size: 14px;
+    font-weight: normal;
   }
 
-  .dialog-header {
+  .dialog-header-buttons {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-right: 20px;
+    gap: 6px;
+    margin-right: 40px;
+  }
+}
 
-    .dialog-title {
-      font-size: 18px;
-      font-weight: bold;
-    }
+/* 确保对话框内容区域显示正常 */
+:deep(.el-dialog__body) {
+  padding: 10px;
+}
 
-    .dialog-header-buttons {
-      display: flex;
-      gap: 10px;
-    }
+.info-card {
+  margin-bottom: 10px;
+}
+
+.compact-form {
+  :deep(.el-form-item) {
+    margin-bottom: 8px;
   }
 
-  .info-card {
-    margin-bottom: 10px;
+  :deep(.el-form-item__label) {
+    font-size: 13px;
+    padding-right: 8px;
+  }
+}
 
-    &.compact-card {
-      :deep(.el-card__header) {
-        padding: 8px 15px;
-        font-size: 14px;
-        font-weight: bold;
+.compact-table {
+  :deep(.el-table__cell) {
+    padding: 4px 0;
+  }
+
+  :deep(.cell) {
+    font-size: 13px;
+  }
+}
+
+.clearfix {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .header-button {
+    padding: 0;
+
+    // 菜单栏风格的箭头图标
+    &.toggle-arrow-icon {
+      font-size: 16px;
+      color: #409EFF;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      padding: 4px;
+      border-radius: 4px;
+
+      &:hover {
+        background-color: rgba(64, 158, 255, 0.1);
       }
 
-      :deep(.el-card__body) {
-        padding: 10px 15px;
+      // 展开时旋转箭头
+      &.is-expanded {
+        transform: rotate(180deg);
       }
     }
   }
+}
 
-  .compact-form {
-    :deep(.el-form-item) {
-      margin-bottom: 8px;
-    }
+.age-text {
+  color: #304156;
+  font-weight: normal;
+}
 
-    :deep(.el-form-item__label) {
-      font-size: 13px;
-      padding-right: 8px;
-    }
+.migration-form {
+  padding: 10px 0;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-
-  .compact-table {
-    :deep(.el-table__cell) {
-      padding: 4px 0;
-    }
-
-    :deep(.cell) {
-      font-size: 13px;
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
 
-  .clearfix {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .header-button {
-      padding: 0;
-    }
-  }
-
-  .age-text {
-    color: #409EFF;
-    font-weight: bold;
-  }
-
-  .migration-form {
-    padding: 10px 0;
-  }
-
-  .migration-buttons {
-    margin-top: 15px;
-    text-align: right;
-  }
+.migration-buttons {
+  margin-top: 15px;
+  text-align: right;
 }
 </style>

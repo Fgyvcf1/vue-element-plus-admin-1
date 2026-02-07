@@ -12,6 +12,8 @@
                 clearable
                 :fetch-suggestions="fetchResidentNameSuggestions"
                 value-key="value"
+                :trigger-on-focus="false"
+                :debounce="300"
                 @select="handleSearch"
                 style="width: 100%"
               />
@@ -35,6 +37,8 @@
                 clearable
                 :fetch-suggestions="fetchHouseholdHeadNameSuggestions"
                 value-key="value"
+                :trigger-on-focus="false"
+                :debounce="300"
                 @select="handleSearch"
                 style="width: 100%"
               />
@@ -85,7 +89,11 @@
           </el-col>
           <el-col :span="6">
             <el-form-item label="联系电话">
-              <el-input v-model="searchForm.phone" placeholder="请输入联系电话" clearable />
+              <el-input
+                v-model="searchForm.phoneNumber"
+                placeholder="请输入联系电话（至少4位）"
+                clearable
+              />
             </el-form-item>
           </el-col>
           <el-col :span="6">
@@ -222,7 +230,11 @@
     </el-card>
 
     <!-- 居民详情对话框 -->
-    <ResidentDetailDialog v-model="detailDialogVisible" :resident-id="selectedResidentId" />
+    <ResidentDetailDialog
+      v-model="detailDialogVisible"
+      :resident-id="selectedResidentId"
+      :household-id="selectedHouseholdId"
+    />
 
     <!-- 导入对话框 -->
     <el-dialog
@@ -231,6 +243,7 @@
       width="900px"
       destroy-on-close
       :close-on-click-modal="false"
+      append-to-body
     >
       <ImportMapping @close="importDialogVisible = false" @import-success="handleImportSuccess" />
     </el-dialog>
@@ -258,7 +271,6 @@ import {
   ElTag,
   ElPagination,
   ElEmpty,
-  ElAlert,
   ElAutocomplete,
   ElDialog
 } from 'element-plus'
@@ -279,7 +291,7 @@ const searchForm = reactive({
   gender: '',
   villageGroup: '',
   birthYear: '',
-  phone: '',
+  phoneNumber: '',
   status: 'active' // 默认状态为正常
 })
 
@@ -294,6 +306,10 @@ watch(
       // 防抖处理，避免频繁请求
       clearTimeout(searchTimer)
       searchTimer = setTimeout(() => {
+        // 电话查询条件：至少输入4位数才触发查询
+        if (searchForm.phoneNumber && searchForm.phoneNumber.length < 4) {
+          return // 电话号码少于4位，不触发查询
+        }
         fetchList()
       }, 300)
     }
@@ -354,6 +370,7 @@ const pagination = reactive({
 // 详情对话框
 const detailDialogVisible = ref(false)
 const selectedResidentId = ref('')
+const selectedHouseholdId = ref('')
 
 // 导入对话框
 const importDialogVisible = ref(false)
@@ -423,6 +440,11 @@ const fetchList = async () => {
 
 // 搜索
 const handleSearch = () => {
+  // 电话查询条件：至少输入4位数才触发查询
+  if (searchForm.phoneNumber && searchForm.phoneNumber.length < 4) {
+    ElMessage.warning('联系电话至少需要输入4位数')
+    return
+  }
   pagination.page = 1
   hasSearched.value = true // 标记已执行过首次查询
   fetchList()
@@ -458,12 +480,14 @@ const handleExport = async () => {
 // 查看详情
 const handleViewDetail = (row: any) => {
   selectedResidentId.value = row.id
+  selectedHouseholdId.value = row.householdId || row.household_id || ''
   detailDialogVisible.value = true
 }
 
 // 行点击
 const handleRowClick = (row: any) => {
   selectedResidentId.value = row.id
+  selectedHouseholdId.value = row.householdId || row.household_id || ''
   detailDialogVisible.value = true
 }
 
@@ -575,6 +599,8 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .resident-query-container {
   padding: 20px;
+  overflow: visible;
+  transform: none;
 
   .search-card {
     margin-bottom: 20px;
@@ -708,6 +734,20 @@ onUnmounted(() => {
       opacity: 1;
       transform: scale(1) translateY(0);
     }
+  }
+
+  /* 隐藏 el-autocomplete 的红 X 图标 */
+  :deep(.el-autocomplete .el-input__validate-icon) {
+    display: none !important;
+  }
+
+  /* 确保 el-card 不会裁剪对话框 */
+  :deep(.el-card) {
+    overflow: visible;
+  }
+
+  :deep(.el-card__body) {
+    overflow: visible;
   }
 }
 </style>
