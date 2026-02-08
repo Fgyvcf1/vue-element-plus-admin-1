@@ -39,10 +39,6 @@ const closeCurrentTab = () => {
 const setTabTitle = () => {
   setTitle(new Date().getTime().toString())
 }
-
-const setAnalysisTitle = () => {
-  setTitle(`分析页-${new Date().getTime().toString()}`, '/dashboard/index')
-}
 </script>
 
 <template>
@@ -54,6 +50,5 @@ const setAnalysisTitle = () => {
     <BaseButton type="primary" @click="closeCurrentTab"> 关闭当前标签页 </BaseButton>
     <BaseButton type="primary" @click="refresh"> 刷新当前标签页 </BaseButton>
     <BaseButton type="primary" @click="setTabTitle"> 修改当前标题 </BaseButton>
-    <BaseButton type="primary" @click="setAnalysisTitle"> 修改分析页标题 </BaseButton>
   </ContentWrap>
 </template>

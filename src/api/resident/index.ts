@@ -44,6 +44,22 @@ export const updateResident = (id: string, data: Partial<ResidentDetail>) => {
   })
 }
 
+// 更新居民状态（迁途改销）
+export const updateResidentStatus = (id: string, data: {
+  status: string
+  death_date?: string
+  death_reason?: string
+  migration_in_date?: string
+  migration_in_reason?: string
+  migration_out_date?: string
+  migration_out_reason?: string
+}) => {
+  return request.put({
+    url: `/residents/${id}/status`,
+    data
+  })
+}
+
 // 删除居民
 export const deleteResident = (id: string) => {
   return request.delete({
@@ -63,7 +79,7 @@ export const batchDeleteResidents = (ids: string[]) => {
 export const getVillageGroups = () => {
   return request.get<{ label: string; value: string }[]>({
     url: '/dictionaries',
-    params: { category: 'village_group' }
+    params: { category: '村组' }
   })
 }
 

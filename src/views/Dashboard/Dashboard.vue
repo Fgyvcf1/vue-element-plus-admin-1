@@ -42,7 +42,7 @@ const quickMenus = [
     name: '居民管理',
     icon: 'User',
     iconClass: 'menu-villager',
-    path: '/resident/list'
+    path: '/resident/query'
   },
   {
     name: '低收入管理',
@@ -115,7 +115,7 @@ const goToNotifications = () => {
 
 // 跳转到居民查询
 const goToResidents = () => {
-  router.push('/resident/list')
+  router.push('/resident/query')
 }
 
 // 跳转到低收入查询

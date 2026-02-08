@@ -1,36 +1,33 @@
 import type { AppRouteRecordRaw } from '@/router/types'
 import { Layout } from '@/utils/routerHelper'
+import { useI18n } from '@/hooks/web/useI18n'
+
+const { t } = useI18n()
 
 /**
  * 居民管理模块路由
- * 模块独立，便于后期维护
- *
- * 原项目结构：
- * - 居民管理（一级菜单）
- *   - 居民查询（二级菜单）
- *   - 新增居民（二级菜单）
- *   - 编辑居民（二级菜单，隐藏）
+ * 父级菜单：居民管理
+ * 子菜单：居民查询、新增居民
  */
 const residentRouter: AppRouteRecordRaw[] = [
   {
     path: '/resident',
     component: Layout,
-    redirect: '/resident/list',
+    redirect: '/resident/query',
     name: 'Resident',
     meta: {
-      title: '居民管理',
-      icon: 'user',
-      orderNo: 100 // 菜单排序，放在首页之后
+      title: t('router.resident'),
+      icon: 'vi-material-symbols:group-outline',
+      alwaysShow: true,
+      orderNo: 100
     },
     children: [
       {
-        path: 'list',
+        path: 'query',
         component: () => import('@/views/Resident/Query.vue'),
-        name: 'ResidentList',
+        name: 'ResidentQuery',
         meta: {
-          title: '居民查询',
-          icon: 'list',
-          noCache: true
+          title: t('router.residentQuery')
         }
       },
       {
@@ -38,9 +35,7 @@ const residentRouter: AppRouteRecordRaw[] = [
         component: () => import('@/views/Resident/Add.vue'),
         name: 'ResidentAdd',
         meta: {
-          title: '新增居民',
-          icon: 'plus',
-          noCache: true
+          title: t('router.residentAdd')
         }
       },
       {
@@ -48,10 +43,10 @@ const residentRouter: AppRouteRecordRaw[] = [
         component: () => import('@/views/Resident/Edit.vue'),
         name: 'ResidentEdit',
         meta: {
-          title: '编辑居民',
+          title: t('router.residentEdit'),
           noCache: true,
-          activeMenu: '/resident/list',
-          hidden: true // 不在菜单显示
+          activeMenu: '/resident/query',
+          hidden: true
         }
       }
     ]

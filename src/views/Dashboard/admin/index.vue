@@ -151,7 +151,8 @@ const disputeChart = ref(null)
 const getStats = async () => {
   // 获取居民总数（状态为正常的）
   try {
-    const residentsRes = await request.get('/residents', {
+    const residentsRes = await request.get({
+      url: '/residents',
       params: { status: 'active', pageNum: 1, pageSize: 1 }
     })
     if (residentsRes.code === 20000) {
@@ -163,7 +164,7 @@ const getStats = async () => {
 
   // 获取低收入人数
   try {
-    const lowIncomeRes = await request.get('/low-income-persons')
+    const lowIncomeRes = await request.get({ url: '/low-income-persons' })
     if (lowIncomeRes.code === 20000) {
       stats.value.lowIncomeTotal =
         lowIncomeRes.total || (lowIncomeRes.data ? lowIncomeRes.data.length : 0)
@@ -174,7 +175,7 @@ const getStats = async () => {
 
   // 获取残疾人数
   try {
-    const disabledRes = await request.get('/disabled-persons')
+    const disabledRes = await request.get({ url: '/disabled-persons' })
     if (disabledRes.code === 20000) {
       stats.value.disabledTotal =
         disabledRes.total || (disabledRes.data ? disabledRes.data.length : 0)
@@ -183,31 +184,15 @@ const getStats = async () => {
     console.error('获取残疾人数失败:', error)
   }
 
-  // 获取当月通知总数
+  // 获取通知数量
   try {
-    const now = new Date()
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-
-    const formatDate = (date: Date) => {
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      return `${year}-${month}-${day}`
-    }
-
-    const startDate = formatDate(startOfMonth)
-    const endDate = formatDate(endOfMonth)
-
-    const notificationRes = await request.get('/notification', {
-      params: { start_date: startDate, end_date: endDate }
-    })
+    const notificationRes = await request.get({ url: '/notifications' })
     if (notificationRes.code === 20000) {
       stats.value.notificationTotal =
         notificationRes.total || (notificationRes.data ? notificationRes.data.length : 0)
     }
   } catch (error) {
-    console.error('获取通知总数失败:', error)
+    console.error('获取通知数量失败:', error)
   }
 }
 
@@ -225,7 +210,7 @@ const getPopulationStructure = async () => {
   ]
 
   try {
-    const response = await request.get('/population-structure')
+    const response = await request.get({ url: '/population-structure' })
     if (response.code === 20000 && response.data) {
       const filteredData = response.data.filter((item) => item.count > 0)
 
@@ -258,7 +243,7 @@ const initPopulationChart = () => {
 // 获取调解档案状态统计
 const getMatterStats = async () => {
   try {
-    const response = await request.get('/archives/status-stats')
+    const response = await request.get({ url: '/archives/status-stats' })
     if (response.code === 20000 && response.data) {
       matterData.value = response.data
       nextTick(() => {
@@ -281,7 +266,7 @@ const initMatterChart = () => {
 // 获取调解档案月度统计
 const getMediationStats = async () => {
   try {
-    const response = await request.get('/archives/mediation-monthly-stats')
+    const response = await request.get({ url: '/archives/mediation-monthly-stats' })
     if (response.code === 20000 && response.data) {
       mediationData.value = response.data
       nextTick(() => {
@@ -470,7 +455,7 @@ const goToNotifications = () => {
 }
 
 const goToResidents = () => {
-  router.push('/resident/list')
+  router.push('/resident/query')
 }
 
 const goToLowIncome = () => {

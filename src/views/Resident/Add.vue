@@ -752,7 +752,7 @@ const submitForm = async () => {
         const res = await addResident(residentData)
         if (res.code === 200) {
           ElMessage.success('新增居民成功')
-          router.push('/resident/list')
+          router.push('/resident/query')
         } else {
           ElMessage.error(res.message || '新增居民失败')
         }

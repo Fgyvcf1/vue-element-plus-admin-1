@@ -26,7 +26,17 @@ export const usePermissionStore = defineStore('permission', {
   }),
   getters: {
     getRouters(): AppRouteRecordRaw[] {
-      return this.routers
+      // 对路由进行排序，确保首页排在第一位，居民管理排在第二位
+      const sortedRouters = [...this.routers].sort((a, b) => {
+        // 首页（Dashboard）排在最前面
+        if (a.path === '/dashboard') return -1
+        if (b.path === '/dashboard') return 1
+        // 居民管理排在第二位
+        if (a.path === '/resident') return -1
+        if (b.path === '/resident') return 1
+        return 0
+      })
+      return sortedRouters
     },
     getAddRouters(): AppRouteRecordRaw[] {
       return flatMultiLevelRoutes(cloneDeep(this.addRouters))

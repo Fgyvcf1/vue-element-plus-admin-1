@@ -8,7 +8,7 @@ const adminList = [
   {
     path: '/dashboard',
     component: '#',
-    redirect: '/dashboard/analysis',
+    redirect: '/dashboard/index',
     name: 'Dashboard',
     meta: {
       title: 'router.dashboard',
@@ -17,23 +17,55 @@ const adminList = [
     },
     children: [
       {
-        path: 'analysis',
-        component: 'views/Dashboard/Analysis',
-        name: 'DashboardAnalysis',
+        path: 'index',
+        component: 'views/Dashboard/index',
+        name: 'DashboardIndex',
         meta: {
-          title: 'router.analysis',
+          title: 'router.home',
           noCache: true,
           affix: true
         }
-      },
+      }
+    ]
+  },
+  {
+    path: '/analysis',
+    component: '#',
+    redirect: '/analysis/index',
+    name: 'Analysis',
+    meta: {
+      title: 'router.analysis',
+      icon: 'vi-ant-design:bar-chart-outlined'
+    },
+    children: [
       {
-        path: 'workplace',
+        path: 'index',
+        component: 'views/Dashboard/Analysis',
+        name: 'AnalysisIndex',
+        meta: {
+          title: 'router.analysis',
+          noCache: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/workplace',
+    component: '#',
+    redirect: '/workplace/index',
+    name: 'Workplace',
+    meta: {
+      title: 'router.workplace',
+      icon: 'vi-ant-design:desktop-outlined'
+    },
+    children: [
+      {
+        path: 'index',
         component: 'views/Dashboard/Workplace',
-        name: 'DashboardWorkplace',
+        name: 'WorkplaceIndex',
         meta: {
           title: 'router.workplace',
-          noCache: true,
-          affix: true
+          noCache: true
         }
       }
     ]
@@ -681,8 +713,8 @@ const adminList = [
 
 const testList: string[] = [
   '/dashboard',
-  '/dashboard/analysis',
-  '/dashboard/workplace',
+  '/analysis',
+  '/workplace',
   'external-link',
   'https://element-plus-admin-doc.cn/',
   '/guide',

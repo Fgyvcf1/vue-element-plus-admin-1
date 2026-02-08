@@ -192,7 +192,7 @@ const submitForm = async () => {
         const res = await updateResident(form.id, form)
         if (res.code === 200) {
           ElMessage.success('更新成功')
-          router.push('/resident/list')
+          router.push('/resident/query')
         } else {
           ElMessage.error(res.message || '更新失败')
         }

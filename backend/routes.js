@@ -185,7 +185,8 @@ router.get('/test-birthday-reminder', (req, res) => {
 });
 
 // 使用各模块路由，先使用通知路由，再使用机构管理路由，然后使用特殊人群路由，接着使用导入路由，最后使用居民路由，避免路由冲突
-router.use('/notification', notificationRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/notification', notificationRoutes); // 兼容单数形式
 router.use('/event', eventRoutes);
 router.use('/', leadershipRoutes);
 router.use('/', specialPeopleRoutes);

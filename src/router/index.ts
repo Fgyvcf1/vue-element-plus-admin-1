@@ -18,9 +18,7 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
     redirect: '/dashboard/index',
     name: 'Root',
     meta: {
-      hidden: true,
-      title: '首页',
-      affix: true
+      hidden: true
     }
   },
   {
@@ -73,8 +71,6 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
       }
     ]
   },
-  // 合并居民模块路由（无需权限，直接显示）
-  ...residentRouter
 ]
 
 export const asyncRouterMap: AppRouteRecordRaw[] = [
@@ -85,7 +81,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
     name: 'Dashboard',
     meta: {
       title: '仪表盘',
-      icon: 'dashboard'
+      icon: 'vi-material-symbols:dashboard'
     },
     children: [
       {
@@ -97,27 +93,10 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
           noCache: true,
           affix: true
         }
-      },
-      {
-        path: 'analysis',
-        component: () => import('@/views/Dashboard/Analysis.vue'),
-        name: 'DashboardAnalysis',
-        meta: {
-          title: '分析页',
-          noCache: true
-        }
-      },
-      {
-        path: 'workplace',
-        component: () => import('@/views/Dashboard/Workplace.vue'),
-        name: 'DashboardWorkplace',
-        meta: {
-          title: '工作台',
-          noCache: true
-        }
       }
     ]
   },
+
   {
     path: '/external-link',
     component: Layout,
@@ -743,7 +722,9 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
       title: '404',
       noTagsView: true
     }
-  }
+  },
+  // 合并居民模块路由
+  ...residentRouter
 ]
 
 const router = createRouter({

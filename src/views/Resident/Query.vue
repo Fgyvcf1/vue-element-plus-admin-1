@@ -2,71 +2,49 @@
   <div class="resident-query-container">
     <!-- 搜索表单 -->
     <el-card class="search-card" shadow="never">
-      <el-form :model="searchForm" label-width="100px" class="search-form">
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-form-item label="居民姓名">
+      <el-form :model="searchForm" label-width="70px" class="search-form" size="small">
+        <div class="search-form-content">
+          <div class="search-fields">
+            <el-form-item label="居民姓名" class="compact-form-item">
               <el-autocomplete
                 v-model="searchForm.name"
-                placeholder="请输入居民姓名"
+                placeholder="姓名"
                 clearable
                 :fetch-suggestions="fetchResidentNameSuggestions"
                 value-key="value"
                 :trigger-on-focus="false"
                 :debounce="300"
                 @select="handleSearch"
-                style="width: 100%"
               />
             </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="身份证号">
+            <el-form-item label="身份证号" class="compact-form-item">
               <el-input
                 v-model="searchForm.idCard"
-                placeholder="请输入身份证号"
+                placeholder="身份证"
                 clearable
                 @keyup.enter="handleSearch"
               />
             </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="户主姓名">
+            <el-form-item label="户主姓名" class="compact-form-item">
               <el-autocomplete
                 v-model="searchForm.householderName"
-                placeholder="请输入户主姓名"
+                placeholder="户主"
                 clearable
                 :fetch-suggestions="fetchHouseholdHeadNameSuggestions"
                 value-key="value"
                 :trigger-on-focus="false"
                 :debounce="300"
                 @select="handleSearch"
-                style="width: 100%"
               />
             </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="性别">
-              <el-select
-                v-model="searchForm.gender"
-                placeholder="请选择性别"
-                clearable
-                style="width: 100%"
-              >
+            <el-form-item label="性别" class="compact-form-item">
+              <el-select v-model="searchForm.gender" placeholder="性别" clearable>
                 <el-option label="男" value="男" />
                 <el-option label="女" value="女" />
               </el-select>
             </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-form-item label="村组">
-              <el-select
-                v-model="searchForm.villageGroup"
-                placeholder="请选择村组"
-                clearable
-                style="width: 100%"
-              >
+            <el-form-item label="村组" class="compact-form-item">
+              <el-select v-model="searchForm.villageGroup" placeholder="村组" clearable>
                 <el-option
                   v-for="item in villageGroupOptions"
                   :key="item.value"
@@ -75,62 +53,48 @@
                 />
               </el-select>
             </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="出生年份">
+            <el-form-item label="出生年份" class="compact-form-item">
               <el-date-picker
                 v-model="searchForm.birthYear"
                 type="year"
-                placeholder="选择出生年份"
-                style="width: 100%"
+                placeholder="年份"
                 value-format="YYYY"
               />
             </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="联系电话">
+            <el-form-item label="联系电话" class="compact-form-item">
               <el-input
                 v-model="searchForm.phoneNumber"
-                placeholder="请输入联系电话（至少4位）"
+                placeholder="电话"
                 clearable
               />
             </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="状态">
-              <el-select
-                v-model="searchForm.status"
-                placeholder="请选择状态"
-                clearable
-                style="width: 100%"
-              >
+            <el-form-item label="状态" class="compact-form-item">
+              <el-select v-model="searchForm.status" placeholder="状态" clearable>
                 <el-option label="正常" value="active" />
                 <el-option label="迁出" value="migrated_out" />
                 <el-option label="死亡" value="deceased" />
               </el-select>
             </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24" style="text-align: right">
-            <el-button type="primary" @click="handleSearch">
+          </div>
+          <div class="search-buttons">
+            <el-button type="primary" @click="handleSearch" size="small">
               <Icon icon="ep:search" class="mr-1" />
               查询
             </el-button>
-            <el-button @click="handleReset">
+            <el-button @click="handleReset" size="small">
               <Icon icon="ep:refresh-right" class="mr-1" />
               重置
             </el-button>
-            <el-button type="success" @click="handleExport">
+            <el-button type="success" @click="handleExport" size="small">
               <Icon icon="ep:download" class="mr-1" />
               导出
             </el-button>
-            <el-button type="warning" @click="handleImport">
+            <el-button type="warning" @click="handleImport" size="small">
               <Icon icon="ep:upload" class="mr-1" />
               导入
             </el-button>
-          </el-col>
-        </el-row>
+          </div>
+        </div>
       </el-form>
     </el-card>
 
@@ -604,6 +568,56 @@ onUnmounted(() => {
 
   .search-card {
     margin-bottom: 20px;
+
+    .search-form {
+      .search-form-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+
+        .search-fields {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px 16px;
+          flex: 1;
+
+          .compact-form-item {
+            margin-bottom: 0;
+            width: calc(25% - 12px);
+            min-width: 180px;
+
+            :deep(.el-form-item__label) {
+              font-size: 12px;
+              padding-right: 4px;
+            }
+
+            :deep(.el-input__inner),
+            :deep(.el-select .el-input__inner) {
+              font-size: 12px;
+            }
+
+            :deep(.el-autocomplete),
+            :deep(.el-input),
+            :deep(.el-select),
+            :deep(.el-date-editor) {
+              width: 100%;
+            }
+          }
+        }
+
+        .search-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          padding-top: 0;
+          min-width: fit-content;
+
+          .el-button {
+            margin-left: 0;
+          }
+        }
+      }
+    }
   }
 
   .stat-card {

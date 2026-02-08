@@ -148,7 +148,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         '/api': {
           target: 'http://localhost:3002',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '/api'),
           bypass: (req) => {
             // 如果请求是mock路径，不代理，让vite-plugin-mock处理
             if (req.url?.startsWith('/api/mock')) {

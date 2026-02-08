@@ -6,3 +6,205 @@
 .el-popup-parent--hidden {
   width: 100% !important;
 }
+
+// 全局样式：禁用表单元素背景改为白色
+// 参考原项目 vue-element-admin 的实现
+
+// 普通输入框
+.el-input.is-disabled .el-input__inner,
+.el-textarea.is-disabled .el-textarea__inner,
+.el-cascader.is-disabled .el-input__inner,
+.el-input-number.is-disabled .el-input__inner,
+.el-date-editor.is-disabled .el-input__inner {
+  background-color: #ffffff !important;
+  color: #606266 !important;
+  border-color: #dcdfe6 !important;
+}
+
+// 下拉选择器 - 需要特殊处理（Element Plus 使用 el-input__wrapper）
+.el-select .el-input.is-disabled .el-input__wrapper,
+.el-select .el-input.is-disabled .el-input__inner,
+.el-select .is-disabled .el-input__wrapper,
+.el-select .is-disabled .el-input__inner {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #606266 !important;
+  -webkit-text-fill-color: #606266 !important;
+  box-shadow: 0 0 0 1px #dcdfe6 inset !important;
+}
+
+// 日期选择器
+.el-date-editor.is-disabled .el-input__wrapper,
+.el-date-editor.is-disabled .el-input__inner {
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 1px #dcdfe6 inset !important;
+}
+
+// 通用覆盖 - 所有禁用状态的 wrapper
+.el-input.is-disabled .el-input__wrapper {
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 1px #dcdfe6 inset !important;
+}
+
+// 终极覆盖 - 使用属性选择器确保所有情况
+[class*="is-disabled"] .el-input__inner,
+[class*="is-disabled"] .el-input__wrapper,
+[class*="is-disabled"] .el-textarea__inner {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+// 针对 Element Plus 的 select 组件特殊处理
+.el-select .el-input__wrapper:has(.el-input__inner:disabled),
+.el-select .el-input__wrapper.is-disabled,
+.el-select .el-input.is-disabled .el-input__wrapper {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+// 直接针对 select 内部的 disabled input
+.el-select .el-input .el-input__inner:disabled {
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #606266 !important;
+}
+
+// 覆盖所有可能的情况
+.el-select .is-disabled .el-input .el-input__wrapper,
+.el-select .is-disabled .el-input .el-input__inner {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+// 覆盖 Element Plus CSS 变量
+.el-input {
+  --el-input-bg-color: #ffffff;
+  --el-disabled-bg-color: #ffffff;
+  --el-fill-color-light: #ffffff;
+}
+
+.el-input.is-disabled {
+  --el-input-bg-color: #ffffff !important;
+  --el-disabled-bg-color: #ffffff !important;
+  --el-fill-color-light: #ffffff !important;
+}
+
+// 全局对话框样式，确保在 fixed header 之上
+// 覆盖 Element Plus 默认的 z-index 和布局中的 z-3000
+.el-overlay {
+  z-index: 20000 !important;
+}
+
+.el-dialog.resident-detail-dialog {
+  z-index: 20001 !important;
+  max-height: 98vh; // 加高到 98% 视口高度，接近全屏
+  overflow: hidden;
+}
+
+// 确保遮罩层和对话框容器都在最上层
+.el-overlay-dialog {
+  z-index: 20000 !important;
+}
+
+// 居民详情对话框特定样式
+.el-dialog.resident-detail-dialog .el-dialog__header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e4e7ed;
+  margin: 0;
+}
+
+.el-dialog.resident-detail-dialog .el-dialog__body {
+  padding: 15px 20px;
+  overflow-y: auto;
+  max-height: calc(98vh - 130px); // 相应调整 body 高度
+}
+
+// 使用 scrollbar-gutter 预留滚动条空间，避免宽度变化
+@supports (scrollbar-gutter: stable) {
+  .el-dialog.resident-detail-dialog .el-dialog__body {
+    scrollbar-gutter: stable;
+  }
+}
+
+// 确保对话框内的卡片和表格不会溢出
+.el-dialog.resident-detail-dialog .el-card {
+  width: 100%;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+}
+
+.el-dialog.resident-detail-dialog .el-card:last-child {
+  margin-bottom: 0;
+}
+
+// 确保表格宽度一致
+.el-dialog.resident-detail-dialog .el-table {
+  width: 100% !important;
+}
+
+// 居民详情对话框：确保所有禁用字段背景为白色
+.el-dialog.resident-detail-dialog {
+  // 输入框
+  .el-input.is-disabled .el-input__inner,
+  .el-input__inner:disabled,
+  .el-textarea.is-disabled .el-textarea__inner,
+  .el-textarea__inner:disabled {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #606266 !important;
+    -webkit-text-fill-color: #606266 !important;
+    border-color: #dcdfe6 !important;
+  }
+
+  // 选择器
+  .el-select .el-input.is-disabled .el-input__wrapper,
+  .el-select .is-disabled .el-input__wrapper,
+  .el-select .el-input__wrapper.is-disabled {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 1px #dcdfe6 inset !important;
+  }
+
+  // 日期选择器
+  .el-date-editor.is-disabled .el-input__wrapper,
+  .el-date-editor.is-disabled .el-input__inner {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 1px #dcdfe6 inset !important;
+  }
+
+  // 通用 wrapper
+  .el-input.is-disabled .el-input__wrapper,
+  .el-input__wrapper.is-disabled {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 1px #dcdfe6 inset !important;
+  }
+
+  // 确保所有表单元素在只读状态下也是白色
+  .el-form-item__content {
+    .el-input.is-disabled,
+    .el-select .el-input.is-disabled,
+    .el-date-editor.is-disabled {
+      .el-input__wrapper,
+      .el-input__inner {
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+      }
+    }
+  }
+}
+
+// 日期选择器弹出层样式 - 确保在对话框之上
+.el-picker__popper {
+  z-index: 30000 !important;
+}
+
+// 日期选择器下拉面板
+.el-date-picker {
+  z-index: 30000 !important;
+}
+
+// 确保日期选择器的弹出层不会被对话框遮挡
+.el-popper.is-light {
+  z-index: 30000 !important;
+}
