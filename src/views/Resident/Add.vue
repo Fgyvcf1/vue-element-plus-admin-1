@@ -232,32 +232,12 @@
                   size="small"
                   style="width: 100%"
                 >
-                  <el-option label="本人" value="本人" />
-                  <el-option label="配偶" value="配偶" />
-                  <el-option label="子" value="子" />
-                  <el-option label="女" value="女" />
-                  <el-option label="儿媳" value="儿媳" />
-                  <el-option label="女婿" value="女婿" />
-                  <el-option label="孙子" value="孙子" />
-                  <el-option label="孙女" value="孙女" />
-                  <el-option label="父亲" value="父亲" />
-                  <el-option label="母亲" value="母亲" />
-                  <el-option label="祖父" value="祖父" />
-                  <el-option label="祖母" value="祖母" />
-                  <el-option label="外祖父" value="外祖父" />
-                  <el-option label="外祖母" value="外祖母" />
-                  <el-option label="兄弟" value="兄弟" />
-                  <el-option label="姐妹" value="姐妹" />
-                  <el-option label="兄嫂" value="兄嫂" />
-                  <el-option label="弟媳" value="弟媳" />
-                  <el-option label="姐夫" value="姐夫" />
-                  <el-option label="妹夫" value="妹夫" />
-                  <el-option label="伯父" value="伯父" />
-                  <el-option label="叔父" value="叔父" />
-                  <el-option label="侄子" value="侄子" />
-                  <el-option label="侄女" value="侄女" />
-                  <el-option label="其他亲属" value="其他亲属" />
-                  <el-option label="非亲属" value="非亲属" />
+                  <el-option
+                    v-for="item in relationshipOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -459,7 +439,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   ElMessage,
@@ -480,6 +460,7 @@ import {
 } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { addResident, addHousehold, getSearchSuggestions } from '@/api/resident'
+import { getDictApi } from '@/api/common'
 import ImportMapping from './components/ImportMapping.vue'
 
 const router = useRouter()
@@ -603,6 +584,9 @@ const housingTypeOptions = ref([
   { label: '借住', value: '借住' },
   { label: '其他', value: '其他' }
 ])
+
+// 与户主关系选项（从字典表获取）
+const relationshipOptions = ref<{ label: string; value: string }[]>([])
 
 // 户主信息表单
 const householdForm = reactive({
@@ -799,6 +783,50 @@ const handleImportSuccess = () => {
   importDialogVisible.value = false
   ElMessage.success('导入成功')
 }
+
+// 加载所有字典数据
+const loadAllDictionaries = async () => {
+  try {
+    const res = await getDictApi()
+    if (res.code === 20000 && res.data) {
+      // /dictionaries 接口返回的是扁平数组，需要按 category 分组
+      const dictArray = res.data
+      const dictData: Record<string, any[]> = {}
+
+      // 按 category 分组
+      dictArray.forEach((item: any) => {
+        if (!dictData[item.category]) {
+          dictData[item.category] = []
+        }
+        dictData[item.category].push({
+          id: item.id,
+          value: item.value,
+          label: item.label || item.value,
+          display_order: item.display_order
+        })
+      })
+
+      // 对每个分类内的选项按 display_order 排序
+      Object.keys(dictData).forEach((key) => {
+        dictData[key].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+      })
+
+      // 加载与户主关系字典
+      const relationshipData = dictData['relationship_to_head'] || []
+      relationshipOptions.value = relationshipData.map((item: any) => ({
+        label: item.label || item.value,
+        value: item.value
+      }))
+    }
+  } catch (error) {
+    console.error('加载字典数据失败:', error)
+  }
+}
+
+// 组件挂载时加载字典数据
+onMounted(() => {
+  loadAllDictionaries()
+})
 </script>
 
 <style scoped lang="scss">

@@ -14,10 +14,44 @@
       <div class="dialog-header">
         <span class="dialog-title">{{ title }}</span>
         <div class="dialog-header-buttons">
-          <el-button v-if="!isAddingNew && !isEditable" type="primary" size="small" :loading="loading" @click="handleEdit">修改</el-button>
-          <el-button v-if="!isAddingNew" type="primary" size="small" :loading="loading" @click="handleSameHouseholdAdd">同户新增</el-button>
+          <el-button :style="{ visibility: !isAddingNew && !isEditable ? 'visible' : 'hidden' }" type="primary" size="small" :loading="loading" @click="handleEdit">修改</el-button>
+          <el-button :style="{ visibility: !isAddingNew ? 'visible' : 'hidden' }" type="primary" size="small" :loading="loading" @click="handleSameHouseholdAdd">同户新增</el-button>
           <el-button type="success" size="small" :loading="loading" @click="handleSave">保存</el-button>
-          <el-button v-if="isEditable" type="info" size="small" @click="cancelEdit">取消</el-button>
+          <el-dropdown
+            v-if="!isAddingNew && isCurrentUserHead"
+            trigger="click"
+            :teleported="true"
+            popper-class="header-dropdown-popper"
+            @command="handleHouseholdCommand"
+          >
+            <el-button type="info" size="small" class="dropdown-trigger-btn">
+              <el-icon><CaretBottom /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="changeHead">更换户主</el-dropdown-item>
+                <el-dropdown-item command="splitHousehold">独立成户</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-dropdown
+            v-if="!isAddingNew && !isCurrentUserHead"
+            trigger="click"
+            :teleported="true"
+            popper-class="header-dropdown-popper"
+            @command="handleHouseholdCommand"
+          >
+            <el-button type="info" size="small" class="dropdown-trigger-btn">
+              <el-icon><CaretBottom /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="changeHead">更换户主</el-dropdown-item>
+                <el-dropdown-item command="splitHousehold">独立成户</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-button :style="{ visibility: isEditable ? 'visible' : 'hidden' }" type="info" size="small" @click="cancelEdit">取消</el-button>
         </div>
       </div>
     </template>
@@ -256,6 +290,84 @@
       </el-form>
     </el-card>
 
+    <!-- 更换户主对话框 -->
+    <el-dialog
+      v-model="changeHeadDialogVisible"
+      title="更换户主"
+      width="550px"
+      :close-on-click-modal="false"
+      append-to-body
+    >
+      <el-form label-width="120px" size="small">
+        <el-form-item label="当前户主">
+          <span class="readonly-text">{{ householdForm.householdHeadName }}</span>
+        </el-form-item>
+        
+        <!-- 选择更换类型 -->
+        <el-form-item label="更换类型">
+          <el-radio-group v-model="changeHeadType">
+            <el-radio label="same">同户更换</el-radio>
+            <el-radio label="other">跨户迁移</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        
+        <!-- 同户更换：选择新户主 -->
+        <template v-if="changeHeadType === 'same'">
+          <el-form-item v-if="isCurrentUserHead" label="新户主" required>
+            <el-select v-model="newHeadId" placeholder="请选择新户主" style="width: 100%">
+              <el-option
+                v-for="member in eligibleNewHeads"
+                :key="member.id"
+                :label="member.name + ' (' + member.relationshipToHead + ')'"
+                :value="member.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-else label="新户主">
+            <span class="readonly-text">{{ residentForm.name }} (将自己设为户主)</span>
+          </el-form-item>
+        </template>
+        
+        <!-- 跨户迁移：搜索并选择目标家庭 -->
+        <template v-if="changeHeadType === 'other'">
+          <el-form-item label="目标户主" required>
+            <el-autocomplete
+              v-model="targetHouseholdHeadName"
+              :fetch-suggestions="fetchHouseholdHeadSuggestions"
+              placeholder="请输入户主姓名搜索"
+              style="width: 100%"
+              value-key="householdHeadName"
+              :trigger-on-focus="false"
+              :debounce="300"
+              @select="handleTargetHouseholdSelect"
+            >
+              <template #default="{ item }">
+                <div>{{ item.householdHeadName }} - {{ item.address }}</div>
+              </template>
+            </el-autocomplete>
+          </el-form-item>
+          <el-form-item v-if="selectedTargetHousehold" label="目标地址">
+            <span class="readonly-text">{{ selectedTargetHousehold.address }}</span>
+          </el-form-item>
+        </template>
+        
+        <el-form-item label="与户主关系" required>
+          <el-select v-model="oldHeadNewRelationship" placeholder="请选择与户主的关系" style="width: 100%">
+            <el-option
+              v-for="option in relationshipOptions"
+              :key="option.id"
+              :label="option.value"
+              :value="option.value"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button size="small" @click="changeHeadDialogVisible = false">取消</el-button>
+        <el-button type="primary" size="small" :loading="loading" @click="confirmChangeHead">确定</el-button>
+      </template>
+    </el-dialog>
+
     <!-- 成员列表区 -->
     <el-card shadow="hover" class="info-card compact-card">
       <template #header>
@@ -440,6 +552,7 @@
 import { ref, watch, computed, onMounted } from 'vue'
 import {
   ElMessage,
+  ElMessageBox,
   ElDialog,
   ElButton,
   ElTag,
@@ -454,12 +567,19 @@ import {
   ElCol,
   ElTable,
   ElTableColumn,
-  ElIcon
+  ElIcon,
+  ElDropdown,
+  ElDropdownMenu,
+  ElDropdownItem,
+  ElRadio,
+  ElRadioGroup,
+  ElAutocomplete
 } from 'element-plus'
-import { ArrowDown } from '@element-plus/icons-vue'
-import { getResidentDetail, addResident, updateResident, updateResidentStatus } from '@/api/resident'
+import { CaretBottom, ArrowDown } from '@element-plus/icons-vue'
+import { getResidentDetail, addResident, updateResident, updateResidentStatus, getSearchSuggestions } from '@/api/resident'
 import { getHouseholdDetail, getHouseholdMembers, updateHousehold, createHousehold } from '@/api/household'
 import { getDictApi } from '@/api/common'
+import request from '@/axios'
 
 const props = defineProps<{
   modelValue: boolean
@@ -554,6 +674,29 @@ const migrationForm = ref({
 const isMigrationEditable = ref(false)
 const originalMigrationForm = ref({})
 
+// 更换户主对话框
+const changeHeadDialogVisible = ref(false)
+const changeHeadType = ref<'same' | 'other'>('same') // 更换类型：same-同户更换，other-跨户迁移
+const newHeadId = ref<number | string | null>(null)
+const oldHeadNewRelationship = ref('')
+
+// 跨户迁移相关
+const targetHouseholdHeadName = ref('')
+const selectedTargetHousehold = ref<any>(null)
+
+// 当前居民是否是户主
+const isCurrentUserHead = computed(() => {
+  return residentForm.value.relationshipToHead === '本人' || residentForm.value.relationshipToHead === '户主'
+})
+
+// 可作为新户主的成员列表（排除当前户主）
+const eligibleNewHeads = computed(() => {
+  return householdMembers.value.filter(member => 
+    member.id !== currentResidentId.value && 
+    member.status === 'active'
+  )
+})
+
 // 家庭成员列表
 const householdMembers = ref<any[]>([])
 const filteredHouseholdMembers = ref<any[]>([])
@@ -611,6 +754,9 @@ watch(() => props.modelValue, (val) => {
     currentResidentId.value = null
     currentHouseholdId.value = null
     isMigrationExpanded.value = false
+    isEditable.value = false
+    isAddingNew.value = false
+    title.value = '居民详细信息'
     initData()
   } else {
     resetFormData()
@@ -769,7 +915,7 @@ const loadAllDictionaries = async () => {
       militaryServiceOptions.value = dictData['兵役状况'] || []
       educationLevelOptions.value = dictData['文化程度'] || []
       villageGroupOptions.value = dictData['村组'] || []
-      relationshipOptions.value = dictData['与户主关系'] || []
+      relationshipOptions.value = dictData['relationship_to_head'] || []
     }
   } catch (error) {
     console.error('加载字典数据失败:', error)
@@ -1237,6 +1383,181 @@ const updateResidentData = async () => {
   }
 }
 
+// 打开更换户主对话框
+const openChangeHeadDialog = () => {
+  // 重置对话框状态
+  changeHeadType.value = 'same'
+  newHeadId.value = null
+  oldHeadNewRelationship.value = ''
+  targetHouseholdHeadName.value = ''
+  selectedTargetHousehold.value = null
+  
+  // 如果当前用户不是户主，自动将自己设为新户主（同户更换时）
+  if (!isCurrentUserHead.value) {
+    newHeadId.value = currentResidentId.value
+  }
+  
+  changeHeadDialogVisible.value = true
+}
+
+// 搜索目标户主建议
+const fetchHouseholdHeadSuggestions = async (queryString: string, cb: any) => {
+  if (!queryString || queryString.length < 1) {
+    cb([])
+    return
+  }
+  
+  try {
+    const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
+    if (res.code === 20000 && res.householdHeadNames) {
+      // 过滤掉当前家庭
+      const results = res.householdHeadNames.filter((item: any) => 
+        item.householdNumber !== currentHouseholdId.value
+      ).map((item: any) => ({
+        householdNumber: item.householdNumber,
+        householdHeadName: item.householdHeadName,
+        address: item.address,
+        householdHeadId: item.householdHeadId,
+        value: item.householdHeadName
+      }))
+      cb(results)
+    } else {
+      cb([])
+    }
+  } catch (error) {
+    console.error('搜索户主失败:', error)
+    cb([])
+  }
+}
+
+// 选择目标家庭
+const handleTargetHouseholdSelect = (item: any) => {
+  selectedTargetHousehold.value = item
+}
+
+// 确认更换户主
+const confirmChangeHead = async () => {
+  // 验证
+  if (!oldHeadNewRelationship.value) {
+    ElMessage.error('请选择与户主的关系')
+    return
+  }
+
+  loading.value = true
+  try {
+    let res
+    
+    if (changeHeadType.value === 'same') {
+      // 同户更换
+      if (!newHeadId.value) {
+        ElMessage.error('请选择新户主')
+        loading.value = false
+        return
+      }
+      
+      res = await request.post({
+        url: `/households/${currentHouseholdId.value}/change-head`,
+        data: {
+          newHeadResidentId: newHeadId.value,
+          oldHeadNewRelationship: oldHeadNewRelationship.value
+        }
+      })
+    } else {
+      // 跨户迁移
+      if (!selectedTargetHousehold.value) {
+        ElMessage.error('请选择目标家庭')
+        loading.value = false
+        return
+      }
+      
+      res = await request.post({
+        url: `/residents/${currentResidentId.value}/migrate-household`,
+        data: {
+          targetHouseholdNumber: selectedTargetHousehold.value.householdNumber,
+          targetHouseholdHeadId: selectedTargetHousehold.value.householdHeadId,
+          relationshipToHead: oldHeadNewRelationship.value
+        }
+      })
+    }
+
+    if (res.code === 20000) {
+      ElMessage.success(changeHeadType.value === 'same' ? '更换户主成功' : '迁移家庭成功')
+      changeHeadDialogVisible.value = false
+      await initData()
+      emit('refresh-list')
+    } else {
+      ElMessage.error(res.message || '操作失败')
+    }
+  } catch (error: any) {
+    console.error('操作失败:', error)
+    ElMessage.error(error?.response?.data?.message || '操作失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 处理户主信息下拉菜单命令
+const handleHouseholdCommand = (command: string) => {
+  console.log('handleHouseholdCommand 被调用:', command)
+  if (command === 'changeHead') {
+    openChangeHeadDialog()
+  } else if (command === 'splitHousehold') {
+    handleSplitHousehold()
+  }
+}
+
+// 独立成户处理
+const handleSplitHousehold = async () => {
+  console.log('handleSplitHousehold 被调用', {
+    currentResidentId: currentResidentId.value,
+    isCurrentUserHead: isCurrentUserHead.value,
+    relationshipToHead: residentForm.value.relationshipToHead
+  })
+  
+  if (isCurrentUserHead.value) {
+    ElMessage.warning('当前居民是户主，无法独立成户')
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      `确定将 "${residentForm.value.name}" 独立成户吗？\n\n独立后该居民将成为新户主，与原家庭分离。`,
+      '确认独立成户',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+  } catch {
+    return
+  }
+
+  loading.value = true
+  try {
+    const res = await request.post({
+      url: `/residents/${currentResidentId.value}/split-household`,
+      data: {
+        keepAddress: true,
+        keepVillageGroup: true
+      }
+    })
+
+    if (res.code === 20000) {
+      ElMessage.success('独立成户成功')
+      emit('refresh-list')
+      dialogVisible.value = false
+    } else {
+      ElMessage.error(res.message || '独立成户失败')
+    }
+  } catch (error: any) {
+    console.error('独立成户失败:', error)
+    ElMessage.error(error?.response?.data?.message || '独立成户失败')
+  } finally {
+    loading.value = false
+  }
+}
+
 // 切换迁途改销展开状态
 const toggleMigration = () => {
   isMigrationExpanded.value = !isMigrationExpanded.value
@@ -1270,10 +1591,29 @@ const filterHouseholdMembers = () => {
 }
 
 // 点击成员列表行，切换编辑当前成员
-const handleMemberRowClick = (row: any) => {
+const handleMemberRowClick = async (row: any) => {
+  // 避免重复点击同一个成员
+  if (currentResidentId.value === row.id) {
+    return
+  }
+  
+  // 重置编辑状态，避免按钮显示状态变化导致闪烁
+  isEditable.value = false
+  title.value = '居民详细信息'
+  
   currentResidentId.value = row.id
   currentHouseholdId.value = row.householdId || row.household_id
-  initData()
+  
+  // 静默加载数据，不显示loading，避免按钮闪烁
+  try {
+    await Promise.all([
+      loadHouseholdInfo(currentHouseholdId.value!),
+      loadResidentInfo(currentResidentId.value!)
+      // 不重新加载家庭成员列表，避免表格闪烁
+    ])
+  } catch (error) {
+    console.error('切换成员失败:', error)
+  }
 }
 
 // 获取成员状态文本
@@ -1373,7 +1713,23 @@ onMounted(() => {
   .dialog-header-buttons {
     display: flex;
     gap: 8px;
+    min-height: 32px;
+    align-items: center;
+
+    .dropdown-trigger-btn {
+      padding: 0 8px;
+      min-width: 32px;
+
+      .el-icon {
+        font-size: 14px;
+      }
+    }
   }
+}
+
+// 标题栏下拉菜单弹出层样式
+:deep(.header-dropdown-popper) {
+  z-index: 30001 !important;
 }
 
 /* 注意：禁用输入框背景样式已在全局样式文件 index.less 中定义 */
@@ -1397,6 +1753,17 @@ onMounted(() => {
 
 .info-card {
   margin-bottom: 10px;
+  overflow: visible;
+
+  :deep(.el-card__header) {
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+  }
+
+  :deep(.el-card__body) {
+    overflow: visible;
+  }
 }
 
 .compact-form {
@@ -1487,4 +1854,5 @@ onMounted(() => {
   margin-top: 15px;
   text-align: right;
 }
+
 </style>

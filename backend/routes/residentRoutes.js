@@ -199,11 +199,12 @@ router.get('/residents', (req, res) => {
     }
   }
 
-  // 特殊处理户主姓名查询
-  if (req.query.householdHeadName) {
+  // 特殊处理户主姓名查询（支持 householdHeadName 和 householderName 两种参数名）
+  const householdHeadName = req.query.householdHeadName || req.query.householderName;
+  if (householdHeadName) {
     // 先查询对应家庭的household_number
     const householdsSql = `SELECT household_number FROM households WHERE household_head_name LIKE ? AND status = 'active'`;
-    db.all(householdsSql, [`%${req.query.householdHeadName}%`], (householdErr, households) => {
+    db.all(householdsSql, [`%${householdHeadName}%`], (householdErr, households) => {
       if (householdErr) {
         console.error('查询家庭失败:', householdErr.message);
         res.status(500).json({ code: 500, message: '查询居民数据失败' });
@@ -289,20 +290,315 @@ router.get('/residents', (req, res) => {
   });
 });
 
-// 获取居民的户籍变动记录 - 放在/residents/:id之前，确保正确匹配
-router.get('/residents/:id/change-logs', (req, res) => {
+// 独立成户 API - 必须放在 /residents/:id 之前，避免被拦截
+router.post('/residents/:id/split-household', async (req, res) => {
   const { id } = req.params;
+  const { keepAddress = true, keepVillageGroup = true } = req.body;
 
-  const sql = `SELECT * FROM household_change_log WHERE resident_id = ? ORDER BY change_date DESC`;
+  console.log('收到独立成户请求:', { residentId: id, keepAddress, keepVillageGroup });
 
-  db.all(sql, [id], (err, rows) => {
-    if (err) {
-      console.error('获取户籍变动记录失败:', err.message);
-      return res.status(500).json({ code: 500, message: '获取户籍变动记录失败' });
+  try {
+    // 开启事务
+    await new Promise((resolve, reject) => {
+      db.run('BEGIN TRANSACTION', (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    // 1. 查询当前居民信息
+    const resident = await new Promise((resolve, reject) => {
+      db.get(
+        `SELECT r.*, h.address as household_address, h.village_group as household_village_group
+         FROM residents r
+         LEFT JOIN households h ON r.household_id = h.household_number
+         WHERE r.id = ? AND r.status = 'active'`,
+        [id],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
+    });
+
+    if (!resident) {
+      await new Promise((resolve) => db.run('ROLLBACK', resolve));
+      return res.status(404).json({ code: 404, message: '未找到居民信息' });
     }
 
-    res.json({ code: 20000, data: rows });
+    // 检查是否是户主
+    if (resident.relationship_to_head === '本人' || resident.relationship_to_head === '户主') {
+      await new Promise((resolve) => db.run('ROLLBACK', resolve));
+      return res.status(400).json({ code: 400, message: '户主不能独立成户，请先更换户主' });
+    }
+
+    const oldHouseholdId = resident.household_id;
+
+    // 2. 生成新的户编号
+    const villageGroup = keepVillageGroup ? resident.household_village_group || resident.village_group : resident.village_group;
+    const idCardSuffix = resident.id_card ? resident.id_card.slice(-6) : '000000';
+    
+    // 获取村组首字母
+    let groupCode = 'XX';
+    if (villageGroup) {
+      const pinyinMap = {
+        '一': 'Y', '二': 'E', '三': 'S', '四': 'S', '五': 'W',
+        '六': 'L', '七': 'Q', '八': 'B', '九': 'J', '十': 'S',
+        '大': 'D', '小': 'X', '前': 'Q', '后': 'H', '东': 'D',
+        '西': 'X', '南': 'N', '北': 'B', '中': 'Z', '山': 'S',
+        '河': 'H', '村': 'C', '庄': 'Z', '镇': 'Z', '乡': 'X'
+      };
+      const firstChar = villageGroup.charAt(0);
+      const secondChar = villageGroup.charAt(1);
+      groupCode = (pinyinMap[firstChar] || firstChar) + (pinyinMap[secondChar] || secondChar);
+    }
+    
+    let newHouseholdNumber = `${groupCode}${idCardSuffix}`;
+    
+    // 检查户编号是否已存在，如果存在则添加后缀
+    const checkHouseholdNumber = async (number, suffix = 0) => {
+      const checkNumber = suffix === 0 ? number : `${number}-${suffix}`;
+      const exists = await new Promise((resolve, reject) => {
+        db.get('SELECT 1 FROM households WHERE household_number = ?', [checkNumber], (err, row) => {
+          if (err) reject(err);
+          else resolve(!!row);
+        });
+      });
+      if (exists) {
+        return checkHouseholdNumber(number, suffix + 1);
+      }
+      return checkNumber;
+    };
+
+    newHouseholdNumber = await checkHouseholdNumber(newHouseholdNumber);
+
+    // 3. 创建新的 households 记录
+    const address = keepAddress ? resident.household_address || resident.Home_address : resident.Home_address;
+    const registeredDate = new Date().toISOString().split('T')[0]; // 当前日期
+    
+    await new Promise((resolve, reject) => {
+      db.run(
+        `INSERT INTO households (
+          household_number, household_head_name, household_head_id_card,
+          village_group, address, gender, ethnicity,
+          household_type, housing_type, status, registered_date
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, '农业户口', '自有住房', 'active', ?)`,
+        [
+          newHouseholdNumber,
+          resident.name,
+          resident.id_card,
+          villageGroup,
+          address,
+          resident.gender,
+          resident.ethnicity,
+          registeredDate
+        ],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+
+    // 4. 更新居民信息
+    await new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE residents SET
+          household_id = ?,
+          household_head_id = ?,
+          relationship_to_head = '本人',
+          Home_address = ?,
+          village_group = ?
+         WHERE id = ?`,
+        [newHouseholdNumber, id, address, villageGroup, id],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+
+    // 提交事务
+    await new Promise((resolve, reject) => {
+      db.run('COMMIT', (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    console.log('独立成户成功:', { residentId: id, newHouseholdNumber });
+
+    res.json({
+      code: 20000,
+      success: true,
+      message: '独立成户成功',
+      data: {
+        newHouseholdNumber,
+        residentName: resident.name
+      }
+    });
+
+  } catch (error) {
+    console.error('独立成户失败:', error);
+    await new Promise((resolve) => db.run('ROLLBACK', resolve));
+    res.status(500).json({ code: 500, message: '独立成户失败: ' + error.message });
+  }
+});
+
+// 跨户迁移 API - 将居民迁移到另一个家庭
+router.post('/residents/:id/migrate-household', async (req, res) => {
+  const { id } = req.params;
+  const { targetHouseholdNumber, targetHouseholdHeadId, relationshipToHead } = req.body;
+
+  console.log('收到跨户迁移请求:', { 
+    residentId: id, 
+    targetHouseholdNumber, 
+    targetHouseholdHeadId, 
+    relationshipToHead 
   });
+
+  if (!targetHouseholdNumber || !targetHouseholdHeadId || !relationshipToHead) {
+    return res.status(400).json({ 
+      code: 400, 
+      message: '缺少必要参数：目标家庭编号、目标户主ID或与户主关系' 
+    });
+  }
+
+  try {
+    // 开启事务
+    await new Promise((resolve, reject) => {
+      db.run('BEGIN TRANSACTION', (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    // 1. 查询当前居民信息
+    const resident = await new Promise((resolve, reject) => {
+      db.get(
+        `SELECT r.*, h.address as household_address, h.village_group as household_village_group
+         FROM residents r
+         LEFT JOIN households h ON r.household_id = h.household_number
+         WHERE r.id = ? AND r.status = 'active'`,
+        [id],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
+    });
+
+    if (!resident) {
+      await new Promise((resolve) => db.run('ROLLBACK', resolve));
+      return res.status(404).json({ code: 404, message: '未找到居民信息' });
+    }
+
+    // 检查是否是户主
+    if (resident.relationship_to_head === '本人' || resident.relationship_to_head === '户主') {
+      await new Promise((resolve) => db.run('ROLLBACK', resolve));
+      return res.status(400).json({ code: 400, message: '户主不能跨户迁移，请先更换户主' });
+    }
+
+    // 2. 查询目标家庭信息
+    const targetHousehold = await new Promise((resolve, reject) => {
+      db.get(
+        `SELECT * FROM households WHERE household_number = ? AND status = 'active'`,
+        [targetHouseholdNumber],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
+    });
+
+    if (!targetHousehold) {
+      await new Promise((resolve) => db.run('ROLLBACK', resolve));
+      return res.status(404).json({ code: 404, message: '目标家庭不存在' });
+    }
+
+    // 3. 更新居民信息 - 迁移到目标家庭
+    await new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE residents SET
+          household_id = ?,
+          household_head_id = ?,
+          relationship_to_head = ?,
+          Home_address = ?,
+          village_group = ?
+         WHERE id = ?`,
+        [
+          targetHouseholdNumber,
+          targetHouseholdHeadId,
+          relationshipToHead,
+          targetHousehold.address || resident.Home_address,
+          targetHousehold.village_group || resident.village_group,
+          id
+        ],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+
+    // 4. 记录迁移日志（可选）
+    await new Promise((resolve, reject) => {
+      db.run(
+        `INSERT INTO household_change_log (
+          resident_id, change_type, change_date, change_reason, 
+          previous_status, new_status, operator
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          id,
+          'migration_in',
+          new Date().toISOString().split('T')[0],
+          `从家庭 ${resident.household_id} 迁移到家庭 ${targetHouseholdNumber}`,
+          resident.household_id,
+          targetHouseholdNumber,
+          'system'
+        ],
+        (err) => {
+          if (err) {
+            console.error('记录迁移日志失败:', err.message);
+            // 日志记录失败不影响主流程
+          }
+          resolve();
+        }
+      );
+    });
+
+    // 提交事务
+    await new Promise((resolve, reject) => {
+      db.run('COMMIT', (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    console.log('跨户迁移成功:', { 
+      residentId: id, 
+      residentName: resident.name,
+      fromHousehold: resident.household_id,
+      toHousehold: targetHouseholdNumber
+    });
+
+    res.json({
+      code: 20000,
+      success: true,
+      message: '跨户迁移成功',
+      data: {
+        residentId: id,
+        residentName: resident.name,
+        targetHouseholdNumber,
+        relationshipToHead
+      }
+    });
+
+  } catch (error) {
+    console.error('跨户迁移失败:', error);
+    await new Promise((resolve) => db.run('ROLLBACK', resolve));
+    res.status(500).json({ code: 500, message: '跨户迁移失败: ' + error.message });
+  }
 });
 
 // 获取单个居民详情
@@ -431,6 +727,155 @@ router.get('/households', (req, res) => {
     
     res.json({ code: 20000, data: rows });
   });
+});
+
+// 更换户主 API - 必须放在 /households/:id 之前，避免被拦截
+router.post('/households/:id/change-head', async (req, res) => {
+  const { id } = req.params;
+  const { newHeadResidentId, oldHeadNewRelationship } = req.body;
+
+  console.log('收到更换户主请求:', { householdId: id, newHeadResidentId, oldHeadNewRelationship });
+
+  if (!newHeadResidentId || !oldHeadNewRelationship) {
+    return res.status(400).json({ code: 400, message: '缺少必要参数' });
+  }
+
+  try {
+    // 开启事务
+    await new Promise((resolve, reject) => {
+      db.run('BEGIN TRANSACTION', (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    // 1. 查询当前户主信息
+    const currentHead = await new Promise((resolve, reject) => {
+      db.get(
+        `SELECT id, name, id_card, household_id FROM residents 
+         WHERE household_id = ? AND (relationship_to_head = '本人' OR relationship_to_head = '户主') AND status = 'active'`,
+        [id],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
+    });
+
+    if (!currentHead) {
+      await new Promise((resolve) => db.run('ROLLBACK', resolve));
+      return res.status(404).json({ code: 404, message: '未找到当前户主' });
+    }
+
+    // 2. 查询新户主信息（获取 residents 表中的完整信息）
+    const newHead = await new Promise((resolve, reject) => {
+      db.get(
+        `SELECT id, name, id_card, gender, ethnicity, village_group, Home_address, phone_number 
+         FROM residents 
+         WHERE id = ? AND household_id = ? AND status = 'active'`,
+        [newHeadResidentId, id],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
+    });
+
+    if (!newHead) {
+      await new Promise((resolve) => db.run('ROLLBACK', resolve));
+      return res.status(404).json({ code: 404, message: '未找到新户主成员' });
+    }
+
+    // 3. 更新原户主的 relationship_to_head
+    await new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE residents SET relationship_to_head = ? WHERE id = ?`,
+        [oldHeadNewRelationship, currentHead.id],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+
+    // 4. 更新新户主的 relationship_to_head 为“本人”
+    await new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE residents SET relationship_to_head = '本人' WHERE id = ?`,
+        [newHead.id],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+
+    // 5. 更新 households 表的户主信息（使用新户主在 residents 表中的完整信息）
+    await new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE households SET 
+          household_head_name = ?,
+          household_head_id_card = ?,
+          gender = ?,
+          ethnicity = ?,
+          village_group = ?,
+          address = ?,
+          phone_number = ?
+         WHERE household_number = ?`,
+        [
+          newHead.name, 
+          newHead.id_card, 
+          newHead.gender, 
+          newHead.ethnicity, 
+          newHead.village_group || '',
+          newHead.Home_address || '',
+          newHead.phone_number || '',
+          id
+        ],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+
+    // 6. 更新所有成员的 household_head_id
+    await new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE residents SET household_head_id = ? WHERE household_id = ?`,
+        [newHead.id, id],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+
+    // 提交事务
+    await new Promise((resolve, reject) => {
+      db.run('COMMIT', (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    console.log('更换户主成功:', { oldHead: currentHead.name, newHead: newHead.name });
+
+    res.json({
+      code: 20000,
+      success: true,
+      message: '更换户主成功',
+      data: {
+        oldHead: { id: currentHead.id, name: currentHead.name },
+        newHead: { id: newHead.id, name: newHead.name }
+      }
+    });
+
+  } catch (error) {
+    console.error('更换户主失败:', error);
+    await new Promise((resolve) => db.run('ROLLBACK', resolve));
+    res.status(500).json({ code: 500, message: '更换户主失败: ' + error.message });
+  }
 });
 
 // 更新户主信息
@@ -563,12 +1008,10 @@ router.get('/households/check-household-number', (req, res) => {
   });
 });
 
-// 获取户主下的所有成员（包括非active状态）
 router.get('/households/:id/members', (req, res) => {
   const { id } = req.params;
   
   // 构建SQL查询，获取该户主下的所有成员，包括非active状态
-  // 由于我们修改了household_id存储household_number，直接使用id作为household_number查询
   const sql = `SELECT 
                 r.id, 
                 r.name, 
@@ -890,14 +1333,26 @@ router.get('/search-suggestions', (req, res) => {
 
   // 查询户主姓名建议
   if (!type || type === 'householdHeadNames') {
-    const householdSql = `SELECT DISTINCT household_head_name FROM households WHERE household_head_name LIKE ? AND status = 'active' LIMIT 10`;
+    const householdSql = `SELECT 
+                            household_number,
+                            household_head_name,
+                            address,
+                            village_group,
+                            id as householdHeadId
+                          FROM households 
+                          WHERE household_head_name LIKE ? AND status = 'active' 
+                          LIMIT 10`;
     db.all(householdSql, [searchKeyword], (householdErr, householdRows) => {
       if (householdErr) {
         console.error('查询户主姓名建议失败:', householdErr.message);
       } else {
         results.householdHeadNames = householdRows.map(row => ({
-          value: row.household_head_name,
-          label: row.household_head_name
+          householdNumber: row.household_number,
+          householdHeadName: row.household_head_name,
+          address: row.address,
+          villageGroup: row.village_group,
+          householdHeadId: row.householdHeadId,
+          value: row.household_head_name
         }));
       }
       
@@ -1081,6 +1536,22 @@ router.get('/population-structure', async (req, res) => {
     console.error('查询人口结构统计失败:', err.message);
     res.status(500).json({ code: 500, message: '查询人口结构统计失败: ' + err.message });
   }
+});
+
+// 获取居民的户籍变动记录 - 必须放在 /residents/:id 之前
+router.get('/residents/:id/change-logs', (req, res) => {
+  const { id } = req.params;
+
+  const sql = `SELECT * FROM household_change_log WHERE resident_id = ? ORDER BY change_date DESC`;
+
+  db.all(sql, [id], (err, rows) => {
+    if (err) {
+      console.error('获取户籍变动记录失败:', err.message);
+      return res.status(500).json({ code: 500, message: '获取户籍变动记录失败' });
+    }
+
+    res.json({ code: 20000, data: rows });
+  });
 });
 
 module.exports = router;

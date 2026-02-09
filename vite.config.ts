@@ -146,7 +146,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       proxy: {
         // 选项写法 - 排除mock路径
         '/api': {
-          target: 'http://localhost:3002',
+          target: 'http://localhost:3001',
           changeOrigin: true,
           bypass: (req) => {
             // 如果请求是mock路径，不代理，让vite-plugin-mock处理

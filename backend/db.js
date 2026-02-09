@@ -61,6 +61,9 @@ function convertSql(sql) {
   // sqlite_version() → VERSION()
   sql = sql.replace(/sqlite_version\(\)/gi, 'VERSION()');
   
+  // BEGIN TRANSACTION → START TRANSACTION (MySQL语法)
+  sql = sql.replace(/BEGIN\s+TRANSACTION/gi, 'START TRANSACTION');
+  
   // 处理LIMIT offset, count 语法差异
   // SQLite: LIMIT count OFFSET offset
   // MySQL: LIMIT offset, count 或 LIMIT count OFFSET offset (都支持)

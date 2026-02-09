@@ -97,7 +97,7 @@
 .el-dialog.resident-detail-dialog {
   z-index: 20001 !important;
   max-height: 98vh; // 加高到 98% 视口高度，接近全屏
-  overflow: hidden;
+  overflow: visible; // 改为 visible，允许下拉菜单等弹出层正常显示
 }
 
 // 确保遮罩层和对话框容器都在最上层
