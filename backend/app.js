@@ -2,7 +2,29 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const routes = require('./routes');
+const fs = require('fs'); // 引入fs模块
+const path = require('path'); // 引入path模块
 require('./cron');  // 引入定时任务脚本
+
+// 配置错误日志文件
+const errorLogPath = path.join(__dirname, 'runtime-error.log');
+const errorLogStream = fs.createWriteStream(errorLogPath, { flags: 'a' });
+
+// 重写 console.error，将错误同时输出到控制台和文件
+const originalConsoleError = console.error;
+console.error = (...args) => {
+  originalConsoleError(...args);
+  const timestamp = new Date().toISOString();
+  errorLogStream.write(`[${timestamp}] `);
+  args.forEach(arg => {
+    if (typeof arg === 'object' && arg !== null) {
+      errorLogStream.write(JSON.stringify(arg, null, 2) + '\n');
+    } else {
+      errorLogStream.write(arg + ' ');
+    }
+  });
+  errorLogStream.write('\n');
+};
 
 const app = express();
 const port = 3001;  // 端口改回3001

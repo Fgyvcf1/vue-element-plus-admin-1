@@ -358,8 +358,8 @@ router.post('/import-residents', async (req, res) => {
             gender || '',
             'active',
             currentDate,
-            householdType || '',
-            housingType || ''
+            householdType || '农村居民户口',
+            housingType || '自有住房'
           ];
           
           await dbRun(`INSERT INTO households (${householdColumns.join(',')}) VALUES (${householdValues.map(() => '?').join(',')})`, householdValues);

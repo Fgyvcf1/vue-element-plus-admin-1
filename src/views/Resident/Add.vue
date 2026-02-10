@@ -231,6 +231,7 @@
                   placeholder="请选择与户主关系"
                   size="small"
                   style="width: 100%"
+                  @change="handleRelationshipChange"
                 >
                   <el-option
                     v-for="item in relationshipOptions"
@@ -470,122 +471,14 @@ const loading = ref(false)
 const importDialogVisible = ref(false)
 
 // 字典选项
-const ethnicityOptions = ref([
-  { label: '汉族', value: '汉族' },
-  { label: '蒙古族', value: '蒙古族' },
-  { label: '回族', value: '回族' },
-  { label: '藏族', value: '藏族' },
-  { label: '维吾尔族', value: '维吾尔族' },
-  { label: '苗族', value: '苗族' },
-  { label: '彝族', value: '彝族' },
-  { label: '壮族', value: '壮族' },
-  { label: '布依族', value: '布依族' },
-  { label: '朝鲜族', value: '朝鲜族' },
-  { label: '满族', value: '满族' },
-  { label: '侗族', value: '侗族' },
-  { label: '瑶族', value: '瑶族' },
-  { label: '白族', value: '白族' },
-  { label: '土家族', value: '土家族' },
-  { label: '哈尼族', value: '哈尼族' },
-  { label: '哈萨克族', value: '哈萨克族' },
-  { label: '傣族', value: '傣族' },
-  { label: '黎族', value: '黎族' },
-  { label: '傈僳族', value: '傈僳族' },
-  { label: '佤族', value: '佤族' },
-  { label: '畲族', value: '畲族' },
-  { label: '高山族', value: '高山族' },
-  { label: '拉祜族', value: '拉祜族' },
-  { label: '水族', value: '水族' },
-  { label: '东乡族', value: '东乡族' },
-  { label: '纳西族', value: '纳西族' },
-  { label: '景颇族', value: '景颇族' },
-  { label: '柯尔克孜族', value: '柯尔克孜族' },
-  { label: '土族', value: '土族' },
-  { label: '达斡尔族', value: '达斡尔族' },
-  { label: '仫佬族', value: '仫佬族' },
-  { label: '羌族', value: '羌族' },
-  { label: '布朗族', value: '布朗族' },
-  { label: '撒拉族', value: '撒拉族' },
-  { label: '毛南族', value: '毛南族' },
-  { label: '仡佬族', value: '仡佬族' },
-  { label: '锡伯族', value: '锡伯族' },
-  { label: '阿昌族', value: '阿昌族' },
-  { label: '普米族', value: '普米族' },
-  { label: '塔吉克族', value: '塔吉克族' },
-  { label: '怒族', value: '怒族' },
-  { label: '乌孜别克族', value: '乌孜别克族' },
-  { label: '俄罗斯族', value: '俄罗斯族' },
-  { label: '鄂温克族', value: '鄂温克族' },
-  { label: '德昂族', value: '德昂族' },
-  { label: '保安族', value: '保安族' },
-  { label: '裕固族', value: '裕固族' },
-  { label: '京族', value: '京族' },
-  { label: '塔塔尔族', value: '塔塔尔族' },
-  { label: '独龙族', value: '独龙族' },
-  { label: '鄂伦春族', value: '鄂伦春族' },
-  { label: '赫哲族', value: '赫哲族' },
-  { label: '门巴族', value: '门巴族' },
-  { label: '珞巴族', value: '珞巴族' },
-  { label: '基诺族', value: '基诺族' }
-])
-
-const villageGroupOptions = ref([
-  { label: '一组', value: '一组' },
-  { label: '二组', value: '二组' },
-  { label: '三组', value: '三组' },
-  { label: '四组', value: '四组' },
-  { label: '五组', value: '五组' },
-  { label: '六组', value: '六组' },
-  { label: '七组', value: '七组' },
-  { label: '八组', value: '八组' },
-  { label: '九组', value: '九组' },
-  { label: '十组', value: '十组' }
-])
-
-const maritalStatusOptions = ref([
-  { label: '未婚', value: '未婚' },
-  { label: '已婚', value: '已婚' },
-  { label: '离异', value: '离异' },
-  { label: '丧偶', value: '丧偶' }
-])
-
-const politicalStatusOptions = ref([
-  { label: '群众', value: '群众' },
-  { label: '共青团员', value: '共青团员' },
-  { label: '中共党员', value: '中共党员' },
-  { label: '民主党派', value: '民主党派' }
-])
-
-const educationLevelOptions = ref([
-  { label: '小学', value: '小学' },
-  { label: '初中', value: '初中' },
-  { label: '高中', value: '高中' },
-  { label: '中专', value: '中专' },
-  { label: '大专', value: '大专' },
-  { label: '本科', value: '本科' },
-  { label: '研究生', value: '研究生' }
-])
-
-const militaryServiceOptions = ref([
-  { label: '未服兵役', value: '未服兵役' },
-  { label: '已服兵役', value: '已服兵役' },
-  { label: '现役', value: '现役' }
-])
-
-const householdTypeOptions = ref([
-  { label: '农业户口', value: '农业户口' },
-  { label: '非农业户口', value: '非农业户口' },
-  { label: '居民户口', value: '居民户口' }
-])
-
-const housingTypeOptions = ref([
-  { label: '自有住房', value: '自有住房' },
-  { label: '租赁住房', value: '租赁住房' },
-  { label: '借住', value: '借住' },
-  { label: '其他', value: '其他' }
-])
-
-// 与户主关系选项（从字典表获取）
+const ethnicityOptions = ref<{ label: string; value: string }[]>([])
+const villageGroupOptions = ref<{ label: string; value: string }[]>([])
+const maritalStatusOptions = ref<{ label: string; value: string }[]>([])
+const politicalStatusOptions = ref<{ label: string; value: string }[]>([])
+const educationLevelOptions = ref<{ label: string; value: string }[]>([])
+const militaryServiceOptions = ref<{ label: string; value: string }[]>([])
+const householdTypeOptions = ref<{ label: string; value: string }[]>([])
+const housingTypeOptions = ref<{ label: string; value: string }[]>([])
 const relationshipOptions = ref<{ label: string; value: string }[]>([])
 
 // 户主信息表单
@@ -677,7 +570,7 @@ const handleHouseholdIdCardInput = (value: string) => {
 // 获取户主姓名搜索建议
 const fetchHouseholdHeadSuggestions = async (
   queryString: string,
-  callback: (data: { value: string }[]) => void
+  callback: (data: any[]) => void
 ) => {
   if (!queryString || queryString.trim().length < 1) {
     callback([])
@@ -685,21 +578,68 @@ const fetchHouseholdHeadSuggestions = async (
   }
   try {
     const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
-    callback(res.data || [])
+    // 后端返回的数据在 householdHeadNames 字段中（直接返回，不在 data 中）
+    const suggestions = res.householdHeadNames || []
+    callback(suggestions)
   } catch (error) {
     callback([])
   }
 }
 
 // 户主姓名选择处理
-const handleHouseholdHeadSelect = (item: { value: string }) => {
+const handleHouseholdHeadSelect = (item: any) => {
   console.log('选择户主:', item)
-  // 这里可以调用API获取户主详情并填充表单
+  if (item) {
+    // 填充户主信息到表单
+    householdForm.householdHeadName = item.householdHeadName || item.value || ''
+    householdForm.household_number = item.householdNumber || ''
+    householdForm.address = item.address || ''
+    householdForm.villageGroup = item.villageGroup || ''
+    householdForm.gender = item.gender || ''
+    householdForm.householdHeadIdCard = item.householdHeadIdCard || ''
+    householdForm.phoneNumber = item.phoneNumber || ''
+    householdForm.householdType = item.householdType || ''
+    householdForm.housingType = item.housingType || ''
+    householdForm.ethnicity = item.ethnicity || ''
+    
+    // 重要：填充居民表单中的 household_id
+    residentForm.household_id = item.householdNumber || ''
+    residentForm.household_head_id = item.householdHeadId || ''
+    residentForm.Home_address = item.address || residentForm.Home_address
+    residentForm.village_group = item.villageGroup || residentForm.village_group
+    
+    ElMessage.success(`已选择户主：${item.householdHeadName || item.value}`)
+  }
 }
 
 // 户主姓名输入处理
 const handleHouseholdHeadInput = (value: string) => {
   console.log('输入户主姓名:', value)
+  // 清空已选择的户主信息
+  if (!value) {
+    householdForm.household_number = ''
+    householdForm.address = ''
+    householdForm.villageGroup = ''
+    residentForm.household_id = ''
+    residentForm.household_head_id = ''
+  }
+}
+
+// 与户主关系变化处理
+const handleRelationshipChange = (value: string) => {
+  console.log('关系变化:', value)
+  if (value === '本人' || value === '户主') {
+    // 如果是户主，自动将居民信息复制到户主信息
+    householdForm.householdHeadName = residentForm.name
+    householdForm.householdHeadIdCard = residentForm.id_card
+    householdForm.gender = residentForm.gender
+    householdForm.ethnicity = residentForm.ethnicity
+    householdForm.villageGroup = residentForm.village_group
+    householdForm.address = residentForm.Home_address
+    householdForm.phoneNumber = residentForm.phone_number
+    
+    ElMessage.info('已自动将居民信息填充到户主信息，请补充户主的户口类型和住房类型')
+  }
 }
 
 // 提交表单
@@ -710,6 +650,51 @@ const submitForm = async () => {
     if (valid) {
       loading.value = true
       try {
+        let householdId = residentForm.household_id
+        
+        // 如果是户主（本人），需要先创建户主信息
+        if (residentForm.relationship_to_head === '本人' || residentForm.relationship_to_head === '户主') {
+          // 验证户主必填信息
+          if (!householdForm.householdHeadName || !householdForm.householdHeadIdCard) {
+            ElMessage.error('创建户主时，户主姓名和身份证号为必填项')
+            loading.value = false
+            return
+          }
+          
+          // 创建户主
+          const householdData = {
+            household_head_name: householdForm.householdHeadName,
+            household_head_id_card: householdForm.householdHeadIdCard,
+            gender: householdForm.gender || residentForm.gender,
+            ethnicity: householdForm.ethnicity || residentForm.ethnicity,
+            village_group: householdForm.villageGroup || residentForm.village_group,
+            address: householdForm.address || residentForm.Home_address,
+            phone_number: householdForm.phoneNumber || residentForm.phone_number,
+            household_type: householdForm.householdType || '农业户口',
+            housing_type: householdForm.housingType || '自有住房'
+          }
+          
+          console.log('创建户主:', householdData)
+          const householdRes = await addHousehold(householdData)
+          
+          if (householdRes.code === 20000) {
+            householdId = householdRes.data?.householdNumber
+            ElMessage.success('创建户主成功')
+          } else {
+            ElMessage.error(householdRes.message || '创建户主失败')
+            loading.value = false
+            return
+          }
+        } else {
+          // 非户主，必须选择已有家庭
+          if (!householdId) {
+            ElMessage.error('请选择户主或输入户主姓名搜索并选择')
+            loading.value = false
+            return
+          }
+        }
+        
+        // 准备居民数据
         const residentData = {
           name: residentForm.name,
           idCard: residentForm.id_card,
@@ -729,20 +714,21 @@ const submitForm = async () => {
           occupation: residentForm.occupation,
           healthStatus: residentForm.health_status,
           equityShares: residentForm.equity_shares,
-          householdId: residentForm.household_id,
+          householdId: householdId,
           householdHeadId: residentForm.household_head_id
         }
 
+        console.log('提交居民数据:', residentData)
         const res = await addResident(residentData)
-        if (res.code === 200) {
+        if (res.code === 20000) {
           ElMessage.success('新增居民成功')
           router.push('/resident/query')
         } else {
           ElMessage.error(res.message || '新增居民失败')
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('新增居民失败:', error)
-        ElMessage.error('新增居民失败')
+        ElMessage.error(error?.response?.data?.message || '新增居民失败')
       } finally {
         loading.value = false
       }
@@ -780,7 +766,7 @@ const handleImport = () => {
 
 // 导入成功
 const handleImportSuccess = () => {
-  importDialogVisible.value = false
+  // importDialogVisible.value = false
   ElMessage.success('导入成功')
 }
 
@@ -811,12 +797,70 @@ const loadAllDictionaries = async () => {
         dictData[key].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
       })
 
-      // 加载与户主关系字典
-      const relationshipData = dictData['relationship_to_head'] || []
-      relationshipOptions.value = relationshipData.map((item: any) => ({
-        label: item.label || item.value,
-        value: item.value
-      }))
+      // 加载字典数据到对应的响应式变量
+      // 民族
+      if (dictData['民族']) {
+        ethnicityOptions.value = dictData['民族'].map((item: any) => ({
+          label: item.label,
+          value: item.value
+        }))
+      }
+      // 村组
+      if (dictData['村组']) {
+        villageGroupOptions.value = dictData['村组'].map((item: any) => ({
+          label: item.label,
+          value: item.value
+        }))
+      }
+      // 婚姻状况
+      if (dictData['婚姻状况']) {
+        maritalStatusOptions.value = dictData['婚姻状况'].map((item: any) => ({
+          label: item.label,
+          value: item.value
+        }))
+      }
+      // 政治面貌
+      if (dictData['政治面貌']) {
+        politicalStatusOptions.value = dictData['政治面貌'].map((item: any) => ({
+          label: item.label,
+          value: item.value
+        }))
+      }
+      // 文化程度
+      if (dictData['文化程度']) {
+        educationLevelOptions.value = dictData['文化程度'].map((item: any) => ({
+          label: item.label,
+          value: item.value
+        }))
+      }
+      // 兵役状况
+      if (dictData['兵役状况']) {
+        militaryServiceOptions.value = dictData['兵役状况'].map((item: any) => ({
+          label: item.label,
+          value: item.value
+        }))
+      }
+      // 户口类型
+      if (dictData['户口类型']) {
+        householdTypeOptions.value = dictData['户口类型'].map((item: any) => ({
+          label: item.label,
+          value: item.value
+        }))
+      }
+      // 住房类型
+      if (dictData['住房类型']) {
+        housingTypeOptions.value = dictData['住房类型'].map((item: any) => ({
+          label: item.label,
+          value: item.value
+        }))
+      }
+      // 与户主关系
+      if (dictData['relationship_to_head']) {
+        relationshipOptions.value = dictData['relationship_to_head'].map((item: any) => ({
+          label: item.label,
+          value: item.value
+        }))
+      }
     }
   } catch (error) {
     console.error('加载字典数据失败:', error)

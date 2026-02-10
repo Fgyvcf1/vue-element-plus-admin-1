@@ -425,7 +425,7 @@ const importData = async () => {
     }
 
     const res = await importResidents(importData)
-    if (res.code === 200) {
+    if (res.code === 20000) {
       importSuccess.value = true
       activeStep.value = 3
       emit('import-success')

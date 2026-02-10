@@ -4,6 +4,20 @@ const router = express.Router();
 const db = require('./db');
 const { generateUniqueHouseholdId } = require('./utils/householdIdGenerator');
 
+// 辅助函数：将 Excel 日期数字转换为 YYYY-MM-DD 格式
+const excelDateToJSDate = (excelDate) => {
+  if (typeof excelDate === 'number' && excelDate > 0) {
+    // Excel日期是从1900-01-01开始计算天数，但JavaScript的Date对象是从1970-01-01开始
+    // 25569 是 1970-01-01 到 1900-01-01 的天数差
+    const date = new Date(Math.round((excelDate - 25569) * 86400 * 1000));
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  return excelDate; // 如果不是数字日期，则直接返回
+};
+
 // 使用 MySQL/MariaDB 的 db.pool.execute 进行数据库操作
 
 // 检查户编号是否存在的辅助函数
@@ -59,11 +73,33 @@ router.post('/import-residents', async (req, res) => {
   console.log('前几行数据:', JSON.stringify(data.slice(0, 3)));
 
   try {
+    let successCount = 0;
     // 快速解析和验证数据
     const parseErrors = [];
     const headOfHouseholdRows = []; // 户主数据（与户主关系 = "本人"）
     const familyMemberRows = [];    // 家庭成员数据（与户主关系 ≠ "本人"）
     const currentDate = new Date().toISOString().split('T')[0];
+
+    const householdIdMap = new Map(); // 户主姓名 -> household_id
+    const householdMapByName = new Map(); // 按姓名分组的户主信息
+
+    // 预先加载所有户主信息，按姓名和地址建立索引
+    console.log('预先加载户主信息...');
+    const [allHouseholdHeads] = await db.pool.execute('SELECT household_number, household_head_name, address FROM households');
+    
+    for (const household of allHouseholdHeads) {
+      if (household.household_head_name) {
+        if (!householdMapByName.has(household.household_head_name)) {
+          householdMapByName.set(household.household_head_name, []);
+        }
+        householdMapByName.get(household.household_head_name).push({
+          household_number: household.household_number,
+          address: household.address || ''
+        });
+        console.log('添加户主信息:', household.household_head_name, '地址:', household.address, '->', household.household_number);
+      }
+    }
+    console.log('户主姓名分组数量:', householdMapByName.size);
 
     // 第一阶段：快速解析数据
     for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
@@ -93,7 +129,11 @@ router.post('/import-residents', async (req, res) => {
               rowData.householdData[fieldName] = value;
             } else {
               // 居民字段
-              rowData.residentData[mapItem.dbField] = value;
+              let processedValue = value;
+              if (mapItem.dbField === 'date_of_birth') {
+                processedValue = excelDateToJSDate(value);
+              }
+              rowData.residentData[mapItem.dbField] = processedValue;
               // 检查是否是户主
               if (mapItem.dbField === 'relationship_to_head' && value === '本人') {
                 rowData.isHeadOfHousehold = true;
@@ -137,8 +177,6 @@ router.post('/import-residents', async (req, res) => {
     // 开始事务 - MySQL/MariaDB 语法
     await db.pool.execute('START TRANSACTION');
     
-    let successCount = 0;
-    const householdIdMap = new Map(); // 户主姓名 -> household_id
     
     // 预检查所有身份证号，避免重复处理
     const allIdCards = [...headOfHouseholdRows, ...familyMemberRows].map(row => row.residentData.id_card);
@@ -183,16 +221,17 @@ router.post('/import-residents', async (req, res) => {
           householdHeadName,
           residentData.id_card || '',
           villageGroup,
-          householdData.address || '',
+          householdData.address || residentData.address || residentData.Home_address || '',
           householdData.phone_number || residentData.phone_number || '',
           householdData.ethnicity || residentData.ethnicity || '汉族',
           householdData.gender || residentData.gender || '',
           'active',
           currentDate,
-          householdData.householdType || '',
-          householdData.housingType || ''
+          householdData.householdType || '农村居民户口',
+          householdData.housingType || '自有住房'
         ];
         
+        console.log('即将插入 households 表 (现有居民):', householdValues);
         await db.pool.execute(`INSERT INTO households (${householdColumns.join(',')}) VALUES (${householdValues.map(() => '?').join(',')})`, householdValues);
         console.log(`创建 households 记录成功: ${householdNumber}`);
         
@@ -236,16 +275,17 @@ router.post('/import-residents', async (req, res) => {
           householdHeadName,
           idCard,
           villageGroup,
-          householdData.address || '',
+          householdData.address || residentData.address || residentData.Home_address || '',
           householdData.phone_number || residentData.phone_number || '',
           householdData.ethnicity || residentData.ethnicity || '汉族',
           householdData.gender || residentData.gender || '',
           'active',
           currentDate,
-          householdData.householdType || '',
-          householdData.housingType || ''
+          householdData.householdType || '农村居民户口',
+          householdData.housingType || '自有住房'
         ];
         
+        console.log('即将插入 households 表 (新户主):', householdValues);
         const [result] = await db.pool.execute(`INSERT INTO households (${householdColumns.join(',')}) VALUES (${householdValues.map(() => '?').join(',')})`, householdValues);
         const householdId = result.insertId;
         
@@ -287,7 +327,7 @@ router.post('/import-residents', async (req, res) => {
           residentData.phone_number || '',
           currentDate,
           'active',
-          residentData.address || '',
+          residentData.Home_address || residentData.address || '', // 优先使用 Home_address
           residentData.equity_shares || 0
         ];
       });
@@ -301,25 +341,6 @@ router.post('/import-residents', async (req, res) => {
     
     // 处理家庭成员数据
     console.log('开始处理家庭成员数据...');
-    
-    // 预先加载所有户主信息，按姓名和地址建立索引
-    console.log('预先加载户主信息...');
-    const [allHouseholdHeads] = await db.pool.execute('SELECT household_number, household_head_name, address FROM households');
-    const householdMapByName = new Map(); // 按姓名分组的户主信息
-    
-    for (const household of allHouseholdHeads) {
-      if (household.household_head_name) {
-        if (!householdMapByName.has(household.household_head_name)) {
-          householdMapByName.set(household.household_head_name, []);
-        }
-        householdMapByName.get(household.household_head_name).push({
-          household_number: household.household_number,
-          address: household.address || ''
-        });
-        console.log('添加户主信息:', household.household_head_name, '地址:', household.address, '->', household.household_number);
-      }
-    }
-    console.log('户主姓名分组数量:', householdMapByName.size);
     
     // 分离现有居民和新居民
     const existingFamilyMembers = familyMemberRows.filter(row => existingIdCardMap.has(row.residentData.id_card));
@@ -351,7 +372,7 @@ router.post('/import-residents', async (req, res) => {
             const cleanHouseholdAddress = household.address.replace(/\s+/g, '').replace(/[\s\t\n\r]/g, '');
             
             // 检查地址是否相似（包含关系）
-            if (cleanMemberAddress.includes(cleanHouseholdAddress) || cleanHouseholdAddress.includes(cleanMemberAddress)) {
+            if (cleanMemberAddress.includes(cleanHouseholdAddress) || cleanHouseholdAddress.includes(cleanHouseholdAddress)) {
               console.log('按地址匹配成功:', headName, '地址:', cleanMemberAddress, '->', household.household_number);
               return household.household_number;
             }
@@ -399,24 +420,24 @@ router.post('/import-residents', async (req, res) => {
          Home_address = ?,
          equity_shares = ?
          WHERE id = ?`,
-        [
-          householdId,
-          residentData.name || '',
-          residentData.gender || '',
-          residentData.date_of_birth || '',
-          residentData.village_group || '',
-          residentData.bank_card || '',
-          residentData.bank_name || '',
-          residentData.phone_number || '',
-          residentData.ethnicity || '汉族',
-          residentData.relationship_to_head || '其他',
-          residentData.marital_status || '未婚',
-          residentData.political_status || '群众',
-          residentData.military_service || '未服兵役',
-          residentData.education_level || '小学',
-          residentData.Home_address || residentData.address || '',
-          residentData.equity_shares || 0,
-          existingResident.id
+       [
+         householdId,
+         residentData.name || '',
+         residentData.gender || '',
+         residentData.date_of_birth || '',
+         residentData.village_group || '',
+         residentData.bank_card || '',
+         residentData.bank_name || '',
+         residentData.phone_number || '',
+         residentData.ethnicity || '汉族',
+         residentData.relationship_to_head || '其他',
+         residentData.marital_status || '未婚',
+         residentData.political_status || '群众',
+         residentData.military_service || '未服兵役',
+         residentData.education_level || '小学',
+         residentData.Home_address || residentData.address || '', // 优先使用 Home_address
+         residentData.equity_shares || 0,
+         existingResident.id
         ]
       );
       
@@ -430,7 +451,7 @@ router.post('/import-residents', async (req, res) => {
       
       // 过滤掉缺少户主信息或找不到户主的记录
       const validNewMembers = newFamilyMembers.filter(rowData => {
-        const householdHeadName = rowData.householdData.household_head_name;
+        const householdHeadName = rowData.householdData.household_head_name || rowData.residentData.name;
         const memberAddress = rowData.householdData.address || rowData.residentData.address || rowData.residentData.Home_address || '';
         const householdId = findHouseholdByHeadNameAndAddress(householdHeadName, memberAddress);
         
@@ -472,7 +493,7 @@ router.post('/import-residents', async (req, res) => {
             residentData.phone_number || '',
             currentDate,
             'active',
-            residentData.Home_address || residentData.address || '',
+            residentData.Home_address || residentData.address || '', // 优先使用 Home_address
             residentData.equity_shares || 0
           ];
         });
@@ -507,8 +528,18 @@ router.post('/import-residents', async (req, res) => {
     console.error('错误堆栈:', error.stack);
     console.error('错误对象:', error);
     
-    // 检查是否是400错误
-    if (error.message && error.message.includes('400')) {
+    // 如果有部分成功，即使有错误也返回成功状态码，并提示部分成功
+    if (successCount > 0) {
+      res.json({
+        code: 20000,
+        message: `导入部分成功，共处理${data.length}条数据，成功${successCount}条，但存在错误：${error.message}`,
+        data: {
+          successCount,
+          errorCount: 1,
+          errors: [error.message]
+        }
+      });
+    } else if (error.message && error.message.includes('400')) { // 检查是否是400错误
       res.status(400).json({
         code: 400,
         message: error.message,

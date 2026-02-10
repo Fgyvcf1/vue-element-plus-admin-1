@@ -116,7 +116,7 @@
       <el-table
         v-loading="loading"
         :data="tableData"
-        :row-style="{ height: '26px' }"
+        :row-style="getRowStyle"
         size="small"
         class="custom-row-height-table"
         @row-click="handleRowClick"
@@ -139,6 +139,7 @@
         />
         <el-table-column prop="dateOfBirth" label="出生日期" align="center" width="120" />
         <el-table-column prop="age" label="年龄" align="center" width="60" />
+        <el-table-column prop="phoneNumber" label="联系电话" align="center" width="120" />
         <el-table-column prop="villageGroup" label="村组" align="center" width="90" />
         <el-table-column
           prop="address"
@@ -147,7 +148,6 @@
           width="200"
           show-overflow-tooltip
         />
-        <el-table-column prop="phoneNumber" label="联系电话" align="center" width="120" />
         <el-table-column prop="bankCard" label="银行帐号" align="center" width="180" />
         <el-table-column label="股权数量" align="center" width="100">
           <template #default="{ row }">
@@ -419,8 +419,8 @@ const handleReset = () => {
   Object.keys(searchForm).forEach((key) => {
     searchForm[key as keyof typeof searchForm] = ''
   })
-  // 重置状态为active
-  searchForm.status = 'active'
+  // 状态默认为空，查询所有状态
+  searchForm.status = ''
   pagination.page = 1
   hasSearched.value = false // 重置搜索标志
   tableData.value = [] // 清空数据
@@ -455,6 +455,16 @@ const handleRowClick = (row: any) => {
   detailDialogVisible.value = true
 }
 
+// 获取行样式 - 非正常状态显示绿色字体
+const getRowStyle = ({ row }: { row: any }) => {
+  const style: any = { height: '26px' }
+  // 非正常状态（active 为正常，其他状态如 migrated_out, deceased 等为非正常）
+  if (row.status && row.status !== 'active') {
+    style.color = '#67C23A' // Element Plus 绿色
+  }
+  return style
+}
+
 // 点击页面其他地方关闭右键菜单
 const handleDocumentClick = () => {
   closeContextMenu()
@@ -467,7 +477,7 @@ const handleImport = () => {
 
 // 导入成功
 const handleImportSuccess = () => {
-  importDialogVisible.value = false
+  // importDialogVisible.value = false // 暂时不关闭，让用户看到成功界面
   ElMessage.success('导入成功')
   // 刷新列表
   fetchList()
