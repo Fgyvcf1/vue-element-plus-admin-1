@@ -398,8 +398,16 @@ const handleQuery = () => {
 }
 
 const resetQuery = () => {
-  queryFormRef.value?.resetFields()
-  handleQuery()
+  // 手动重置所有查询参数
+  queryParams.name = ''
+  queryParams.idCard = ''
+  queryParams.disabilityType = ''
+  queryParams.disabilityLevel = ''
+  queryParams.pageNum = 1
+  
+  // 清空列表数据
+  disabledList.value = []
+  total.value = 0
 }
 
 const handleRowClick = async (row: any) => {
@@ -506,7 +514,9 @@ const handleExport = () => {
 
 onMounted(() => {
   loadDictionaries()
-  getList()
+  // 页面加载时不自动查询，列表保持为空
+  disabledList.value = []
+  total.value = 0
 })
 </script>
 

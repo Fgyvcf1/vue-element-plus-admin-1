@@ -93,6 +93,17 @@ router.get('/disabled-persons', async (req, res) => {
     
     const [rows] = await db.pool.execute(dataSql, queryParams);
     console.log('【disabledPersonRoutes】查询到', rows.length, '条记录');
+    
+    if (rows.length === 0) {
+      return res.json({
+        code: 20000,
+        data: [],
+        total: 0,
+        pageNum: parseInt(pageNum),
+        pageSize: parseInt(pageSize)
+      });
+    }
+    
     console.log('【disabledPersonRoutes】第一条记录原始字段:', Object.keys(rows[0]));
 
     // 转换字段名为驼峰命名（数据库返回的字段名可能已经是驼峰命名）
