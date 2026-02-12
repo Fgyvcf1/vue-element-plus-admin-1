@@ -380,7 +380,7 @@ const specialPeopleController = {
   
   // 获取所有残疾人
   getDisabledPersons: (req, res) => {
-    console.log('收到/disabled-persons请求，查询参数:', req.query);
+    console.log('【specialPeopleController】收到 /disabled-persons 请求，查询参数:', req.query);
     
     // 构建SQL查询
     let sql = `SELECT
@@ -436,7 +436,28 @@ const specialPeopleController = {
         return;
       }
       console.log('查询到残疾人数据:', rows.length, '条');
-      res.json({ code: 20000, data: rows });
+      
+      // 转换字段名为驼峰命名
+      const formattedRows = rows.map(row => ({
+        id: row.id,
+        residentId: row.resident_id,
+        disabilityType: row.disability_type,
+        disabilityLevel: row.disability_level,
+        certificateNumber: row.certificate_number,
+        issueDate: row.issue_date,
+        certificateStatus: row.certificate_status,
+        guardianName: row.guardian_name,
+        guardianPhone: row.guardian_phone,
+        guardianRelationship: row.guardian_relationship,
+        createdAt: row.created_at,
+        name: row.name,
+        idCard: row.id_card || row.idCard,
+        gender: row.gender,
+        age: row.age,
+        address: row.household_address || row.resident_address || row.address
+      }));
+      
+      res.json({ code: 20000, data: formattedRows });
     });
   },
   
@@ -469,7 +490,32 @@ const specialPeopleController = {
         res.json({ code: 20000, data: null });
         return;
       }
-      res.json({ code: 20000, data: row });
+      
+      // 转换字段名为驼峰命名
+      const formattedData = row ? {
+        id: row.id,
+        residentId: row.resident_id,
+        disabilityType: row.disability_type,
+        disabilityLevel: row.disability_level,
+        certificateNumber: row.certificate_number,
+        issueDate: row.issue_date,
+        certificateStatus: row.certificate_status,
+        guardianName: row.guardian_name,
+        guardianPhone: row.guardian_phone,
+        guardianRelationship: row.guardian_relationship,
+        createdAt: row.created_at,
+        name: row.name,
+        idCard: row.idCard || row.id_card,
+        gender: row.gender,
+        dateOfBirth: row.date_of_birth,
+        age: row.age,
+        phoneNumber: row.phoneNumber || row.phone_number,
+        householdHeadName: row.household_head_name,
+        householdHeadIdCard: row.household_head_id_card,
+        address: row.household_address || row.resident_address || row.address
+      } : null;
+      
+      res.json({ code: 20000, data: formattedData });
     });
   },
   

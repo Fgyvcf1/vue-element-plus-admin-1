@@ -16,6 +16,8 @@ const archiveRoutes = require('./routes/archiveRoutes');
 const configRoutes = require('./modules/config-management/backend/routes/configRoutes');
 const dictionaryRoutes = require('./routes/dictionaryRoutes');
 const caseFileRoutes = require('./routes/caseFileRoutes');
+const lowIncomeRoutes = require('./routes/lowIncomeRoutes');
+const disabledPersonRoutes = require('./routes/disabledPersonRoutes');
 
 // 配置multer存储
 const storage = multer.diskStorage({
@@ -188,6 +190,7 @@ router.get('/test-birthday-reminder', (req, res) => {
 router.use('/notifications', notificationRoutes);
 router.use('/notification', notificationRoutes); // 兼容单数形式
 router.use('/event', eventRoutes);
+router.use('/', disabledPersonRoutes); // 残疾人路由优先加载
 router.use('/', leadershipRoutes);
 router.use('/', specialPeopleRoutes);
 router.use('/', importRoutes);
@@ -196,5 +199,6 @@ router.use('/', archiveRoutes);
 router.use('/config', configRoutes);
 router.use('/dictionary', dictionaryRoutes);
 router.use('/case-files', caseFileRoutes);
+router.use('/', lowIncomeRoutes);
 
 module.exports = router;

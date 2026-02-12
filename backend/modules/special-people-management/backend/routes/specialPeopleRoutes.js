@@ -19,22 +19,7 @@ router.put('/low-income-persons/:id', specialPeopleController.updateLowIncomePer
 // 删除低收入人群
 router.delete('/low-income-persons/:id', specialPeopleController.deleteLowIncomePerson);
 
-// 残疾人API路由
-
-// 获取所有残疾人
-router.get('/disabled-persons', specialPeopleController.getDisabledPersons);
-
-// 获取单个残疾人
-router.get('/disabled-persons/:id', specialPeopleController.getDisabledPerson);
-
-// 添加残疾人
-router.post('/disabled-persons', specialPeopleController.addDisabledPerson);
-
-// 更新残疾人
-router.put('/disabled-persons/:id', specialPeopleController.updateDisabledPerson);
-
-// 删除残疾人
-router.delete('/disabled-persons/:id', specialPeopleController.deleteDisabledPerson);
+// 残疾人API路由已移至 disabledPersonRoutes.js
 
 // 低收入政策享受记录相关API路由
 
