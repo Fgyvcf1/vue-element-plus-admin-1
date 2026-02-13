@@ -11,72 +11,69 @@ router.get('/test', (req, res) => {
 // 机构管理相关API路由
 
 // 获取班子成员列表
-router.get('/committee-members', (req, res) => {
+router.get('/committee-members', async (req, res) => {
   console.log('收到/committee-members请求，查询参数:', req.query);
 
   const { organization_type, term_number, status, page, pageSize, keyword } = req.query;
 
-  let sql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, r.date_of_birth, r.Home_address as address
-             FROM committee_members cm
-             JOIN residents r ON cm.resident_id = r.id
-             WHERE 1=1`;
+  let filterSql = `FROM committee_members cm
+                   JOIN residents r ON cm.resident_id = r.id
+                   WHERE 1=1`;
   const params = [];
 
   if (organization_type) {
-    sql += ` AND cm.organization_type = ?`;
+    filterSql += ` AND cm.organization_type = ?`;
     params.push(organization_type);
   }
 
   if (term_number) {
-    sql += ` AND cm.term_number = ?`;
+    filterSql += ` AND cm.term_number = ?`;
     params.push(term_number);
   }
 
   if (status) {
-    sql += ` AND cm.status = ?`;
+    filterSql += ` AND cm.status = ?`;
     params.push(status);
   }
 
   if (keyword) {
-    sql += ` AND (r.name LIKE ? OR cm.position LIKE ?)`;
+    filterSql += ` AND (r.name LIKE ? OR cm.position LIKE ?)`;
     params.push(`%${keyword}%`, `%${keyword}%`);
   }
 
-  sql += ` ORDER BY cm.term_number DESC, cm.created_at DESC`;
+  const listParams = [...params];
+  const pageSizeNum = Number.parseInt(pageSize, 10);
+  const pageNum = Number.parseInt(page, 10) || 1;
 
-  // 分页
-  if (pageSize) {
-    const offset = ((parseInt(page) || 1) - 1) * parseInt(pageSize);
-    sql += ` LIMIT ? OFFSET ?`;
-    params.push(parseInt(pageSize), offset);
+  let listSql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, r.date_of_birth, r.\`Home_address\` AS address
+                 ${filterSql}
+                 ORDER BY cm.term_number DESC, cm.created_at DESC`;
+  if (Number.isInteger(pageSizeNum) && pageSizeNum > 0) {
+    const offset = (pageNum - 1) * pageSizeNum;
+    listSql += ` LIMIT ? OFFSET ?`;
+    listParams.push(pageSizeNum, offset);
   }
 
-  db.all(sql, params, (err, rows) => {
-    if (err) {
-      console.error('查询班子成员失败:', err.message);
-      res.json({ code: 20000, data: [], total: 0 });
-      return;
-    }
+  const countSql = `SELECT COUNT(*) AS total ${filterSql}`;
 
+  try {
+    const [rows] = await db.pool.execute(listSql, listParams);
+    const [countRows] = await db.pool.execute(countSql, params);
+    const total = countRows && countRows[0] ? countRows[0].total : rows.length;
     console.log('查询到班子成员数据:', rows.length, '条');
-
-    // 获取总数
-    let countSql = sql.replace(/SELECT.*?FROM/, 'SELECT COUNT(*) as total FROM');
-    if (pageSize) {
-      countSql = countSql.replace(/LIMIT\s+\d+\s+OFFSET\s+\d+$/i, '');
-    }
-    db.get(countSql, params.slice(0, -2), (countErr, countRow) => {
-      res.json({
-        code: 20000,
-        data: rows,
-        total: countRow ? countRow.total : rows.length
-      });
+    res.json({
+      code: 20000,
+      data: rows || [],
+      total
     });
-  });
+  } catch (err) {
+    console.error('查询班子成员失败:', err.message);
+    res.json({ code: 20000, data: [], total: 0 });
+  }
 });
 
 // 获取届数列表
-router.get('/committee-members/term-numbers', (req, res) => {
+router.get('/committee-members/term-numbers', async (req, res) => {
   const { organization_type } = req.query;
   console.log('收到届数列表请求，机构类型:', organization_type);
 
@@ -93,19 +90,18 @@ router.get('/committee-members/term-numbers', (req, res) => {
              GROUP BY term_number
              ORDER BY term_number DESC`;
 
-  db.all(sql, [organization_type], (err, rows) => {
-    if (err) {
-      console.error('查询届数失败:', err.message);
-      res.json({ code: 500, message: '查询失败', data: [] });
-      return;
-    }
+  try {
+    const [rows] = await db.pool.execute(sql, [organization_type]);
     console.log('查询到届数:', rows.length, '个');
     res.json({ code: 20000, data: rows || [] });
-  });
+  } catch (err) {
+    console.error('查询届数失败:', err.message);
+    res.json({ code: 500, message: '查询失败', data: [] });
+  }
 });
 
 // 获取成员历史任职记录
-router.get('/committee-members/history', (req, res) => {
+router.get('/committee-members/history', async (req, res) => {
   console.log('收到成员历史记录请求，完整查询参数:', req.query);
   const { resident_id } = req.query;
   console.log('解析出的 resident_id:', resident_id);
@@ -116,26 +112,25 @@ router.get('/committee-members/history', (req, res) => {
     return;
   }
 
-  const sql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, r.date_of_birth, r.Home_address as address
+  const sql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, r.date_of_birth, r.\`Home_address\` AS address
              FROM committee_members cm
              JOIN residents r ON cm.resident_id = r.id
              WHERE cm.resident_id = ?
              ORDER BY cm.term_number DESC`;
 
-  db.all(sql, [resident_id], (err, rows) => {
-    if (err) {
-      console.error('查询成员历史记录失败:', err.message);
-      res.json({ code: 500, message: '查询失败', data: [] });
-      return;
-    }
+  try {
+    const [rows] = await db.pool.execute(sql, [resident_id]);
     console.log('查询成功，返回行数:', rows.length);
     console.log('返回数据:', rows);
     res.json({ code: 20000, data: rows || [] });
-  });
+  } catch (err) {
+    console.error('查询成员历史记录失败:', err.message);
+    res.json({ code: 500, message: '查询失败', data: [] });
+  }
 });
 
 // 获取成员统计信息
-router.get('/committee-members/statistics', (req, res) => {
+router.get('/committee-members/statistics', async (req, res) => {
   const { resident_id } = req.query;
   console.log('收到成员统计信息请求，resident_id:', resident_id);
 
@@ -165,16 +160,11 @@ router.get('/committee-members/statistics', (req, res) => {
     GROUP BY r.id, r.name, r.id_card
   `;
 
-  db.get(sql, [resident_id], (err, row) => {
-    if (err) {
-      console.error('查询统计信息失败:', err.message);
-      res.json({ code: 500, message: '查询失败', data: null });
-      return;
-    }
-
-    // 计算年数并转换字段名为驼峰命名法
+  try {
+    const [rows] = await db.pool.execute(sql, [resident_id]);
+    let row = rows && rows[0] ? rows[0] : null;
     if (row) {
-      const result = {
+      row = {
         name: row.name,
         idCard: row.id_card,
         totalTerms: row.total_terms,
@@ -182,30 +172,30 @@ router.get('/committee-members/statistics', (req, res) => {
         totalDays: row.total_days ? Math.round(row.total_days) : 0,
         totalYears: row.total_days ? (row.total_days / 365).toFixed(1) : '0.0'
       };
-      row = result;
     }
-
     res.json({ code: 20000, data: row ? [row] : [] });
-  });
+  } catch (err) {
+    console.error('查询统计信息失败:', err.message);
+    res.json({ code: 500, message: '查询失败', data: null });
+  }
 });
 
 // 获取单个成员
-router.get('/committee-members/:id', (req, res) => {
+router.get('/committee-members/:id', async (req, res) => {
   const { id } = req.params;
 
-  const sql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, r.date_of_birth, r.Home_address as address
+  const sql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, r.date_of_birth, r.\`Home_address\` AS address
              FROM committee_members cm
              JOIN residents r ON cm.resident_id = r.id
              WHERE cm.id = ?`;
-
-  db.get(sql, [id], (err, row) => {
-    if (err) {
-      console.error('查询成员失败:', err.message);
-      res.json({ code: 500, message: '查询失败' });
-      return;
-    }
+  try {
+    const [rows] = await db.pool.execute(sql, [id]);
+    const row = rows && rows[0] ? rows[0] : null;
     res.json({ code: 20000, data: row });
-  });
+  } catch (err) {
+    console.error('查询成员失败:', err.message);
+    res.json({ code: 500, message: '查询失败' });
+  }
 });
 
 // 添加成员
@@ -306,21 +296,19 @@ router.put('/committee-members/:id', async (req, res) => {
 });
 
 // 删除成员
-router.delete('/committee-members/:id', (req, res) => {
+router.delete('/committee-members/:id', async (req, res) => {
   const { id } = req.params;
   console.log('收到删除成员请求，ID:', id);
 
   const sql = `DELETE FROM committee_members WHERE id = ?`;
-
-  db.run(sql, [id], function(err) {
-    if (err) {
-      console.error('删除成员失败:', err.message);
-      res.status(500).json({ code: 500, message: '删除失败' });
-      return;
-    }
+  try {
+    await db.pool.execute(sql, [id]);
     console.log('删除成员成功');
     res.json({ code: 20000, message: '删除成功' });
-  });
+  } catch (err) {
+    console.error('删除成员失败:', err.message);
+    res.status(500).json({ code: 500, message: '删除失败' });
+  }
 });
 
 module.exports = router;

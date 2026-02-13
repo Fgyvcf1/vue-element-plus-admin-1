@@ -40,9 +40,6 @@ export const useLeadershipStore = defineStore('leadership', {
     },
     getTermOptions(): any[] {
       return this.termOptions
-    },
-    getFilters(): LeadershipState['filters'] {
-      return this.filters
     }
   },
   actions: {
@@ -95,4 +92,3 @@ export const useLeadershipStore = defineStore('leadership', {
 export const useLeadershipStoreWithOut = () => {
   return useLeadershipStore(store)
 }
-
