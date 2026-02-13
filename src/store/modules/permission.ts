@@ -34,6 +34,12 @@ export const usePermissionStore = defineStore('permission', {
         // 居民管理排在第二位
         if (a.path === '/resident') return -1
         if (b.path === '/resident') return 1
+        // 特殊人群管理排在第三位
+        if (a.path === '/special-people') return -1
+        if (b.path === '/special-people') return 1
+        // 机构管理排在第四位
+        if (a.path === '/organization') return -1
+        if (b.path === '/organization') return 1
         return 0
       })
       return sortedRouters
@@ -100,10 +106,10 @@ export const usePermissionStore = defineStore('permission', {
       this.isAddRouters = false
     }
   },
-  persist: {
-    // 只持久化部分状态，routers 不持久化，确保每次都能重新加载
-    paths: ['isAddRouters', 'menuTabRouters']
-  }
+  // persist: {
+  //   // 只持久化部分状态，routers 不持久化，确保每次都能重新加载
+  //   paths: ['isAddRouters', 'menuTabRouters']
+  // }
 })
 
 export const usePermissionStoreWithOut = () => {

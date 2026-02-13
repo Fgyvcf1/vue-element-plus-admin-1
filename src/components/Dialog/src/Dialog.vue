@@ -66,6 +66,8 @@ const dialogStyle = computed(() => {
 <template>
   <ElDialog
     v-bind="getBindValue"
+    class="v-dialog"
+    modal-class="v-dialog-overlay"
     :fullscreen="isFullscreen"
     destroy-on-close
     lock-scroll
@@ -114,32 +116,32 @@ const dialogStyle = computed(() => {
 </template>
 
 <style lang="less">
-.@{elNamespace}-overlay-dialog {
+.v-dialog-overlay {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.@{elNamespace}-dialog {
+.v-dialog.@{elNamespace}-dialog {
   margin: 0 !important;
+}
 
-  &__header {
-    height: 54px;
-    padding: 0;
-    margin-right: 0 !important;
-    border-bottom: 1px solid var(--el-border-color);
-  }
+.v-dialog.@{elNamespace}-dialog .@{elNamespace}-dialog__header {
+  height: 54px;
+  padding: 0;
+  margin-right: 0 !important;
+  border-bottom: 1px solid var(--el-border-color);
+}
 
-  &__body {
-    padding: 15px !important;
-  }
+.v-dialog.@{elNamespace}-dialog .@{elNamespace}-dialog__body {
+  padding: 15px !important;
+}
 
-  &__footer {
-    border-top: 1px solid var(--el-border-color);
-  }
+.v-dialog.@{elNamespace}-dialog .@{elNamespace}-dialog__footer {
+  border-top: 1px solid var(--el-border-color);
+}
 
-  &__headerbtn {
-    top: 0;
-  }
+.v-dialog.@{elNamespace}-dialog .@{elNamespace}-dialog__headerbtn {
+  top: 0;
 }
 </style>

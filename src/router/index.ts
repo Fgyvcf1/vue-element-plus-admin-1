@@ -8,6 +8,8 @@ import { NO_RESET_WHITE_LIST } from '@/constants'
 
 // 导入模块路由
 import residentRouter from './modules/resident'
+import specialPeopleRouter from './modules/specialPeople'
+import organizationRouter from './modules/organization'
 
 const { t } = useI18n()
 
@@ -90,6 +92,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         name: 'DashboardIndex',
         meta: {
           title: '首页',
+          icon: 'vi-ep:house',
           noCache: true,
           affix: true
         }
@@ -724,7 +727,9 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
     }
   },
   // 合并居民模块路由
-  ...residentRouter
+  ...residentRouter,
+  ...specialPeopleRouter,
+  ...organizationRouter
 ]
 
 const router = createRouter({
