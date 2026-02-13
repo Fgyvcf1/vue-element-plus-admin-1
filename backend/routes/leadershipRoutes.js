@@ -149,13 +149,15 @@ router.get('/committee-members/statistics', (req, res) => {
       r.name,
       r.id_card,
       COUNT(*) as total_terms,
-      COUNT(CASE WHEN cm.term_end_date IS NULL THEN 1 END) as current_terms,
+      SUM(CASE WHEN cm.term_end_date IS NULL THEN 1 ELSE 0 END) as current_terms,
       SUM(
-        CASE 
-          WHEN cm.term_end_date IS NULL 
-            THEN julianday('now') - julianday(cm.term_start_date)
-          ELSE julianday(cm.term_end_date) - julianday(cm.term_start_date)
-        END
+        GREATEST(
+          DATEDIFF(
+            COALESCE(cm.term_end_date, CURDATE()),
+            cm.term_start_date
+          ),
+          0
+        )
       ) as total_days
     FROM committee_members cm
     JOIN residents r ON cm.resident_id = r.id
@@ -257,7 +259,7 @@ router.post('/committee-members', async (req, res) => {
 });
 
 // 更新成员
-router.put('/committee-members/:id', (req, res) => {
+router.put('/committee-members/:id', async (req, res) => {
   const { id } = req.params;
   console.log('收到更新成员请求，ID:', id, '数据:', req.body);
   // 同时支持驼峰命名和下划线命名的字段
@@ -273,11 +275,14 @@ router.put('/committee-members/:id', (req, res) => {
   } = req.body;
 
   // 优先使用驼峰命名，如果没有则使用下划线命名
-  const residentIdValue = residentId || resident_id;
-  const organizationTypeValue = organizationType || organization_type;
-  const termNumberValue = termNumber || term_number;
-  const termStartDateValue = termStartDate || term_start_date;
-  const termEndDateValue = termEndDate || term_end_date;
+  const residentIdValue = residentId || resident_id || null;
+  const organizationTypeValue = organizationType || organization_type || null;
+  const termNumberValue = termNumber || term_number || null;
+  const termStartDateValue = termStartDate || term_start_date || null;
+  const termEndDateValue = termEndDate || term_end_date || null;
+  const positionValue = position || null;
+  const statusValue = status || 'current';
+  const remarksValue = remarks || null;
 
   const sql = `UPDATE committee_members
                SET resident_id = ?, organization_type = ?, term_number = ?,
@@ -287,18 +292,17 @@ router.put('/committee-members/:id', (req, res) => {
 
   const params = [
     residentIdValue, organizationTypeValue, termNumberValue, termStartDateValue,
-    termEndDateValue, position, status, remarks, id
+    termEndDateValue, positionValue, statusValue, remarksValue, id
   ];
 
-  db.run(sql, params, function(err) {
-    if (err) {
-      console.error('更新成员失败:', err.message);
-      res.status(500).json({ code: 500, message: '更新失败: ' + err.message });
-      return;
-    }
+  try {
+    await db.pool.execute(sql, params);
     console.log('更新成员成功');
     res.json({ code: 20000, message: '更新成功' });
-  });
+  } catch (err) {
+    console.error('更新成员失败:', err.message);
+    res.status(500).json({ code: 500, message: '更新失败: ' + err.message });
+  }
 });
 
 // 删除成员
