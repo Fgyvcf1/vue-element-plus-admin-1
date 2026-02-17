@@ -10,7 +10,7 @@ start "后端服务" cmd /k "cd /d %~dp0backend && node start-backend.js"
 echo.
 echo [2/2] 启动前端服务...
 cd /d %~dp0
-pnpm dev
+pnpm dev:win
 
 echo.
 echo 前端服务已关闭

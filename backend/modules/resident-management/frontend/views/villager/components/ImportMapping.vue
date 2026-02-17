@@ -21,9 +21,7 @@
       >
         <i class="el-icon-upload" />
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-        <div slot="tip" class="el-upload__tip">
-          请上传Excel文件（.xlsx或.xls格式）
-        </div>
+        <div slot="tip" class="el-upload__tip"> 请上传Excel文件（.xlsx或.xls格式） </div>
       </el-upload>
       <div style="margin-top: 20px; text-align: center">
         <el-button type="primary" :disabled="!excelFile" @click="parseExcel">下一步</el-button>
@@ -46,9 +44,19 @@
               <el-select v-model="scope.row.dbField" placeholder="请选择" size="small">
                 <el-option label="- 跳过此字段 -" value="" />
                 <el-option label="=== 户主表字段 ===" value="" disabled />
-                <el-option v-for="field in householdFields" :key="field.value" :label="field.label" :value="field.value" />
+                <el-option
+                  v-for="field in householdFields"
+                  :key="field.value"
+                  :label="field.label"
+                  :value="field.value"
+                />
                 <el-option label="=== 居民表字段 ===" value="" disabled />
-                <el-option v-for="field in residentFields" :key="field.value" :label="field.label" :value="field.value" />
+                <el-option
+                  v-for="field in residentFields"
+                  :key="field.value"
+                  :label="field.label"
+                  :value="field.value"
+                />
               </el-select>
             </template>
           </el-table-column>
@@ -71,7 +79,12 @@
           </div>
         </template>
         <el-table :data="previewData" border style="width: 100%">
-          <el-table-column v-for="column in previewColumns" :key="column.prop" :prop="column.prop" :label="column.label" />
+          <el-table-column
+            v-for="column in previewColumns"
+            :key="column.prop"
+            :prop="column.prop"
+            :label="column.label"
+          />
         </el-table>
       </el-card>
       <div style="margin-top: 20px; text-align: right">
@@ -83,26 +96,21 @@
     <!-- 步骤4: 导入完成 -->
     <div v-if="activeStep === 3" style="text-align: center; padding: 40px">
       <div v-if="importSuccess">
-        <i class="el-icon-success" style="font-size: 64px; color: #67C23A; margin-bottom: 20px" />
+        <i class="el-icon-success" style="font-size: 64px; color: #67c23a; margin-bottom: 20px" />
         <h2 style="margin: 0 0 10px 0">导入成功</h2>
         <p style="color: #909399; margin: 0 0 30px 0">数据已成功导入系统</p>
         <el-button type="primary" @click="$emit('close')">关闭</el-button>
         <el-button @click="reset">再次导入</el-button>
       </div>
       <div v-else>
-        <i class="el-icon-error" style="font-size: 64px; color: #F56C6C; margin-bottom: 20px" />
+        <i class="el-icon-error" style="font-size: 64px; color: #f56c6c; margin-bottom: 20px" />
         <h2 style="margin: 0 0 10px 0">导入失败</h2>
         <p style="color: #909399; margin: 0 0 30px 0">数据导入过程中出现错误</p>
         <el-button type="primary" @click="$emit('close')">关闭</el-button>
         <el-button @click="reset">重新导入</el-button>
       </div>
       <div v-if="importError" style="margin-top: 20px; text-align: left">
-        <el-alert
-          :title="importError"
-          type="error"
-          show-icon
-          :closable="false"
-        />
+        <el-alert :title="importError" type="error" show-icon :closable="false" />
       </div>
     </div>
   </div>
@@ -193,7 +201,7 @@ export default {
           // 获取完整的表头信息，包括空列
           const range = XLSX.utils.decode_range(worksheet['!ref'])
           const rawHeaders = []
-          
+
           // 读取表头行
           for (let C = range.s.c; C <= range.e.c; ++C) {
             const cell = worksheet[XLSX.utils.encode_cell({ c: C, r: range.s.r })]
@@ -202,7 +210,7 @@ export default {
             rawHeaders.push(hdr.replace(/[\r\n]/g, '').trim())
           }
           this.headerRow = rawHeaders
-          
+
           // 直接读取所有数据行，不依赖sheet_to_json，确保所有列都被读取
           const excelData = []
           // 从第二行开始读取数据（range.s.r + 1）
@@ -212,7 +220,7 @@ export default {
               const cellAddress = XLSX.utils.encode_cell({ c: C, r: R })
               const cell = worksheet[cellAddress]
               let value = ''
-              
+
               if (cell) {
                 // 确保正确处理所有类型的单元格
                 switch (cell.t) {
@@ -238,22 +246,22 @@ export default {
                     // 其他类型直接格式化
                     value = XLSX.utils.format_cell(cell)
                 }
-                
+
                 if (typeof value === 'string') {
                   value = value.replace(/[\r\n]/g, ' ').trim()
                 }
               }
-              
+
               rowData.push(value)
             }
             excelData.push(rowData)
           }
-          
+
           if (excelData.length < 1) {
             this.$message.error('Excel文件至少需要包含一条数据')
             return
           }
-          
+
           this.excelData = excelData
 
           this.totalRows = this.excelData.length
@@ -272,7 +280,7 @@ export default {
                 }
               }
             }
-            
+
             return {
               excelField: header,
               dbField: this.getRecommendedMapping(header),
@@ -293,46 +301,49 @@ export default {
       const originalField = excelField
       const cleanedField = excelField.replace(/[\r\n\s\t]/g, '').trim() // 移除所有空白字符
       const spaceCleanedField = excelField.replace(/[\r\n\t]/g, '').trim() // 仅移除换行符和制表符，保留空格
-      const simplifiedField = excelField.replace(/[\r\n\t]/g, '').replace(/\s+/g, ' ').trim() // 合并多个空格为一个
+      const simplifiedField = excelField
+        .replace(/[\r\n\t]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim() // 合并多个空格为一个
 
       const mappings = {
-        '姓名': 'name',
-        '户主姓名': 'household_head_name',
-        '与户主关系': 'relationship_to_head',
+        姓名: 'name',
+        户主姓名: 'household_head_name',
+        与户主关系: 'relationship_to_head',
         '与户主 关系': 'relationship_to_head', // 带空格的版本
-        '与户主': 'relationship_to_head',
-        '关系': 'relationship_to_head',
-        '性别': 'gender',
-        '民族': 'ethnicity',
-        '组别': 'village_group',
-        '村组': 'village_group',
-        '户籍详细地址': 'address',
-        '地址': 'address',
-        '家庭地址': 'address',
-        '出生日期': 'date_of_birth',
-        '身份证号码': 'id_card',
-        '年龄': '', // 年龄可以从出生日期计算，不需要单独导入
-        '联系电话': 'phone_number',
-        '电话': 'phone_number',
-        '联系方式': 'phone_number',
-        '联系': 'phone_number',
-        '方式': 'phone_number',
-        '文化程度': 'education_level',
-        '文化': 'education_level',
-        '程度': 'education_level',
-        '婚姻状况': 'marital_status',
-        '兵役状况': 'military_service',
-        '兵役': 'military_service',
-        '状况': 'military_service',
-        '政治面貌': 'political_status',
-        '政治': 'political_status',
-        '面貌': 'political_status',
-        '开户银行': 'bank_name',
-        '银行账号': 'bank_card',
-        '拥有权数': 'equity_shares',
-        '股权数量': 'equity_shares',
-        '户口类型': 'householdType',
-        '住房类型': 'housingType'
+        与户主: 'relationship_to_head',
+        关系: 'relationship_to_head',
+        性别: 'gender',
+        民族: 'ethnicity',
+        组别: 'village_group',
+        村组: 'village_group',
+        户籍详细地址: 'address',
+        地址: 'address',
+        家庭地址: 'address',
+        出生日期: 'date_of_birth',
+        身份证号码: 'id_card',
+        年龄: '', // 年龄可以从出生日期计算，不需要单独导入
+        联系电话: 'phone_number',
+        电话: 'phone_number',
+        联系方式: 'phone_number',
+        联系: 'phone_number',
+        方式: 'phone_number',
+        文化程度: 'education_level',
+        文化: 'education_level',
+        程度: 'education_level',
+        婚姻状况: 'marital_status',
+        兵役状况: 'military_service',
+        兵役: 'military_service',
+        状况: 'military_service',
+        政治面貌: 'political_status',
+        政治: 'political_status',
+        面貌: 'political_status',
+        开户银行: 'bank_name',
+        银行账号: 'bank_card',
+        拥有权数: 'equity_shares',
+        股权数量: 'equity_shares',
+        户口类型: 'householdType',
+        住房类型: 'housingType'
       }
 
       // 1. 尝试精确匹配多种清理版本
@@ -352,17 +363,31 @@ export default {
       }
 
       // 3. 特殊处理：匹配包含"与户主"和"关系"的任意组合
-      if ((originalField.includes('与户主') || cleanedField.includes('与户主') || spaceCleanedField.includes('与户主') || simplifiedField.includes('与户主')) &&
-          (originalField.includes('关系') || cleanedField.includes('关系') || spaceCleanedField.includes('关系') || simplifiedField.includes('关系'))) {
+      if (
+        (originalField.includes('与户主') ||
+          cleanedField.includes('与户主') ||
+          spaceCleanedField.includes('与户主') ||
+          simplifiedField.includes('与户主')) &&
+        (originalField.includes('关系') ||
+          cleanedField.includes('关系') ||
+          spaceCleanedField.includes('关系') ||
+          simplifiedField.includes('关系'))
+      ) {
         return 'relationship_to_head'
       }
 
       // 4. 尝试包含匹配（例如："与户主关系"可能包含"关系"）
       for (const [key, value] of Object.entries(mappings)) {
-        if (cleanedField.includes(key) || key.includes(cleanedField) ||
-            originalField.includes(key) || key.includes(originalField) ||
-            spaceCleanedField.includes(key) || key.includes(spaceCleanedField) ||
-            simplifiedField.includes(key) || key.includes(simplifiedField)) {
+        if (
+          cleanedField.includes(key) ||
+          key.includes(cleanedField) ||
+          originalField.includes(key) ||
+          key.includes(originalField) ||
+          spaceCleanedField.includes(key) ||
+          key.includes(spaceCleanedField) ||
+          simplifiedField.includes(key) ||
+          key.includes(simplifiedField)
+        ) {
           return value
         }
       }
@@ -370,7 +395,7 @@ export default {
       return ''
     },
     autoMap() {
-      this.mappingList.forEach(item => {
+      this.mappingList.forEach((item) => {
         const recommendedField = this.getRecommendedMapping(item.excelField)
         item.dbField = recommendedField
       })
@@ -413,39 +438,39 @@ export default {
     getFieldLabel(dbField) {
       // 处理带前缀的字段
       const fieldMap = {
-        'household_head_name': '户主姓名',
-        'household_village_group': '组别(户主)',
-        'household_address': '家庭地址',
-        'household_phone_number': '联系电话(户主)',
-        'household_ethnicity': '民族(户主)',
-        'household_gender': '性别(户主)',
-        'household_head_id_card': '户主身份证号',
-        'householdType': '户口类型',
-        'housingType': '住房类型',
-        'name': '姓名',
-        'relationship_to_head': '与户主关系',
-        'gender': '性别',
-        'ethnicity': '民族',
-        'date_of_birth': '出生日期',
-        'id_card': '身份证号码',
-        'village_group': '组别',
-        'phone_number': '联系电话',
-        'education_level': '文化程度',
-        'marital_status': '婚姻状况',
-        'military_service': '兵役状况',
-        'political_status': '政治面貌',
-        'bank_name': '开户银行',
-        'bank_card': '银行账号',
-        'equity_shares': '股权数量',
-        'occupation': '职业',
-        'health_status': '健康状况',
-        'household_registration_status': '户籍状态',
-        'migration_in_date': '迁入日期',
-        'migration_out_date': '迁出日期',
-        'death_date': '死亡日期',
-        'account_cancellation_date': '注销日期',
-        'Home_address': '家庭地址',
-        'household_head_id': '户主ID'
+        household_head_name: '户主姓名',
+        household_village_group: '组别(户主)',
+        household_address: '家庭地址',
+        household_phone_number: '联系电话(户主)',
+        household_ethnicity: '民族(户主)',
+        household_gender: '性别(户主)',
+        household_head_id_card: '户主身份证号',
+        householdType: '户口类型',
+        housingType: '住房类型',
+        name: '姓名',
+        relationship_to_head: '与户主关系',
+        gender: '性别',
+        ethnicity: '民族',
+        date_of_birth: '出生日期',
+        id_card: '身份证号码',
+        village_group: '组别',
+        phone_number: '联系电话',
+        education_level: '文化程度',
+        marital_status: '婚姻状况',
+        military_service: '兵役状况',
+        political_status: '政治面貌',
+        bank_name: '开户银行',
+        bank_card: '银行账号',
+        equity_shares: '股权数量',
+        occupation: '职业',
+        health_status: '健康状况',
+        household_registration_status: '户籍状态',
+        migration_in_date: '迁入日期',
+        migration_out_date: '迁出日期',
+        death_date: '死亡日期',
+        account_cancellation_date: '注销日期',
+        Home_address: '家庭地址',
+        household_head_id: '户主ID'
       }
 
       return fieldMap[dbField] || dbField
@@ -460,7 +485,7 @@ export default {
         const importData = {
           headers: this.headerRow,
           data: this.excelData, // 这里已经是数组的数组格式，后端会处理
-          mapping: this.mappingList.map(item => ({
+          mapping: this.mappingList.map((item) => ({
             excelField: item.excelField,
             dbField: item.dbField
           }))

@@ -7,6 +7,8 @@ import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { usePageLoading } from '@/hooks/web/usePageLoading'
 import { NO_REDIRECT_WHITE_LIST } from '@/constants'
 import { useUserStoreWithOut } from '@/store/modules/user'
+import { ElMessage } from 'element-plus'
+import { getMyPermission } from '@/api/permission'
 
 const { start, done } = useNProgress()
 
@@ -34,13 +36,44 @@ router.beforeEach(async (to, from, next) => {
   if (userStore.getUserInfo || userStore.getToken) {
     // 已登录用户访问登录页，重定向到首页
     if (to.path === '/login') {
-      next({ path: '/dashboard/index', replace: true })
+      next({ path: '/index', replace: true })
       return
     }
 
-    // 静态路由模式：所有路由已在初始化时加载，直接通过
+    const isSuperAdmin = userStore.getUserInfo?.role === 'superadmin'
+
+    // 非超级管理员禁止访问权限管理/系统设置
+    if (!isSuperAdmin && (to.path.startsWith('/permission') || to.path.startsWith('/system'))) {
+      ElMessage.warning('仅超级管理员可访问该页面')
+      next({ path: '/403', replace: true })
+      return
+    }
+
+    // 静态路由模式：检查权限后通过
     if (!appStore.getDynamicRouter) {
-      console.log('静态路由模式，直接通过')
+      console.log('静态路由模式，检查权限...')
+
+      // 静态路由模式下补齐权限与菜单
+      if (userStore.getPermissions.length === 0) {
+        const res = await getMyPermission().catch(() => null)
+        if (res?.data) {
+          userStore.setPermissions(res.data.permissions || [])
+        }
+        await permissionStore
+          .generateRoutes('static', undefined, userStore.getPermissions)
+          .catch(() => {})
+      }
+
+      // 检查路由权限
+      const requiredPermission = to.meta?.permission as string
+      if (requiredPermission && !userStore.hasPermission(requiredPermission)) {
+        console.log('无权限访问:', requiredPermission)
+        ElMessage.warning('您没有该页面的访问权限')
+        next({ path: '/index', replace: true })
+        return
+      }
+
+      console.log('权限检查通过，允许导航')
       next()
       return
     }
@@ -48,12 +81,37 @@ router.beforeEach(async (to, from, next) => {
     // 动态路由模式：检查是否需要生成路由
     if (!permissionStore.getIsAddRouters) {
       console.log('动态路由模式，生成路由...')
-      const roleRouters = userStore.getRoleRouters || []
+      let roleRouters = userStore.getRoleRouters || []
+
+      // 服务端动态路由：必要时重新拉取权限与菜单
+      if (appStore.getServerDynamicRouter) {
+        const needRefresh =
+          !Array.isArray(roleRouters) ||
+          roleRouters.length === 0 ||
+          userStore.getPermissions.length === 0
+
+        if (needRefresh) {
+          const res = await getMyPermission().catch(() => null)
+          if (res?.data) {
+            roleRouters = res.data.menus || []
+            userStore.setRoleRouters(roleRouters)
+            userStore.setPermissions(res.data.permissions || [])
+          }
+        }
+      }
 
       if (appStore.serverDynamicRouter) {
-        await permissionStore.generateRoutes('server', roleRouters as AppCustomRouteRecordRaw[])
+        await permissionStore.generateRoutes(
+          'server',
+          roleRouters as AppCustomRouteRecordRaw[],
+          userStore.getPermissions
+        )
       } else {
-        await permissionStore.generateRoutes('frontEnd', roleRouters as string[])
+        await permissionStore.generateRoutes(
+          'frontEnd',
+          roleRouters as string[],
+          userStore.getPermissions
+        )
       }
 
       // 添加动态路由
@@ -64,6 +122,14 @@ router.beforeEach(async (to, from, next) => {
 
       permissionStore.setIsAddRouters(true)
       console.log('动态路由添加完成')
+    }
+
+    // 动态路由模式下也做权限校验（防止手动输入URL）
+    const requiredPermission = to.meta?.permission as string
+    if (requiredPermission && !userStore.hasPermission(requiredPermission)) {
+      ElMessage.warning('您没有该页面的访问权限')
+      next({ path: '/403', replace: true })
+      return
     }
 
     // 路由检查通过，允许导航

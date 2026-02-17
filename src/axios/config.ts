@@ -6,6 +6,13 @@ import { useUserStoreWithOut } from '@/store/modules/user'
 import { objToFormData } from '@/utils'
 
 const defaultRequestInterceptors = (config: InternalAxiosRequestConfig) => {
+  // 添加用户ID到请求头（用于后端权限验证）
+  const userStore = useUserStoreWithOut()
+  const userId = userStore.getUserInfo?.id
+  if (userId) {
+    config.headers['X-User-Id'] = String(userId)
+  }
+
   if (
     config.method === 'post' &&
     config.headers['Content-Type'] === 'application/x-www-form-urlencoded'

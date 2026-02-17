@@ -55,14 +55,28 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="small" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+          <el-button type="primary" size="small" icon="el-icon-search" @click="handleQuery"
+            >搜索</el-button
+          >
           <el-button size="small" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
-          <el-button type="success" size="small" icon="el-icon-plus" @click="handleAdd">新增低收入人员</el-button>
-          <el-button type="info" size="small" icon="el-icon-download" @click="handleExport">导出</el-button>
+          <el-button type="success" size="small" icon="el-icon-plus" @click="handleAdd"
+            >新增低收入人员</el-button
+          >
+          <el-button type="info" size="small" icon="el-icon-download" @click="handleExport"
+            >导出</el-button
+          >
         </el-form-item>
       </el-form>
 
-      <el-table v-loading="loading" :data="lowIncomeList" size="small" style="width: 100%" fit :header-cell-style="{ textAlign: 'center', whiteSpace: 'normal', lineHeight: '1.4' }" @row-click="handleRowClick">
+      <el-table
+        v-loading="loading"
+        :data="lowIncomeList"
+        size="small"
+        style="width: 100%"
+        fit
+        :header-cell-style="{ textAlign: 'center', whiteSpace: 'normal', lineHeight: '1.4' }"
+        @row-click="handleRowClick"
+      >
         <el-table-column type="index" width="30" align="center" />
         <el-table-column prop="name" label="居民姓名" align="center" width="80" />
         <el-table-column prop="idCard" label="身份证号" align="center" width="160" />
@@ -82,9 +96,13 @@
           </template>
         </el-table-column>
         <el-table-column prop="totalHouseholdMembers" label="全户人数" align="center" width="50" />
-        <el-table-column prop="lowIncomeHouseholdMembers" label="享受人数" align="center" width="50" />
+        <el-table-column
+          prop="lowIncomeHouseholdMembers"
+          label="享受人数"
+          align="center"
+          width="50"
+        />
         <el-table-column prop="monthlyHouseholdAmount" label="户月金额" align="center" width="60" />
-
       </el-table>
 
       <!-- 成员详情和历史记录模态框 -->
@@ -95,22 +113,40 @@
         :close-on-click-modal="true"
         @close="handleDialogClose"
       >
-        <div style="margin-bottom: 16px; text-align: right;">
-          <el-button v-if="!isEditing" type="primary" size="small" @click="handleEditDetail">编辑</el-button>
-          <el-button v-else-if="isEditing" type="primary" size="small" @click="handleSave">保存</el-button>
+        <div style="margin-bottom: 16px; text-align: right">
+          <el-button v-if="!isEditing" type="primary" size="small" @click="handleEditDetail"
+            >编辑</el-button
+          >
+          <el-button v-else-if="isEditing" type="primary" size="small" @click="handleSave"
+            >保存</el-button
+          >
           <el-button v-else size="small" @click="handleCancelEdit">取消</el-button>
         </div>
         <el-tabs v-model="activeTab" type="border-card">
           <!-- 成员基本信息 -->
           <el-tab-pane label="详细信息" name="info">
             <el-form v-loading="detailLoading" label-width="120px" size="small">
-              <div style="margin-bottom: 10px; padding: 10px; background-color: #f0f9ff; border-radius: 4px;">
+              <div
+                style="
+                  margin-bottom: 10px;
+                  padding: 10px;
+                  background-color: #f0f9ff;
+                  border-radius: 4px;
+                "
+              >
                 <strong>说明：</strong>
-                <span style="margin-left: 10px;">享受人数：该成员全部家庭成员享受政策的人数</span>
-                <span style="margin-left: 20px;">户月金额：每名家庭成员享受月补助金额的总和</span>
+                <span style="margin-left: 10px">享受人数：该成员全部家庭成员享受政策的人数</span>
+                <span style="margin-left: 20px">户月金额：每名家庭成员享受月补助金额的总和</span>
               </div>
               <!-- 第一行：户主姓名、全户人数、享受人数 -->
-              <div style="margin-bottom: 20px; padding: 15px; background-color: #f9fafc; border-radius: 4px;">
+              <div
+                style="
+                  margin-bottom: 20px;
+                  padding: 15px;
+                  background-color: #f9fafc;
+                  border-radius: 4px;
+                "
+              >
                 <el-row :gutter="20">
                   <el-col :span="8">
                     <el-form-item label="户主姓名">
@@ -119,12 +155,18 @@
                   </el-col>
                   <el-col :span="8">
                     <el-form-item label="全户人数">
-                      <el-input v-model.number="memberDetail.totalHouseholdMembers" :disabled="!isEditing" />
+                      <el-input
+                        v-model.number="memberDetail.totalHouseholdMembers"
+                        :disabled="!isEditing"
+                      />
                     </el-form-item>
                   </el-col>
                   <el-col :span="8">
                     <el-form-item label="享受人数">
-                      <el-input v-model.number="memberDetail.lowIncomeHouseholdMembers" :disabled="!isEditing" />
+                      <el-input
+                        v-model.number="memberDetail.lowIncomeHouseholdMembers"
+                        :disabled="!isEditing"
+                      />
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -167,7 +209,13 @@
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="享受政策类型">
-                    <el-select v-model="memberDetail.enjoyPolicyType" placeholder="请选择政策类型" :disabled="!isEditing" size="small" @change="handlePolicyTypeChange">
+                    <el-select
+                      v-model="memberDetail.enjoyPolicyType"
+                      placeholder="请选择政策类型"
+                      :disabled="!isEditing"
+                      size="small"
+                      @change="handlePolicyTypeChange"
+                    >
                       <el-option
                         v-for="item in lowIncomeTypeOptions"
                         :key="item.value"
@@ -179,7 +227,12 @@
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="享受档次">
-                    <el-select v-model="memberDetail.enjoyLevel" placeholder="请选择享受档次" :disabled="!isEditing || memberDetail.enjoyPolicyType !== '最低生活保证金'" size="small">
+                    <el-select
+                      v-model="memberDetail.enjoyLevel"
+                      placeholder="请选择享受档次"
+                      :disabled="!isEditing || memberDetail.enjoyPolicyType !== '最低生活保证金'"
+                      size="small"
+                    >
                       <el-option
                         v-for="item in levelOptions"
                         :key="item.value"
@@ -196,7 +249,12 @@
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="补贴周期">
-                    <el-select v-model="memberDetail.subsidyCycle" placeholder="请选择补贴周期" :disabled="!isEditing" size="small">
+                    <el-select
+                      v-model="memberDetail.subsidyCycle"
+                      placeholder="请选择补贴周期"
+                      :disabled="!isEditing"
+                      size="small"
+                    >
                       <el-option label="月度" value="monthly" />
                       <el-option label="季度" value="quarterly" />
                       <el-option label="年度" value="yearly" />
@@ -205,17 +263,36 @@
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="开始时间">
-                    <el-date-picker v-model="memberDetail.startDate" type="date" placeholder="选择开始时间" :disabled="!isEditing" value-format="yyyy-MM-dd" size="small" />
+                    <el-date-picker
+                      v-model="memberDetail.startDate"
+                      type="date"
+                      placeholder="选择开始时间"
+                      :disabled="!isEditing"
+                      value-format="yyyy-MM-dd"
+                      size="small"
+                    />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="结束时间">
-                    <el-date-picker v-model="memberDetail.endDate" type="date" placeholder="选择结束时间" :disabled="!isEditing" value-format="yyyy-MM-dd" size="small" />
+                    <el-date-picker
+                      v-model="memberDetail.endDate"
+                      type="date"
+                      placeholder="选择结束时间"
+                      :disabled="!isEditing"
+                      value-format="yyyy-MM-dd"
+                      size="small"
+                    />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="状态">
-                    <el-select v-model="memberDetail.status" placeholder="请选择状态" :disabled="!isEditing" size="small">
+                    <el-select
+                      v-model="memberDetail.status"
+                      placeholder="请选择状态"
+                      :disabled="!isEditing"
+                      size="small"
+                    >
                       <el-option label="在享" value="active" />
                       <el-option label="暂停" value="suspended" />
                       <el-option label="取消" value="cancelled" />
@@ -224,7 +301,10 @@
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="户月金额">
-                    <el-input v-model.number="memberDetail.monthlyHouseholdAmount" :disabled="!isEditing" />
+                    <el-input
+                      v-model.number="memberDetail.monthlyHouseholdAmount"
+                      :disabled="!isEditing"
+                    />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -244,7 +324,12 @@
                 </el-col>
                 <el-col :span="24">
                   <el-form-item label="备注">
-                    <el-input v-model="memberDetail.remark" type="textarea" :rows="3" :disabled="!isEditing" />
+                    <el-input
+                      v-model="memberDetail.remark"
+                      type="textarea"
+                      :rows="3"
+                      :disabled="!isEditing"
+                    />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -254,7 +339,7 @@
           <!-- 历史修改记录 -->
           <el-tab-pane label="历史记录" name="history">
             <!-- 统计信息 -->
-            <el-card class="stats-card" style="margin-bottom: 20px;">
+            <el-card class="stats-card" style="margin-bottom: 20px">
               <h3>享受政策统计</h3>
               <el-row :gutter="20">
                 <el-col :span="8">
@@ -276,11 +361,13 @@
                   </div>
                 </el-col>
               </el-row>
-              <div style="margin-top: 10px; font-size: 12px; color: #909399;">
-                <span>说明：该成员历史享受月数仅统计当前成员的月数；该户所有成员总月数统计全户所有成员的总月数；总金额按每条记录的补贴金额×月数计算后求和。</span>
+              <div style="margin-top: 10px; font-size: 12px; color: #909399">
+                <span
+                  >说明：该成员历史享受月数仅统计当前成员的月数；该户所有成员总月数统计全户所有成员的总月数；总金额按每条记录的补贴金额×月数计算后求和。</span
+                >
               </div>
             </el-card>
-            
+
             <!-- 历史记录 -->
             <el-timeline v-loading="historyLoading">
               <el-timeline-item
@@ -294,7 +381,13 @@
                   <div class="card-header">
                     <h4>{{ record.policyType }}</h4>
                     <el-tag :type="record.status === 'active' ? 'success' : 'warning'" size="small">
-                      {{ record.status === 'active' ? '在享' : record.status === 'suspended' ? '暂停' : '取消' }}
+                      {{
+                        record.status === 'active'
+                          ? '在享'
+                          : record.status === 'suspended'
+                            ? '暂停'
+                            : '取消'
+                      }}
                     </el-tag>
                   </div>
                   <div class="card-content">
@@ -314,13 +407,19 @@
                       <el-col :span="12">
                         <div class="info-item">
                           <span class="label">补贴金额：</span>
-                          <span class="value">{{ record.subsidyAmount ? record.subsidyAmount + '元/' + record.subsidyCycle : '无补贴' }}</span>
+                          <span class="value">{{
+                            record.subsidyAmount
+                              ? record.subsidyAmount + '元/' + record.subsidyCycle
+                              : '无补贴'
+                          }}</span>
                         </div>
                       </el-col>
                       <el-col :span="12">
                         <div class="info-item">
                           <span class="label">享受档次：</span>
-                          <span class="value">{{ getEnjoyLevelDisplay(record.policyType, record.enjoyLevel) }}</span>
+                          <span class="value">{{
+                            getEnjoyLevelDisplay(record.policyType, record.enjoyLevel)
+                          }}</span>
                         </div>
                       </el-col>
                       <el-col :span="12">
@@ -332,7 +431,9 @@
                       <el-col :span="12">
                         <div class="info-item">
                           <span class="label">与开户人关系：</span>
-                          <span class="value">{{ record.accountHolderRelationship || '未填写' }}</span>
+                          <span class="value">{{
+                            record.accountHolderRelationship || '未填写'
+                          }}</span>
                         </div>
                       </el-col>
                       <el-col :span="24">
@@ -347,8 +448,11 @@
               </el-timeline-item>
             </el-timeline>
             <div v-if="policyHistory.length === 0 && !historyLoading" class="no-records">
-              <div style="text-align: center; color: #909399; padding: 20px;">
-                <i class="el-icon-info" style="font-size: 24px; margin-bottom: 10px; display: block;" />
+              <div style="text-align: center; color: #909399; padding: 20px">
+                <i
+                  class="el-icon-info"
+                  style="font-size: 24px; margin-bottom: 10px; display: block"
+                />
                 <span>暂无历史记录</span>
               </div>
             </div>
@@ -360,7 +464,7 @@
       </el-dialog>
 
       <pagination
-        v-show="total>0"
+        v-show="total > 0"
         :total="total"
         :page.sync="queryParams.pageNum"
         :limit.sync="queryParams.pageSize"
@@ -372,7 +476,16 @@
 
 <script>
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { getLowIncomePersons, getLowIncomePerson, getPolicyRecords, addPolicyRecord, updatePolicyRecord, updateLowIncomePerson, getTotalMonths, getHouseholdTotalSubsidy } from '@/api/special-people'
+import {
+  getLowIncomePersons,
+  getLowIncomePerson,
+  getPolicyRecords,
+  addPolicyRecord,
+  updatePolicyRecord,
+  updateLowIncomePerson,
+  getTotalMonths,
+  getHouseholdTotalSubsidy
+} from '@/api/special-people'
 import { getDictionaryByCategory } from '@/api/dictionary'
 import ExcelJS from 'exceljs'
 
@@ -406,8 +519,8 @@ export default {
       // 统计数据
       stats: {
         memberTotalMonths: 0, // 成员个人历史享受月数
-        totalMonths: 0,       // 该户所有成员总月数
-        totalSubsidy: 0       // 该户所有成员享受总金额
+        totalMonths: 0, // 该户所有成员总月数
+        totalSubsidy: 0 // 该户所有成员享受总金额
       },
       // 字典数据
       levelOptions: [], // 档次选项
@@ -428,7 +541,7 @@ export default {
 
         // 加载低收入类型选项（享受政策）
         const lowIncomeTypeRes = await getDictionaryByCategory('享受政策')
-        this.lowIncomeTypeOptions = (lowIncomeTypeRes.data || []).map(item => ({
+        this.lowIncomeTypeOptions = (lowIncomeTypeRes.data || []).map((item) => ({
           label: item.value,
           value: item.value
         }))
@@ -445,35 +558,37 @@ export default {
 
     getList() {
       this.loading = true
-      getLowIncomePersons(this.queryParams).then(response => {
-        // 将API返回的数据转换为组件需要的格式
-        this.lowIncomeList = response.data.map(item => ({
-          id: item.id,
-          name: item.name || '',
-          idCard: item.idCard || item.id_card || '',
-          gender: item.gender || '',
-          ethnicity: item.ethnicity || '',
-          age: item.age || '',
-          householdHeadName: item.household_head_name || '',
-          relationshipToHead: item.relationship_to_head || '',
-          enjoyPolicyType: item.enjoyPolicyType || '',
-          enjoyLevel: this.getEnjoyLevelDisplay(item.enjoyPolicyType, item.enjoy_level),
-          subsidyAmount: item.subsidy_amount || '',
-          subsidyCycle: item.subsidy_cycle || '',
-          startDate: item.start_date || '',
-          endDate: item.end_date || '',
-          totalHouseholdMembers: item.totalHouseholdMembers || 0,
-          lowIncomeHouseholdMembers: item.lowIncomeHouseholdMembers || 0,
-          monthlyHouseholdAmount: item.monthlyHouseholdAmount || 0,
-          status: item.status
-        }))
-        this.total = response.data.length
-        this.loading = false
-      }).catch(error => {
-        console.error('获取低收入人员数据失败:', error)
-        this.loading = false
-        this.$message.error('获取低收入人员数据失败')
-      })
+      getLowIncomePersons(this.queryParams)
+        .then((response) => {
+          // 将API返回的数据转换为组件需要的格式
+          this.lowIncomeList = response.data.map((item) => ({
+            id: item.id,
+            name: item.name || '',
+            idCard: item.idCard || item.id_card || '',
+            gender: item.gender || '',
+            ethnicity: item.ethnicity || '',
+            age: item.age || '',
+            householdHeadName: item.household_head_name || '',
+            relationshipToHead: item.relationship_to_head || '',
+            enjoyPolicyType: item.enjoyPolicyType || '',
+            enjoyLevel: this.getEnjoyLevelDisplay(item.enjoyPolicyType, item.enjoy_level),
+            subsidyAmount: item.subsidy_amount || '',
+            subsidyCycle: item.subsidy_cycle || '',
+            startDate: item.start_date || '',
+            endDate: item.end_date || '',
+            totalHouseholdMembers: item.totalHouseholdMembers || 0,
+            lowIncomeHouseholdMembers: item.lowIncomeHouseholdMembers || 0,
+            monthlyHouseholdAmount: item.monthlyHouseholdAmount || 0,
+            status: item.status
+          }))
+          this.total = response.data.length
+          this.loading = false
+        })
+        .catch((error) => {
+          console.error('获取低收入人员数据失败:', error)
+          this.loading = false
+          this.$message.error('获取低收入人员数据失败')
+        })
     },
     handleQuery() {
       this.queryParams.pageNum = 1
@@ -507,13 +622,15 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        // 这里应该调用实际的删除API
-        this.$message.success('删除成功')
-        this.getList()
-      }).catch(() => {
-        // 取消删除
       })
+        .then(() => {
+          // 这里应该调用实际的删除API
+          this.$message.success('删除成功')
+          this.getList()
+        })
+        .catch(() => {
+          // 取消删除
+        })
     },
     // 单击行弹出模态框
     async handleRowClick(row) {
@@ -548,7 +665,8 @@ export default {
             endDate: data.endDate || data.end_date || '', // 兼容end_date字段
             status: data.status || '',
             totalHouseholdMembers: data.totalHouseholdMembers || data.totalHouseholdMembers || 0,
-            lowIncomeHouseholdMembers: data.lowIncomeHouseholdMembers || data.lowIncomeHouseholdMembers || 0,
+            lowIncomeHouseholdMembers:
+              data.lowIncomeHouseholdMembers || data.lowIncomeHouseholdMembers || 0,
             monthlyHouseholdAmount: data.monthlyHouseholdAmount || data.monthlyHouseholdAmount || 0,
             accountName: data.accountName || data.account_name || '', // 兼容account_name字段
             bankName: data.bankName || data.bank_name || '', // 兼容bank_name字段
@@ -560,7 +678,7 @@ export default {
         // 获取历史记录
         const historyResponse = await getPolicyRecords({ low_income_person_id: row.id })
         if (historyResponse && historyResponse.data) {
-          this.policyHistory = historyResponse.data.map(item => ({
+          this.policyHistory = historyResponse.data.map((item) => ({
             id: item.id,
             policyType: item.policy_type,
             startDate: item.start_date,
@@ -576,23 +694,24 @@ export default {
             bank_name: item.bank_name,
             bank_account: item.bank_account
           }))
-          
+
           // 如果有政策记录，使用最新的政策记录中的银行信息填充详情
           // 优先使用有值的记录，如果最新记录的值为空，则查找最近一个有值的记录
           if (this.policyHistory.length > 0) {
             // 按创建时间排序，获取最新的政策记录
-            const sortedRecords = [...this.policyHistory].sort((a, b) =>
-              new Date(b.created_at) - new Date(a.created_at)
+            const sortedRecords = [...this.policyHistory].sort(
+              (a, b) => new Date(b.created_at) - new Date(a.created_at)
             )
 
             // 查找最近一个有值的记录
-            const latestValidRecord = sortedRecords.find(record =>
-              record.account_name != null &&
-              record.account_name !== '' &&
-              record.bank_name != null &&
-              record.bank_name !== '' &&
-              record.bank_account != null &&
-              record.bank_account !== ''
+            const latestValidRecord = sortedRecords.find(
+              (record) =>
+                record.account_name != null &&
+                record.account_name !== '' &&
+                record.bank_name != null &&
+                record.bank_name !== '' &&
+                record.bank_account != null &&
+                record.bank_account !== ''
             )
 
             // 如果找到有值的记录，使用它；否则使用最新记录
@@ -610,13 +729,13 @@ export default {
             }
           }
         }
-        
+
         // 保存原始数据，用于比较修改
         this.originalMemberDetail = JSON.parse(JSON.stringify(this.memberDetail))
-        
+
         this.detailLoading = false
         this.historyLoading = false
-        
+
         // 获取统计数据
         await this.getStatsData(row.id)
       } catch (error) {
@@ -626,7 +745,7 @@ export default {
         this.historyLoading = false
       }
     },
-    
+
     // 获取统计数据
     async getStatsData(id) {
       try {
@@ -649,7 +768,7 @@ export default {
         console.error('获取统计数据失败:', error)
       }
     },
-    
+
     // 政策类型变化处理
     handlePolicyTypeChange() {
       // 如果政策类型为最低生活保证金，显示档次选项，否则直接使用政策类型作为享受档次
@@ -760,9 +879,11 @@ export default {
 
         // 刷新列表数据和历史记录
         this.getList()
-        const historyResponse = await getPolicyRecords({ low_income_person_id: this.memberDetail.id })
+        const historyResponse = await getPolicyRecords({
+          low_income_person_id: this.memberDetail.id
+        })
         if (historyResponse && historyResponse.data) {
-          this.policyHistory = historyResponse.data.map(item => ({
+          this.policyHistory = historyResponse.data.map((item) => ({
             id: item.id,
             policyType: item.policy_type,
             startDate: item.start_date,
@@ -863,8 +984,10 @@ export default {
       })
 
       // 生成Excel文件并下载
-      workbook.xlsx.writeBuffer().then(buffer => {
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+      workbook.xlsx.writeBuffer().then((buffer) => {
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        })
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url

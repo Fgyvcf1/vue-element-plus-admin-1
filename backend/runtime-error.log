@@ -35,3 +35,300 @@
 [2026-02-10T14:40:29.940Z] 生成户主ID失败: pinyin is not a function 
 [2026-02-10T15:07:07.396Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
 [2026-02-10T15:07:23.471Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-11T15:23:42.594Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-11T15:25:33.414Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-11T15:32:23.201Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T15:32:33.551Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T15:32:47.267Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T15:39:42.965Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T15:39:52.516Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T15:44:04.714Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T15:44:15.761Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T15:44:46.599Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-11T15:45:23.013Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T15:49:52.208Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-11T15:51:47.152Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T16:07:39.156Z] 获取字典数据失败: {
+  "message": "Table 'village.dictionary' doesn't exist",
+  "code": "ER_NO_SUCH_TABLE",
+  "errno": 1146,
+  "sql": "\n      SELECT id, category, value, label, sort_order, status\n      FROM dictionary\n      WHERE category = ? AND status = 'active'\n      ORDER BY sort_order ASC, id ASC\n    ",
+  "sqlState": "42S02",
+  "sqlMessage": "Table 'village.dictionary' doesn't exist"
+}
+
+[2026-02-11T16:07:55.852Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T07:16:21.922Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T07:16:21.935Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T07:16:25.800Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T07:16:25.801Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T07:30:09.997Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T07:30:10.001Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T07:30:13.338Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T07:30:13.344Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T07:30:25.822Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T07:30:25.823Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T09:33:18.790Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T09:33:18.791Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T09:35:41.005Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T09:35:41.007Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T09:39:25.440Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T09:39:25.443Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T09:39:26.470Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T09:39:26.475Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T09:39:45.098Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T09:39:45.105Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T09:39:46.081Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T09:39:46.082Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T10:00:25.032Z] 添加残疾人失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T10:00:25.051Z] 错误详情: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-12T10:42:04.890Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T10:47:10.547Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T10:47:31.656Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T10:47:52.150Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T11:03:20.551Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T11:08:31.248Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T11:24:29.825Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T11:28:27.971Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T11:33:38.955Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T11:45:21.182Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T11:57:15.075Z] 获取残疾人列表失败: {}
+
+[2026-02-12T11:57:20.936Z] 获取残疾人列表失败: {}
+
+[2026-02-12T11:57:25.529Z] 获取残疾人列表失败: {}
+
+[2026-02-12T11:57:28.172Z] 获取残疾人列表失败: {}
+
+[2026-02-12T11:57:29.854Z] 获取残疾人列表失败: {}
+
+[2026-02-12T12:05:11.341Z] 获取残疾人列表失败: {}
+
+[2026-02-12T12:05:24.855Z] 获取残疾人列表失败: {}
+
+[2026-02-12T12:07:20.340Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T12:33:31.072Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T12:39:26.106Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T13:54:55.352Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T13:55:35.906Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T13:58:22.582Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T13:58:28.093Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T13:58:30.358Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T14:01:08.107Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T14:01:49.964Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T14:03:37.608Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T14:07:04.333Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T14:07:16.292Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T14:17:15.366Z] SyntaxError: Unterminated string in JSON at position 105 (line 1 column 106)
+    at JSON.parse (<anonymous>)
+    at parse (D:\vue-element-plus-admin\backend\node_modules\body-parser\lib\types\json.js:72:19)
+    at D:\vue-element-plus-admin\backend\node_modules\body-parser\lib\read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:238:16)
+    at done (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:508:28)
+    at endReadableNT (node:internal/streams/readable:1701:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) 
+[2026-02-12T14:18:36.033Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T14:19:32.956Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-12T14:20:31.470Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T14:49:50.674Z] 更新政策记录失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-12T15:35:29.222Z] 添加低收入人员失败: {}
+
+[2026-02-12T15:35:44.729Z] 添加低收入人员失败: {}
+
+[2026-02-12T15:38:12.027Z] 添加低收入人员失败: {}
+
+[2026-02-13T05:06:16.169Z] 更新成员失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-13T05:06:17.416Z] 更新成员失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-13T05:06:18.583Z] 更新成员失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-13T05:06:52.772Z] 更新成员失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-13T05:16:49.272Z] 更新成员失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-13T05:17:14.856Z] 更新成员失败: Bind parameters must not contain undefined. To pass SQL NULL specify JS null 
+[2026-02-13T14:07:33.177Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-15T11:40:20.973Z] 发送通知失败: Error 
+[2026-02-15T12:15:12.670Z] 发送通知失败: Error 
+[2026-02-15T15:53:51.738Z] 更新低收入人员失败: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-15T15:55:29.298Z] 更新低收入人员失败: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-15T16:11:13.030Z] 更新低收入人员失败: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-16T05:37:45.899Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-16T13:00:21.700Z] 创建用户失败: Field 'password_hash' doesn't have a default value 
+[2026-02-16T13:00:29.374Z] 创建用户失败: Field 'password_hash' doesn't have a default value 
+[2026-02-16T13:03:06.289Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-16T13:07:28.482Z] 创建用户失败: Field 'role' doesn't have a default value 
+[2026-02-16T13:07:30.689Z] 创建用户失败: Field 'role' doesn't have a default value 
+[2026-02-16T13:07:31.673Z] 创建用户失败: Field 'role' doesn't have a default value 
+[2026-02-16T13:07:32.687Z] 创建用户失败: Field 'role' doesn't have a default value 
+[2026-02-16T13:07:33.128Z] 创建用户失败: Field 'role' doesn't have a default value 
+[2026-02-16T13:07:33.461Z] 创建用户失败: Field 'role' doesn't have a default value 
+[2026-02-16T13:13:42.547Z] 登录失败: db is not defined 
+[2026-02-16T13:13:54.129Z] 登录失败: db is not defined 
+[2026-02-16T13:22:44.776Z] 更新低收入人员失败: {
+  "message": "Bind parameters must not contain undefined. To pass SQL NULL specify JS null"
+}
+
+[2026-02-16T14:24:49.066Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-16T15:16:57.306Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T05:42:46.103Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T06:21:52.978Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T06:26:57.693Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T06:29:08.218Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T06:29:15.919Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T06:57:06.953Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T06:58:02.371Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T06:59:17.650Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T07:06:33.540Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T07:06:39.246Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T07:07:08.320Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T07:07:12.139Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T07:07:58.947Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T07:08:06.130Z] 查询残疾人列表失败: Unknown column 'r.phone' in 'SELECT' 
+[2026-02-17T11:01:12.957Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-17T13:30:15.676Z] 确保用户信息字段失败: ALTER command denied to user 'app_user'@'localhost' for table `village`.`users` 
+[2026-02-17T13:30:15.679Z] 获取个人资料失败: {
+  "message": "Unknown column 'u.email' in 'SELECT'",
+  "code": "ER_BAD_FIELD_ERROR",
+  "errno": 1054,
+  "sql": "\n      SELECT\n        u.id,\n        u.username,\n        u.real_name,\n        u.phone_number,\n        u.email,\n        u.avatar_url,\n        u.role_id,\n        r.role_name,\n        r.role_code\n      FROM users u\n      LEFT JOIN roles r ON u.role_id = r.id\n      WHERE u.id = ?\n      ",
+  "sqlState": "42S22",
+  "sqlMessage": "Unknown column 'u.email' in 'SELECT'"
+}
+
+[2026-02-17T13:30:32.297Z] 确保用户信息字段失败: ALTER command denied to user 'app_user'@'localhost' for table `village`.`users` 
+[2026-02-17T13:30:32.304Z] 获取个人资料失败: {
+  "message": "Unknown column 'u.email' in 'SELECT'",
+  "code": "ER_BAD_FIELD_ERROR",
+  "errno": 1054,
+  "sql": "\n      SELECT\n        u.id,\n        u.username,\n        u.real_name,\n        u.phone_number,\n        u.email,\n        u.avatar_url,\n        u.role_id,\n        r.role_name,\n        r.role_code\n      FROM users u\n      LEFT JOIN roles r ON u.role_id = r.id\n      WHERE u.id = ?\n      ",
+  "sqlState": "42S22",
+  "sqlMessage": "Unknown column 'u.email' in 'SELECT'"
+}
+
+[2026-02-17T13:30:48.253Z] 确保用户信息字段失败: ALTER command denied to user 'app_user'@'localhost' for table `village`.`users` 
+[2026-02-17T13:30:48.255Z] 更新个人资料失败: {
+  "message": "Unknown column 'email' in 'SET'",
+  "code": "ER_BAD_FIELD_ERROR",
+  "errno": 1054,
+  "sql": "UPDATE users SET real_name = ?, phone_number = ?, email = ?, updated_at = NOW() WHERE id = ?",
+  "sqlState": "42S22",
+  "sqlMessage": "Unknown column 'email' in 'SET'"
+}
+

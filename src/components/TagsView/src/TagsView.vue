@@ -48,7 +48,10 @@ const isDark = computed(() => appStore.getIsDark)
 // 初始化tag
 const initTags = () => {
   affixTagArr.value = filterAffixTags(unref(routers))
-  console.log('[TagsView] initTags - affix tags:', affixTagArr.value.map(t => ({ name: t.name, path: t.path, title: t.meta?.title })))
+  console.log(
+    '[TagsView] initTags - affix tags:',
+    affixTagArr.value.map((t) => ({ name: t.name, path: t.path, title: t.meta?.title }))
+  )
   for (const tag of unref(affixTagArr)) {
     // Must have tag name
     if (tag.name) {
@@ -60,7 +63,11 @@ const initTags = () => {
 // 新增tag
 const addTags = () => {
   const { name, path } = unref(currentRoute)
-  console.log('[TagsView] addTags - current route:', { name, path, title: unref(currentRoute).meta?.title })
+  console.log('[TagsView] addTags - current route:', {
+    name,
+    path,
+    title: unref(currentRoute).meta?.title
+  })
   if (name) {
     setSelectTag(unref(currentRoute))
     tagsViewStore.addView(unref(currentRoute))
@@ -274,7 +281,10 @@ watch(
 watch(
   () => tagsViewStore.getVisitedViews,
   (views) => {
-    console.log('[TagsView] visitedViews changed:', views.map(v => ({ name: v.name, path: v.path, title: v.meta?.title })))
+    console.log(
+      '[TagsView] visitedViews changed:',
+      views.map((v) => ({ name: v.name, path: v.path, title: v.meta?.title }))
+    )
   },
   { deep: true }
 )

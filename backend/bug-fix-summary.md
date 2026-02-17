@@ -4,24 +4,26 @@
 
 ### 问题1: notifications表字段不匹配 ✅ 已修复
 
-**位置**: `backend/routes.js` 第1860行
-**问题**: 插入通知时使用了不存在的字段
+**位置**: `backend/routes.js` 第1860行 **问题**: 插入通知时使用了不存在的字段
+
 ```javascript
 // 错误的代码
 const insertSql = `INSERT INTO notifications (title, content, type, priority, is_read, created_at, updated_at)
-                  VALUES (?, ?, 'reminder', 2, 0, datetime('now'), datetime('now'))`;
+                  VALUES (?, ?, 'reminder', 2, 0, datetime('now'), datetime('now'))`
 ```
 
 **原因**:
+
 - 数据库表使用`status`字段（值为'unread'/'read'）
 - 但代码使用了`is_read`和`updated_at`字段
 - 导致插入失败
 
 **修复**:
+
 ```javascript
 // 正确的代码
 const insertSql = `INSERT INTO notifications (title, content, type, priority, status, created_at)
-                  VALUES (?, ?, 'reminder', 2, 'unread', datetime('now'))`;
+                  VALUES (?, ?, 'reminder', 2, 'unread', datetime('now'))`
 ```
 
 ---
@@ -31,23 +33,25 @@ const insertSql = `INSERT INTO notifications (title, content, type, priority, st
 **位置**: 前端 `src/components/NotificationBell/index.vue` 第87行
 
 **问题**:
+
 - 后端数据库: `status`字段（'unread'/'read'）
 - 前端期望: `is_read`字段（0/1）
 
-**修复方案**:
-在后端API中添加字段转换，返回给前端时自动添加`is_read`字段
+**修复方案**: 在后端API中添加字段转换，返回给前端时自动添加`is_read`字段
 
 **修改的API**:
+
 1. `GET /notifications` - 获取通知列表
 2. `GET /notifications/:id` - 获取单个通知
 
 **转换代码**:
+
 ```javascript
 // 将status转换为is_read
-const convertedRows = rows.map(row => ({
+const convertedRows = rows.map((row) => ({
   ...row,
   is_read: row.status === 'read' ? 1 : 0
-}));
+}))
 ```
 
 ---
@@ -57,15 +61,17 @@ const convertedRows = rows.map(row => ({
 **位置**: `backend/routes.js` 第1521行
 
 **问题**:
+
 ```javascript
 // 错误的代码
-const sql = `UPDATE notifications SET is_read = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+const sql = `UPDATE notifications SET is_read = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
 ```
 
 **修复**:
+
 ```javascript
 // 正确的代码
-const sql = `UPDATE notifications SET status = 'read' WHERE id = ?`;
+const sql = `UPDATE notifications SET status = 'read' WHERE id = ?`
 ```
 
 ---
@@ -73,12 +79,14 @@ const sql = `UPDATE notifications SET status = 'read' WHERE id = ?`;
 ## 测试数据确认
 
 ### 居民信息
+
 - **姓名**: 林国东
 - **ID**: 14
 - **出生日期**: 1966-01-10
 - **状态**: active ✅
 
 ### 提醒规则
+
 - **规则名称**: 满60岁提醒办理城乡居民养老待遇申请
 - **规则ID**: 5
 - **目标年龄**: 60岁
@@ -86,6 +94,7 @@ const sql = `UPDATE notifications SET status = 'read' WHERE id = ?`;
 - **状态**: active ✅
 
 ### 计算结果
+
 - **当前日期**: 2026-01-09
 - **当前年龄**: 59岁
 - **距离60岁生日**: 1天 ✅
@@ -98,6 +107,7 @@ const sql = `UPDATE notifications SET status = 'read' WHERE id = ?`;
 ### 方案1: 自动化测试（推荐）
 
 1. 运行完整测试脚本:
+
 ```bash
 backend/complete-test-age-reminder.bat
 ```
@@ -110,6 +120,7 @@ backend/complete-test-age-reminder.bat
 ### 方案2: 手动测试
 
 #### 步骤1: 重启后端
+
 ```bash
 # 停止现有服务
 taskkill /F /IM node.exe
@@ -120,24 +131,28 @@ node server.js
 ```
 
 #### 步骤2: 运行调试脚本
+
 ```bash
 cd backend
 node full-debug-age-reminder.js
 ```
 
 #### 步骤3: 触发API
+
 在浏览器访问: `http://localhost:3000/api/check-age-reminders`
 
 或在控制台运行:
+
 ```javascript
 fetch('/api/check-age-reminders')
-  .then(res => res.json())
-  .then(data => console.log(data))
+  .then((res) => res.json())
+  .then((data) => console.log(data))
 ```
 
 #### 步骤4: 验证结果
 
 **检查数据库**:
+
 ```sql
 SELECT * FROM notifications
 WHERE title LIKE '%林国东%'
@@ -146,6 +161,7 @@ LIMIT 1;
 ```
 
 **检查前端**:
+
 1. 刷新页面
 2. 查看右上角铃铛图标（应该有红色数字标记）
 3. 点击铃铛查看通知列表
@@ -156,6 +172,7 @@ LIMIT 1;
 ## 预期结果
 
 ### API响应
+
 ```json
 {
   "code": 20000,
@@ -176,6 +193,7 @@ LIMIT 1;
 ```
 
 ### 数据库记录
+
 ```
 id | title | content | type | status | created_at
 ----+-------+---------+------+--------+------------
@@ -183,6 +201,7 @@ id | title | content | type | status | created_at
 ```
 
 ### 前端显示
+
 - ✅ 铃铛图标有红色数字 "1"
 - ✅ 下拉列表显示通知
 - ✅ 通知标题: "林国东 满60岁提醒办理城乡居民养老待遇申请"
@@ -197,6 +216,7 @@ id | title | content | type | status | created_at
 ### 如果还是没有通知
 
 #### 1. 检查后端日志
+
 ```bash
 # 查看后端控制台输出
 # 应该看到:
@@ -206,6 +226,7 @@ id | title | content | type | status | created_at
 ```
 
 #### 2. 检查数据库
+
 ```sql
 -- 检查通知表
 SELECT * FROM notifications ORDER BY id DESC LIMIT 5;
@@ -215,18 +236,21 @@ SELECT * FROM notifications WHERE title LIKE '%林国东%';
 ```
 
 #### 3. 检查前端请求
+
 打开浏览器开发者工具(F12) > Network标签:
+
 - 查找 `/notifications` 请求
 - 检查响应数据
 - 查看是否有错误
 
 #### 4. 检查浏览器控制台
+
 ```javascript
 // 手动获取通知
 fetch('/notifications')
-  .then(res => res.json())
-  .then(data => {
-    console.log('通知列表:', data);
+  .then((res) => res.json())
+  .then((data) => {
+    console.log('通知列表:', data)
   })
 ```
 

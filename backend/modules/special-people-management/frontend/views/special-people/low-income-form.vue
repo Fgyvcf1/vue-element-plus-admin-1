@@ -1,7 +1,13 @@
 <template>
   <div class="app-container">
     <el-card>
-      <el-form ref="lowIncomeForm" :model="formData" label-width="100px" size="small" class="demo-form">
+      <el-form
+        ref="lowIncomeForm"
+        :model="formData"
+        label-width="100px"
+        size="small"
+        class="demo-form"
+      >
         <!-- 居民基本信息（只读，自动填充） -->
         <el-card class="section-card" style="margin-bottom: 10px; padding: 5px">
           <div slot="header" class="section-header">
@@ -105,11 +111,7 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="状态" prop="status">
-                <el-select
-                  v-model="formData.status"
-                  placeholder="请选择状态"
-                  size="small"
-                >
+                <el-select v-model="formData.status" placeholder="请选择状态" size="small">
                   <el-option label="在享" value="active" />
                   <el-option label="暂停" value="suspended" />
                   <el-option label="取消" value="cancelled" />
@@ -160,7 +162,12 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="补贴金额" prop="subsidyAmount">
-                <el-input v-model="formData.subsidyAmount" placeholder="请输入补贴金额" size="small" type="number" />
+                <el-input
+                  v-model="formData.subsidyAmount"
+                  placeholder="请输入补贴金额"
+                  size="small"
+                  type="number"
+                />
               </el-form-item>
             </el-col>
 
@@ -193,7 +200,11 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="账户关系" prop="accountRelationship">
-                <el-input v-model="formData.accountRelationship" placeholder="自动填充" size="small" />
+                <el-input
+                  v-model="formData.accountRelationship"
+                  placeholder="自动填充"
+                  size="small"
+                />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -210,14 +221,22 @@
             </el-col>
             <el-col :span="18">
               <el-form-item label="备注" prop="remark">
-                <el-input v-model="formData.remark" placeholder="请输入备注" size="small" type="textarea" :rows="2" />
+                <el-input
+                  v-model="formData.remark"
+                  placeholder="请输入备注"
+                  size="small"
+                  type="textarea"
+                  :rows="2"
+                />
               </el-form-item>
             </el-col>
           </el-row>
         </el-card>
 
         <div class="form-actions">
-          <el-button type="primary" size="small" :loading="loading" @click="handleSave">保存</el-button>
+          <el-button type="primary" size="small" :loading="loading" @click="handleSave"
+            >保存</el-button
+          >
           <el-button size="small" @click="handleCancel">取消</el-button>
         </div>
       </el-form>
@@ -227,7 +246,12 @@
 
 <script>
 import { getResidents, getResident } from '@/api/resident'
-import { addLowIncomePerson, updateLowIncomePerson, addPolicyRecord, updatePolicyRecord } from '@/api/special-people'
+import {
+  addLowIncomePerson,
+  updateLowIncomePerson,
+  addPolicyRecord,
+  updatePolicyRecord
+} from '@/api/special-people'
 import { getDictionaryByCategory } from '@/api/dictionary'
 
 export default {
@@ -383,7 +407,7 @@ export default {
 
       try {
         const response = await getResidents({ pageNum: 1, pageSize: 10, name: queryString })
-        const suggestions = response.data.map(item => ({
+        const suggestions = response.data.map((item) => ({
           value: item.name,
           id: item.id,
           household_id: item.household_id
@@ -412,9 +436,13 @@ export default {
       try {
         if (!householdId) return
         // 这里应该调用获取全户人员的API，暂时使用列表API模拟
-        const response = await getResidents({ pageNum: 1, pageSize: 100, household_id: householdId })
+        const response = await getResidents({
+          pageNum: 1,
+          pageSize: 100,
+          household_id: householdId
+        })
         if (response && Array.isArray(response.data)) {
-          this.householdMembers = response.data.map(member => ({
+          this.householdMembers = response.data.map((member) => ({
             id: member.id,
             name: member.name,
             relationship: member.relationship_to_head || ''
@@ -440,7 +468,11 @@ export default {
       // 默认为居民本人姓名
       this.formData.accountName = this.formData.name
       this.formData.accountRelationship = relationship
-      console.log('计算出的账户名称和关系:', this.formData.accountName, this.formData.accountRelationship)
+      console.log(
+        '计算出的账户名称和关系:',
+        this.formData.accountName,
+        this.formData.accountRelationship
+      )
     },
 
     // 政策类型变化处理
@@ -516,19 +548,19 @@ export default {
           remark: this.formData.remark
         }
 
-        let lowIncomePersonId;
+        let lowIncomePersonId
         if (this.formData.id) {
           // 更新操作
           await updateLowIncomePerson(this.formData.id, saveData)
-          lowIncomePersonId = this.formData.id;
+          lowIncomePersonId = this.formData.id
           this.$message.success('更新低收入人员信息成功')
         } else {
           // 新增操作
           const result = await addLowIncomePerson(saveData)
-          lowIncomePersonId = result.data.id;
+          lowIncomePersonId = result.data.id
           this.$message.success('新增低收入人员成功')
         }
-        
+
         // 准备政策记录数据
         const policyRecordData = {
           low_income_person_id: lowIncomePersonId,
@@ -544,11 +576,11 @@ export default {
           account_relationship: this.formData.accountRelationship,
           status: this.formData.status,
           remark: this.formData.remark
-        };
-        
+        }
+
         // 保存政策记录
-        await addPolicyRecord(policyRecordData);
-        this.$message.success('保存政策记录成功');
+        await addPolicyRecord(policyRecordData)
+        this.$message.success('保存政策记录成功')
 
         this.loading = false
         this.$router.push('/special-people/low-income-list')

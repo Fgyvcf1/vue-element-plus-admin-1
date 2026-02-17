@@ -1,5 +1,5 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('app.db');
+const sqlite3 = require('sqlite3').verbose()
+const db = new sqlite3.Database('app.db')
 
 // 测试数据
 const testData = [
@@ -9,7 +9,7 @@ const testData = [
     has_subsidy: true,
     start_date: '2023-01-01',
     end_date: null,
-    subsidy_amount: 500.00,
+    subsidy_amount: 500.0,
     subsidy_cycle: '月',
     account_name: '张三',
     account_relationship: '本人',
@@ -24,7 +24,7 @@ const testData = [
     has_subsidy: true,
     start_date: '2023-03-01',
     end_date: null,
-    subsidy_amount: 450.00,
+    subsidy_amount: 450.0,
     subsidy_cycle: '月',
     account_name: '李四',
     account_relationship: '本人',
@@ -39,7 +39,7 @@ const testData = [
     has_subsidy: true,
     start_date: '2023-05-01',
     end_date: null,
-    subsidy_amount: 300.00,
+    subsidy_amount: 300.0,
     subsidy_cycle: '月',
     account_name: '王五',
     account_relationship: '本人',
@@ -54,7 +54,7 @@ const testData = [
     has_subsidy: true,
     start_date: '2023-07-01',
     end_date: null,
-    subsidy_amount: 600.00,
+    subsidy_amount: 600.0,
     subsidy_cycle: '月',
     account_name: '赵六',
     account_relationship: '本人',
@@ -69,7 +69,7 @@ const testData = [
     has_subsidy: true,
     start_date: '2023-09-01',
     end_date: null,
-    subsidy_amount: 700.00,
+    subsidy_amount: 700.0,
     subsidy_cycle: '月',
     account_name: '孙七',
     account_relationship: '监护人',
@@ -78,7 +78,7 @@ const testData = [
     status: 'active',
     remark: ''
   }
-];
+]
 
 // 插入数据
 const sql = `INSERT INTO low_income_policy_records (
@@ -86,15 +86,15 @@ const sql = `INSERT INTO low_income_policy_records (
   start_date, end_date, subsidy_amount, subsidy_cycle,
   account_name, account_relationship, 
   bank_name, bank_account, status, remark
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 db.serialize(() => {
   // 开始事务
-  db.run('BEGIN TRANSACTION');
-  
+  db.run('BEGIN TRANSACTION')
+
   // 插入每条记录
-  const stmt = db.prepare(sql);
-  testData.forEach(data => {
+  const stmt = db.prepare(sql)
+  testData.forEach((data) => {
     stmt.run(
       data.low_income_person_id,
       data.policy_type,
@@ -109,19 +109,19 @@ db.serialize(() => {
       data.bank_account,
       data.status,
       data.remark
-    );
-  });
-  
-  stmt.finalize();
-  
+    )
+  })
+
+  stmt.finalize()
+
   // 提交事务
   db.run('COMMIT', (err) => {
     if (err) {
-      console.error('插入数据失败:', err.message);
-      db.run('ROLLBACK');
+      console.error('插入数据失败:', err.message)
+      db.run('ROLLBACK')
     } else {
-      console.log('成功插入', testData.length, '条测试数据');
+      console.log('成功插入', testData.length, '条测试数据')
     }
-    db.close();
-  });
-});
+    db.close()
+  })
+})

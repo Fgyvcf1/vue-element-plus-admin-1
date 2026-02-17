@@ -1,19 +1,11 @@
 import type { App, Directive, DirectiveBinding } from 'vue'
-import { useI18n } from '@/hooks/web/useI18n'
-import router from '@/router'
-
-const { t } = useI18n()
+import { useUserStoreWithOut } from '@/store/modules/user'
 
 const hasPermission = (value: string): boolean => {
-  const permission = (router.currentRoute.value.meta.permission || []) as string[]
-  if (!value) {
-    throw new Error(t('permission.hasPermission'))
-  }
-  if (permission.includes(value)) {
-    return true
-  }
-  return false
+  const userStore = useUserStoreWithOut()
+  return userStore.hasPermission(value)
 }
+
 function hasPermi(el: Element, binding: DirectiveBinding) {
   const value = binding.value
 
@@ -22,6 +14,7 @@ function hasPermi(el: Element, binding: DirectiveBinding) {
     el.parentNode?.removeChild(el)
   }
 }
+
 const mounted = (el: Element, binding: DirectiveBinding<any>) => {
   hasPermi(el, binding)
 }

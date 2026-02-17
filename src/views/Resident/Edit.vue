@@ -92,7 +92,9 @@
       </el-form>
 
       <div class="action-buttons">
-        <el-button type="primary" :loading="loading" @click="submitForm">保存</el-button>
+        <el-button v-hasPermi="'resident:edit'" type="primary" :loading="loading" @click="submitForm">
+          保存
+        </el-button>
         <el-button @click="goBack">返回</el-button>
       </div>
     </el-card>
@@ -117,9 +119,11 @@ import {
 } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { getResidentDetail, updateResident } from '@/api/resident'
+import { useUserStoreWithOut } from '@/store/modules/user'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStoreWithOut()
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 const residentId = route.params.id as string
@@ -213,6 +217,11 @@ const goBack = () => {
 
 // 初始化
 onMounted(() => {
+  if (!userStore.hasPermission('resident:edit')) {
+    ElMessage.error('当前账号没有编辑居民权限')
+    router.replace('/resident/query')
+    return
+  }
   fetchDetail()
 })
 </script>

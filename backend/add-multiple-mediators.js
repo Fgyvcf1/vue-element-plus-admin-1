@@ -1,7 +1,7 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./app.db');
+const sqlite3 = require('sqlite3').verbose()
+const db = new sqlite3.Database('./app.db')
 
-console.log('开始添加多调解员支持...\n');
+console.log('开始添加多调解员支持...\n')
 
 // 创建调解记录-调解员关联表
 const createMediationMediatorsTable = `
@@ -14,26 +14,26 @@ CREATE TABLE IF NOT EXISTS mediation_record_mediators (
     FOREIGN KEY (mediator_id) REFERENCES mediators(id),
     UNIQUE(mediation_record_id, mediator_id)
 )
-`;
+`
 
 db.run(createMediationMediatorsTable, (err) => {
   if (err) {
-    console.error('❌ 创建调解记录-调解员关联表失败:', err.message);
+    console.error('❌ 创建调解记录-调解员关联表失败:', err.message)
   } else {
-    console.log('✅ 调解记录-调解员关联表创建成功');
+    console.log('✅ 调解记录-调解员关联表创建成功')
   }
 
   // 检查mediation_records表是否有mediator_id字段
-  db.all("PRAGMA table_info(mediation_records)", (err, columns) => {
+  db.all('PRAGMA table_info(mediation_records)', (err, columns) => {
     if (err) {
-      console.error('❌ 检查表结构失败:', err.message);
-      db.close();
-      return;
+      console.error('❌ 检查表结构失败:', err.message)
+      db.close()
+      return
     }
 
-    const hasMediatorId = columns.some(col => col.name === 'mediator_id');
-    console.log(`\nmediation_records表${hasMediatorId ? '有' : '没有'}mediator_id字段`);
+    const hasMediatorId = columns.some((col) => col.name === 'mediator_id')
+    console.log(`\nmediation_records表${hasMediatorId ? '有' : '没有'}mediator_id字段`)
 
-    db.close();
-  });
-});
+    db.close()
+  })
+})

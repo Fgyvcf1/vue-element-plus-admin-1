@@ -1,12 +1,13 @@
 ---
 name: Vue2To3-Migration-Helper
 description: Vue2(vue-element-admin)迁移到Vue3(vue-element-plus-admin)专用技能，强制pnpm依赖管理，自动修复语法差异，支持模块聚焦编辑。Invoke when user needs to migrate Vue2 code to Vue3, upgrade Element UI to Element Plus, convert Vue2 syntax to Vue3 composition API, or edit specific module with module-focused approach.
-version: 2.0
+version: 2.1
 ---
 
 # Vue2 到 Vue3 迁移助手（vue-element-admin → vue-element-plus-admin）
 
 ## 项目背景（必须牢记）
+
 - **原项目**：D:\vue-element-admin-master（Vue 2 + Element UI + Vuex + Vue Router 3）
 - **新项目**：D:\vue-element-plus-admin（Vue 3 + Element Plus + Pinia + Vue Router 4）
 - **包管理器**：⚠️ **强制使用 pnpm** ⚠️ （绝对禁止 npm install / yarn install）
@@ -14,6 +15,7 @@ version: 2.0
 ## 核心规则（优先级最高）
 
 ### 1. 依赖管理（铁律）
+
 - ✅ **必须使用**：`pnpm install`、`pnpm add`、`pnpm remove`
 - ❌ **严禁使用**：`npm install`、`npm i`、`yarn add`、`yarn install`
 - 安装 Element Plus 图标：`pnpm add @element-plus/icons-vue`
@@ -22,7 +24,7 @@ version: 2.0
 ### 2. Element UI → Element Plus 关键变更
 
 | Element UI (Vue2) | Element Plus (Vue3) | 说明 |
-|-------------------|---------------------|------|
+| --- | --- | --- |
 | `el-submenu` | `el-sub-menu` | 组件名变更 |
 | `el-button type="primary"` | 相同 | 但图标用法完全不同 |
 | 图标类名 `el-icon-xxx` | `<el-icon><Home /></el-icon>` | 必须使用 SVG 图标组件 |
@@ -31,7 +33,8 @@ version: 2.0
 | `el-pagination` | 相同 | 事件名变更：`current-change` → `current-change` |
 
 **图标迁移示例**：
-```vue
+
+```
 <!-- Vue2 错误写法 -->
 <i class="el-icon-menu"></i>
 
@@ -42,7 +45,8 @@ version: 2.0
 ### 3. Vue2 → Vue3 语法自动修复规则
 
 #### 3.1 选项式 API → 组合式 API
-```vue
+
+```
 <!-- Vue2 -->
 <script>
 export default {
@@ -68,7 +72,8 @@ const increment = () => {
 ```
 
 #### 3.2 Vuex → Pinia
-```javascript
+
+```
 // Vue2 Vuex
 this.$store.dispatch('user/login')
 this.$store.state.user.token
@@ -81,7 +86,8 @@ userStore.token
 ```
 
 #### 3.3 Vue Router 3 → Vue Router 4
-```javascript
+
+```
 // Vue2
 this.$router.push('/dashboard')
 this.$route.query.id
@@ -95,19 +101,21 @@ route.query.id
 ```
 
 #### 3.4 生命周期钩子
-| Vue2 | Vue3 (Options) | Vue3 (Composition) |
-|------|----------------|-------------------|
-| `beforeCreate` | `beforeCreate` | `setup()` |
-| `created` | `created` | `setup()` |
-| `beforeMount` | `beforeMount` | `onBeforeMount` |
-| `mounted` | `mounted` | `onMounted` |
-| `beforeUpdate` | `beforeUpdate` | `onBeforeUpdate` |
-| `updated` | `updated` | `onUpdated` |
-| `beforeDestroy` | `beforeUnmount` | `onBeforeUnmount` |
-| `destroyed` | `unmounted` | `onUnmounted` |
+
+| Vue2            | Vue3 (Options)  | Vue3 (Composition) |
+| --------------- | --------------- | ------------------ |
+| `beforeCreate`  | `beforeCreate`  | `setup()`          |
+| `created`       | `created`       | `setup()`          |
+| `beforeMount`   | `beforeMount`   | `onBeforeMount`    |
+| `mounted`       | `mounted`       | `onMounted`        |
+| `beforeUpdate`  | `beforeUpdate`  | `onBeforeUpdate`   |
+| `updated`       | `updated`       | `onUpdated`        |
+| `beforeDestroy` | `beforeUnmount` | `onBeforeUnmount`  |
+| `destroyed`     | `unmounted`     | `onUnmounted`      |
 
 #### 3.5 v-model 变更
-```vue
+
+```
 <!-- Vue2 -->
 <ChildComponent v-model="value" />
 <!-- 等价于 -->
@@ -120,7 +128,8 @@ route.query.id
 ```
 
 #### 3.6 过滤器移除
-```vue
+
+```
 <!-- Vue2 -->
 {{ message | capitalize }}
 
@@ -129,7 +138,8 @@ route.query.id
 ```
 
 #### 3.7 $listeners 移除
-```vue
+
+```
 <!-- Vue2 -->
 <Child v-on="$listeners" />
 
@@ -138,8 +148,9 @@ route.query.id
 ```
 
 ### 4. 文件路径映射
+
 | Vue2 路径 | Vue3 路径 |
-|-----------|-----------|
+| --- | --- |
 | `D:\vue-element-admin-master\src\views\login\index.vue` | `D:\vue-element-plus-admin\src\views\Login\Login.vue` |
 | `D:\vue-element-admin-master\src\store\modules\user.js` | `D:\vue-element-plus-admin\src\store\modules\user.ts` |
 | `D:\vue-element-admin-master\src\router\index.js` | `D:\vue-element-plus-admin\src\router\index.ts` |
@@ -148,12 +159,14 @@ route.query.id
 ### 5. 迁移步骤检查清单
 
 #### 阶段1：环境准备
+
 - [ ] 确认使用 pnpm 安装依赖
 - [ ] 安装 Element Plus 和图标库
 - [ ] 配置 vite.config.ts
 - [ ] 设置 TypeScript 配置
 
 #### 阶段2：核心语法迁移
+
 - [ ] 将 `.js` 文件改为 `.ts`
 - [ ] Vue 组件改为 `<script setup>` 语法
 - [ ] Vuex Store 改为 Pinia Store
@@ -161,12 +174,14 @@ route.query.id
 - [ ] 移除过滤器，改为计算属性或方法
 
 #### 阶段3：Element UI 迁移
+
 - [ ] `el-submenu` → `el-sub-menu`
 - [ ] 图标类名改为 SVG 组件
 - [ ] 插槽语法 `slot="xxx"` → `<template #xxx>`
 - [ ] 检查组件属性变更
 
 #### 阶段4：测试验证
+
 - [ ] 运行 `pnpm dev` 检查编译错误
 - [ ] 检查浏览器控制台警告
 - [ ] 验证所有页面功能正常
@@ -174,28 +189,34 @@ route.query.id
 ### 6. 常见错误及修复
 
 #### 错误1：找不到模块
+
 ```
 Cannot find module '@/store/modules/user'
 ```
+
 **修复**：检查路径大小写，Vue3 项目使用大写目录名
 
 #### 错误2：Element Plus 组件未注册
+
 ```
 [Vue warn]: Failed to resolve component: el-button
 ```
+
 **修复**：确保在 main.ts 中正确导入 Element Plus
 
 #### 错误3：图标不显示
+
 ```
 [Vue warn]: Failed to resolve component: el-icon
 ```
+
 **修复**：使用 `@element-plus/icons-vue` 中的图标组件
 
 ### 7. 自动修复命令
 
 当检测到 Vue2 语法时，自动执行以下替换：
 
-```bash
+```
 # 1. 替换 slot 语法
 sed -i 's/slot="\([^"]*\)"/<template #\1>/g' *.vue
 
@@ -223,6 +244,7 @@ sed -i 's/this\.\$store\.state\.\([a-zA-Z]*\)/use\1Store()/g' *.ts
 **必须输出**：`🔍 编辑【模块名称】模块`
 
 例如：
+
 - `🔍 编辑【居民管理】模块`
 - `🔍 编辑【调解档案】模块`
 - `🔍 编辑【残疾人管理】模块`
@@ -234,6 +256,7 @@ sed -i 's/this\.\$store\.state\.\([a-zA-Z]*\)/use\1Store()/g' *.ts
 **启动提示**：`🔍 编辑【居民管理】模块`
 
 **核心文件范围**：
+
 ```
 前端 (Vue3):
 - src/views/Resident/Query.vue
@@ -260,6 +283,7 @@ sed -i 's/this\.\$store\.state\.\([a-zA-Z]*\)/use\1Store()/g' *.ts
 **启动提示**：`🔍 编辑【调解档案】模块`
 
 **核心文件范围**：
+
 ```
 前端 (Vue3):
 - src/views/Archive/ 目录下所有文件
@@ -279,6 +303,7 @@ sed -i 's/this\.\$store\.state\.\([a-zA-Z]*\)/use\1Store()/g' *.ts
 **启动提示**：`🔍 编辑【残疾人管理】模块`
 
 **核心文件范围**：
+
 ```
 前端 (Vue3):
 - src/views/SpecialPeople/Disabled/ 目录下所有文件
@@ -294,6 +319,7 @@ sed -i 's/this\.\$store\.state\.\([a-zA-Z]*\)/use\1Store()/g' *.ts
 ### 公共代码部分（可修改）
 
 以下代码属于公共使用部分，可以在编辑任何模块时修改：
+
 - `src/utils/` 目录下的公共工具函数
 - `src/hooks/` 目录下的公共 hooks
 - `src/components/` 目录下的公共组件（非模块专用）
@@ -328,6 +354,7 @@ sed -i 's/this\.\$store\.state\.\([a-zA-Z]*\)/use\1Store()/g' *.ts
 用户说："帮我修改居民详情模态框的样式"
 
 系统应该：
+
 1. 输出：`🔍 编辑【居民管理】模块`
 2. 识别相关文件：
    - `src/views/Resident/components/ResidentDetailDialog.vue`
@@ -340,6 +367,7 @@ sed -i 's/this\.\$store\.state\.\([a-zA-Z]*\)/use\1Store()/g' *.ts
 用户说："给居民管理添加导出功能"
 
 系统应该：
+
 1. 输出：`🔍 编辑【居民管理】模块`
 2. 识别需要修改的文件：
    - `src/views/Resident/Query.vue` - 添加导出按钮
@@ -366,6 +394,7 @@ sed -i 's/this\.\$store\.state\.\([a-zA-Z]*\)/use\1Store()/g' *.ts
 用户说："帮我迁移登录页面"
 
 你应该：
+
 1. 读取 `D:\vue-element-admin-master\src\views\login\index.vue`
 2. 转换为 Vue3 + Element Plus 语法
 3. 保存到 `D:\vue-element-plus-admin\src\views\Login\Login.vue`
@@ -377,6 +406,7 @@ sed -i 's/this\.\$store\.state\.\([a-zA-Z]*\)/use\1Store()/g' *.ts
 用户说："编辑居民管理模块，修改居民详情对话框"
 
 你应该：
+
 1. 输出：`🔍 编辑【居民管理】模块`
 2. 读取 `src/views/Resident/components/ResidentDetailDialog.vue`
 3. 进行修改

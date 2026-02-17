@@ -4,6 +4,7 @@ import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
 import { reactive, ref, watch } from 'vue'
 import { ElDivider, ElMessage, ElMessageBox } from 'element-plus'
+import { updateProfile } from '@/api/user'
 
 const props = defineProps({
   userInfo: {
@@ -11,6 +12,10 @@ const props = defineProps({
     default: () => ({})
   }
 })
+
+const emit = defineEmits<{
+  (e: 'updated', data: any): void
+}>()
 
 const { required, phone, maxlength, email } = useValidator()
 
@@ -76,8 +81,18 @@ const save = async () => {
       .then(async () => {
         try {
           saveLoading.value = true
-          // 这里可以调用修改用户信息接口
-          ElMessage.success('修改成功')
+          const formData = await formMethods.getFormData(false)
+          const res = await updateProfile({
+            realName: formData.realName,
+            phoneNumber: formData.phoneNumber,
+            email: formData.email
+          })
+          if (res?.code === 20000) {
+            ElMessage.success('修改成功')
+            emit('updated', res.data)
+          } else {
+            ElMessage.error(res?.message || '修改失败')
+          }
         } catch (error) {
           console.log(error)
         } finally {

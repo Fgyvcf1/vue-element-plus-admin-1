@@ -1,0 +1,5 @@
+
+> vue-element-plus-admin@2.9.0 dev:win D:\vue-element-plus-admin
+> powershell -Command "Get-NetTCPConnection -LocalPort 4000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }" && vite --mode base
+
+ ELIFECYCLE  Command failed with exit code 1.

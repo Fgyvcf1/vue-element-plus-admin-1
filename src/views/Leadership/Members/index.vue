@@ -2,7 +2,12 @@
   <div class="app-container">
     <el-card v-loading="loading">
       <el-tabs v-model="filters.organizationType" type="border-card" @tab-change="handleOrgChange">
-        <el-tab-pane v-for="tab in orgTypeTabs" :key="tab.name" :label="tab.label" :name="tab.name" />
+        <el-tab-pane
+          v-for="tab in orgTypeTabs"
+          :key="tab.name"
+          :label="tab.label"
+          :name="tab.name"
+        />
       </el-tabs>
 
       <div class="filter-container">
@@ -26,7 +31,9 @@
           >
             {{ formatTermLabel(getTermValue(term)) }}
           </el-tag>
-          <el-tag :type="!filters.termNumber ? 'primary' : 'info'" @click="showAllMembers">全部</el-tag>
+          <el-tag :type="!filters.termNumber ? 'primary' : 'info'" @click="showAllMembers"
+            >全部</el-tag
+          >
         </div>
 
         <el-radio-group v-model="filters.status" size="small" @change="handleStatusChange">
@@ -58,24 +65,43 @@
         <el-table-column prop="gender" label="性别" align="center" width="60" />
         <el-table-column prop="id_card" label="身份证号码" align="center" width="180" />
         <el-table-column prop="date_of_birth" label="出生日期" align="center" width="110" />
-        <el-table-column prop="address" label="家庭住址" align="center" min-width="150" show-overflow-tooltip />
+        <el-table-column
+          prop="address"
+          label="家庭住址"
+          align="center"
+          min-width="150"
+          show-overflow-tooltip
+        />
         <el-table-column prop="phone_number" label="联系电话" align="center" width="120" />
         <el-table-column prop="position" label="职务" align="center" width="120" />
         <el-table-column prop="term_number" label="届数" align="center" width="90">
-          <template #default="scope">{{ formatTermLabel(scope && scope.row ? scope.row.term_number : '') }}</template>
+          <template #default="scope">{{
+            formatTermLabel(scope && scope.row ? scope.row.term_number : '')
+          }}</template>
         </el-table-column>
         <el-table-column prop="term_start_date" label="任期开始" align="center" width="110" />
         <el-table-column prop="term_end_date" label="任期结束" align="center" width="110">
-          <template #default="scope">{{ (scope && scope.row && scope.row.term_end_date) || '当前' }}</template>
+          <template #default="scope">{{
+            (scope && scope.row && scope.row.term_end_date) || '当前'
+          }}</template>
         </el-table-column>
         <el-table-column prop="status" label="状态" align="center" width="80">
           <template #default="scope">
-            <el-tag :type="scope && scope.row && scope.row.status === 'current' ? 'success' : 'info'" size="small">
+            <el-tag
+              :type="scope && scope.row && scope.row.status === 'current' ? 'success' : 'info'"
+              size="small"
+            >
               {{ scope && scope.row && scope.row.status === 'current' ? '现任' : '历届' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="remarks" label="备注" align="center" min-width="150" show-overflow-tooltip />
+        <el-table-column
+          prop="remarks"
+          label="备注"
+          align="center"
+          min-width="150"
+          show-overflow-tooltip
+        />
       </el-table>
 
       <div v-if="total > 0" class="pagination-container">
@@ -153,9 +179,13 @@ const orgTypeTabs = [
 ]
 
 const isCollectiveOrg = computed(() => {
-  return ['branch_committee', 'village_committee', 'economic_council', 'economic_supervisor', 'supervisory_committee'].includes(
-    filters.organizationType
-  )
+  return [
+    'branch_committee',
+    'village_committee',
+    'economic_council',
+    'economic_supervisor',
+    'supervisory_committee'
+  ].includes(filters.organizationType)
 })
 
 const formatTermLabel = (termNumber: string | number | null | undefined) => {

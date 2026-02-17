@@ -9,9 +9,25 @@
     <div slot="title" class="dialog-header">
       <span class="dialog-title">{{ title }}</span>
       <div class="dialog-header-buttons">
-        <el-button v-if="!isAddingNew && !isEditable" type="primary" size="small" :loading="loading" @click="handleEdit">修改</el-button>
-        <el-button v-if="!isAddingNew" type="primary" size="small" :loading="loading" @click="handleSameHouseholdAdd">同户新增</el-button>
-        <el-button type="success" size="small" :loading="loading" @click="handleSave">保存</el-button>
+        <el-button
+          v-if="!isAddingNew && !isEditable"
+          type="primary"
+          size="small"
+          :loading="loading"
+          @click="handleEdit"
+          >修改</el-button
+        >
+        <el-button
+          v-if="!isAddingNew"
+          type="primary"
+          size="small"
+          :loading="loading"
+          @click="handleSameHouseholdAdd"
+          >同户新增</el-button
+        >
+        <el-button type="success" size="small" :loading="loading" @click="handleSave"
+          >保存</el-button
+        >
         <el-button v-if="isEditable" type="info" size="small" @click="cancelEdit">取消</el-button>
       </div>
     </div>
@@ -25,12 +41,19 @@
         <el-row :gutter="12">
           <el-col :span="8">
             <el-form-item label="户主姓名">
-              <el-input v-model="householdForm.householdHeadName" :disabled="!isEditable && !isAddingNew" />
+              <el-input
+                v-model="householdForm.householdHeadName"
+                :disabled="!isEditable && !isAddingNew"
+              />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="性别">
-              <el-select v-model="householdForm.gender" placeholder="请选择性别" :disabled="!isEditable && !isAddingNew">
+              <el-select
+                v-model="householdForm.gender"
+                placeholder="请选择性别"
+                :disabled="!isEditable && !isAddingNew"
+              >
                 <el-option label="男" value="男" />
                 <el-option label="女" value="女" />
               </el-select>
@@ -38,39 +61,82 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="电话号码">
-              <el-input v-model="householdForm.phoneNumber" :disabled="!isEditable && !isAddingNew" />
+              <el-input
+                v-model="householdForm.phoneNumber"
+                :disabled="!isEditable && !isAddingNew"
+              />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="民族">
-              <el-select v-model="householdForm.ethnicity" placeholder="请选择民族" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in ethnicityOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="householdForm.ethnicity"
+                placeholder="请选择民族"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in ethnicityOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="身份证号码">
-              <el-input v-model="householdForm.householdHeadIdCard" :disabled="!isEditable && !isAddingNew" @change="handleHouseholdIdCardChange" />
+              <el-input
+                v-model="householdForm.householdHeadIdCard"
+                :disabled="!isEditable && !isAddingNew"
+                @change="handleHouseholdIdCardChange"
+              />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="户口类型">
-              <el-select v-model="householdForm.householdType" placeholder="请选择户口类型" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in householdTypeOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="householdForm.householdType"
+                placeholder="请选择户口类型"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in householdTypeOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="住房类型">
-              <el-select v-model="householdForm.housingType" placeholder="请选择住房类型" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in housingTypeOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="householdForm.housingType"
+                placeholder="请选择住房类型"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in housingTypeOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="村组">
-              <el-select v-model="householdForm.villageGroup" placeholder="请选择村组" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in villageGroupOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="householdForm.villageGroup"
+                placeholder="请选择村组"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in villageGroupOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -97,12 +163,21 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="身份证号">
-              <el-input v-model="residentForm.idCard" :disabled="!isEditable && !isAddingNew" @change="handleIdCardChange" />
+              <el-input
+                v-model="residentForm.idCard"
+                :disabled="!isEditable && !isAddingNew"
+                @change="handleIdCardChange"
+              />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="性别">
-              <el-select v-model="residentForm.gender" placeholder="请选择性别" :disabled="!isEditable && !isAddingNew" @change="handleGenderChange">
+              <el-select
+                v-model="residentForm.gender"
+                placeholder="请选择性别"
+                :disabled="!isEditable && !isAddingNew"
+                @change="handleGenderChange"
+              >
                 <el-option label="男" value="男" />
                 <el-option label="女" value="女" />
               </el-select>
@@ -110,7 +185,11 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="与户主关系">
-              <el-select v-model="residentForm.relationshipToHead" placeholder="请选择与户主关系" :disabled="!isEditable && !isAddingNew">
+              <el-select
+                v-model="residentForm.relationshipToHead"
+                placeholder="请选择与户主关系"
+                :disabled="!isEditable && !isAddingNew"
+              >
                 <el-option
                   v-for="option in relationshipOptions"
                   :key="option.id"
@@ -122,8 +201,17 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="民族">
-              <el-select v-model="residentForm.ethnicity" placeholder="请选择民族" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in ethnicityOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="residentForm.ethnicity"
+                placeholder="请选择民族"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in ethnicityOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -147,50 +235,95 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="婚姻状况">
-              <el-select v-model="residentForm.maritalStatus" placeholder="请选择婚姻状况" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in maritalStatusOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="residentForm.maritalStatus"
+                placeholder="请选择婚姻状况"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in maritalStatusOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="兵役状况">
-              <el-select v-model="residentForm.militaryService" placeholder="请选择兵役状况" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in militaryServiceOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="residentForm.militaryService"
+                placeholder="请选择兵役状况"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in militaryServiceOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="政治面貌">
-              <el-select v-model="residentForm.politicalStatus" placeholder="请选择政治面貌" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in politicalStatusOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="residentForm.politicalStatus"
+                placeholder="请选择政治面貌"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in politicalStatusOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="文化程度">
-              <el-select v-model="residentForm.educationLevel" placeholder="请选择文化程度" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in educationLevelOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="residentForm.educationLevel"
+                placeholder="请选择文化程度"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in educationLevelOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="村组">
-              <el-select v-model="residentForm.villageGroup" placeholder="请选择村组" :disabled="!isEditable && !isAddingNew">
-                <el-option v-for="option in villageGroupOptions" :key="option.id" :label="option.value" :value="option.value" />
+              <el-select
+                v-model="residentForm.villageGroup"
+                placeholder="请选择村组"
+                :disabled="!isEditable && !isAddingNew"
+              >
+                <el-option
+                  v-for="option in villageGroupOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="16">
             <el-form-item label="家庭地址">
-              <el-input
-                v-model="residentForm.address"
-                :disabled="!isEditable && !isAddingNew"
-              />
+              <el-input v-model="residentForm.address" :disabled="!isEditable && !isAddingNew" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="联系电话">
-              <el-input v-model="residentForm.phoneNumber" :disabled="!isEditable && !isAddingNew" />
+              <el-input
+                v-model="residentForm.phoneNumber"
+                :disabled="!isEditable && !isAddingNew"
+              />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -204,13 +337,16 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <div style="display: flex; flex-direction: row; gap: 20px; align-items: center;">
-              <div style="flex: 1;">
+            <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
+              <div style="flex: 1">
                 <el-form-item label="股权">
-                  <el-input v-model="residentForm.equityShares" :disabled="!isEditable && !isAddingNew" />
+                  <el-input
+                    v-model="residentForm.equityShares"
+                    :disabled="!isEditable && !isAddingNew"
+                  />
                 </el-form-item>
               </div>
-              <div style="flex: 1;">
+              <div style="flex: 1">
                 <el-form-item label="当前状态">
                   <el-tag :type="statusType" size="small">
                     {{ statusText }}
@@ -258,13 +394,10 @@
     <el-card shadow="hover" class="info-card compact-card">
       <div slot="header" class="clearfix">
         <span>迁途改销</span>
-        <el-button
-          type="text"
-          size="mini"
-          class="header-button"
-          @click="toggleMigration"
-        >
-          <i :class="['el-icon', isMigrationExpanded ? 'el-icon-arrow-up' : 'el-icon-arrow-down']" />
+        <el-button type="text" size="mini" class="header-button" @click="toggleMigration">
+          <i
+            :class="['el-icon', isMigrationExpanded ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"
+          />
         </el-button>
       </div>
       <div v-if="isMigrationExpanded" class="migration-form">
@@ -356,33 +489,27 @@
             </el-col>
           </el-row>
         </el-form>
-        
+
         <!-- 操作按钮区域 -->
         <div class="migration-buttons" style="margin-top: 15px; text-align: right">
-          <el-button 
-            v-if="!isMigrationEditable" 
-            type="primary" 
+          <el-button
+            v-if="!isMigrationEditable"
+            type="primary"
             size="small"
             @click="toggleMigrationEdit"
           >
             修改
           </el-button>
           <div v-else>
-            <el-button 
-              type="text" 
+            <el-button
+              type="text"
               size="small"
               @click="cancelMigrationEdit"
               style="margin-right: 10px"
             >
               取消
             </el-button>
-            <el-button 
-              type="primary" 
-              size="small"
-              @click="handleMigrationSave"
-            >
-              保存
-            </el-button>
+            <el-button type="primary" size="small" @click="handleMigrationSave"> 保存 </el-button>
           </div>
         </div>
       </div>
@@ -575,27 +702,34 @@ export default {
             this.loadHouseholdInfo(householdId),
             this.loadResidentInfo(residentId),
             this.loadHouseholdMembers(householdId)
-          ]).then(() => {
-            // 如果户主身份证号为空，尝试从家庭成员中获取
-            if (!this.householdForm.householdHeadIdCard) {
-              // 首先检查当前居民是否是户主
-              if (this.residentForm.relationshipToHead === '本人' || this.residentForm.relationshipToHead === '户主') {
-                this.householdForm.householdHeadIdCard = this.residentForm.idCard
-                this.householdForm.gender = this.residentForm.gender
-              } else {
-                // 否则从家庭成员列表中查找户主
-                const headMember = this.householdMembers.find(member => 
-                  member.relationship_to_head === '本人' || member.relationship_to_head === '户主'
-                )
-                if (headMember) {
-                  this.householdForm.householdHeadIdCard = headMember.idCard || headMember.id_card
-                  this.householdForm.gender = headMember.gender
+          ])
+            .then(() => {
+              // 如果户主身份证号为空，尝试从家庭成员中获取
+              if (!this.householdForm.householdHeadIdCard) {
+                // 首先检查当前居民是否是户主
+                if (
+                  this.residentForm.relationshipToHead === '本人' ||
+                  this.residentForm.relationshipToHead === '户主'
+                ) {
+                  this.householdForm.householdHeadIdCard = this.residentForm.idCard
+                  this.householdForm.gender = this.residentForm.gender
+                } else {
+                  // 否则从家庭成员列表中查找户主
+                  const headMember = this.householdMembers.find(
+                    (member) =>
+                      member.relationship_to_head === '本人' ||
+                      member.relationship_to_head === '户主'
+                  )
+                  if (headMember) {
+                    this.householdForm.householdHeadIdCard = headMember.idCard || headMember.id_card
+                    this.householdForm.gender = headMember.gender
+                  }
                 }
               }
-            }
-          }).finally(() => {
-            this.loading = false
-          })
+            })
+            .finally(() => {
+              this.loading = false
+            })
         } else {
           this.resetFormData()
           this.loading = false
@@ -692,7 +826,16 @@ export default {
     async loadAllDictionaries() {
       try {
         // 同时加载多个字典数据，使用Promise.all提高效率
-        const [ethnicityData, householdTypeData, housingTypeData, maritalStatusData, politicalStatusData, militaryServiceData, educationLevelData, villageGroupData] = await Promise.all([
+        const [
+          ethnicityData,
+          householdTypeData,
+          housingTypeData,
+          maritalStatusData,
+          politicalStatusData,
+          militaryServiceData,
+          educationLevelData,
+          villageGroupData
+        ] = await Promise.all([
           dictionaryCache.getDictionary('民族'),
           dictionaryCache.getDictionary('户口类型'),
           dictionaryCache.getDictionary('住房类型'),
@@ -762,31 +905,34 @@ export default {
           return
         }
 
-        request.get(`/households/${householdId}`).then(response => {
-          if (response.code === 20000 && response.data) {
-            // 直接使用响应数据，不再做字段名映射
-            this.householdForm = {
-              householdNumber: response.data.household_number || '',
-              villageGroup: response.data.village_group || '',
-              householdHeadId: response.data.household_head_id || null,
-              householdHeadName: response.data.household_head_name || '',
-              ethnicity: response.data.ethnicity || '汉族',
-              householdType: response.data.household_type || '农业户口',
-              housingType: response.data.housing_type || '自有住房',
-              address: response.data.address || '',
-              phoneNumber: response.data.phone_number || '',
-              registeredDate: response.data.registered_date || '',
-              status: response.data.status || 'active',
-              householdHeadIdCard: response.data.household_head_id_card || '',
-              gender: response.data.gender || ''
+        request
+          .get(`/households/${householdId}`)
+          .then((response) => {
+            if (response.code === 20000 && response.data) {
+              // 直接使用响应数据，不再做字段名映射
+              this.householdForm = {
+                householdNumber: response.data.household_number || '',
+                villageGroup: response.data.village_group || '',
+                householdHeadId: response.data.household_head_id || null,
+                householdHeadName: response.data.household_head_name || '',
+                ethnicity: response.data.ethnicity || '汉族',
+                householdType: response.data.household_type || '农业户口',
+                housingType: response.data.housing_type || '自有住房',
+                address: response.data.address || '',
+                phoneNumber: response.data.phone_number || '',
+                registeredDate: response.data.registered_date || '',
+                status: response.data.status || 'active',
+                householdHeadIdCard: response.data.household_head_id_card || '',
+                gender: response.data.gender || ''
+              }
             }
-          }
-          resolve()
-        }).catch(error => {
-          console.error('获取户主信息失败:', error)
-          this.$message.error('获取户主信息失败')
-          resolve()
-        })
+            resolve()
+          })
+          .catch((error) => {
+            console.error('获取户主信息失败:', error)
+            this.$message.error('获取户主信息失败')
+            resolve()
+          })
       })
     },
 
@@ -798,66 +944,88 @@ export default {
           return
         }
 
-        request.get(`/residents/${residentId}`).then(response => {
-          if (response.code === 20000 && response.data) {
-            // 同时处理下划线命名和驼峰命名的字段，确保数据显示稳定
-            this.residentForm = {
-              name: response.data.name || '',
-              idCard: response.data.id_card || response.data.idCard || '',
-              gender: response.data.gender || '',
-              dateOfBirth: response.data.date_of_birth || response.data.dateOfBirth || '',
-              villageGroup: response.data.village_group || response.data.villageGroup || '',
-              address: response.data.home_address || response.data.homeAddress || response.data.address || '',
-              bankCard: response.data.bank_card || response.data.bankCard || '',
-              phoneNumber: response.data.phone_number || response.data.phoneNumber || '',
-              bankName: response.data.bank_name || response.data.bankName || '',
-              householdId: response.data.household_id || response.data.householdId || null,
-              householdHeadId: response.data.household_head_id || response.data.householdHeadId || null,
-              ethnicity: response.data.ethnicity || '汉族',
-              relationshipToHead: response.data.relationship_to_head || response.data.relationshipToHead || '其他',
-              maritalStatus: response.data.marital_status || response.data.maritalStatus || '未婚',
-              politicalStatus: response.data.political_status || response.data.politicalStatus || '群众',
-              militaryService: response.data.military_service || response.data.militaryService || '未服兵役',
-              educationLevel: response.data.education_level || response.data.educationLevel || '小学',
-              status: response.data.status || 'active',
-              registeredPermanentResidence: response.data.registered_permanent_residence || response.data.registeredPermanentResidence || 1,
-              registeredDate: response.data.registered_date || response.data.registeredDate || '',
-              statusUpdatedAt: response.data.status_updated_at || response.data.statusUpdatedAt || '',
-              statusChangeReason: response.data.status_change_reason || response.data.statusChangeReason || '',
-              deathDate: response.data.death_date || response.data.deathDate || '',
-              equityShares: response.data.equity_shares || response.data.equityShares || 0
+        request
+          .get(`/residents/${residentId}`)
+          .then((response) => {
+            if (response.code === 20000 && response.data) {
+              // 同时处理下划线命名和驼峰命名的字段，确保数据显示稳定
+              this.residentForm = {
+                name: response.data.name || '',
+                idCard: response.data.id_card || response.data.idCard || '',
+                gender: response.data.gender || '',
+                dateOfBirth: response.data.date_of_birth || response.data.dateOfBirth || '',
+                villageGroup: response.data.village_group || response.data.villageGroup || '',
+                address:
+                  response.data.home_address ||
+                  response.data.homeAddress ||
+                  response.data.address ||
+                  '',
+                bankCard: response.data.bank_card || response.data.bankCard || '',
+                phoneNumber: response.data.phone_number || response.data.phoneNumber || '',
+                bankName: response.data.bank_name || response.data.bankName || '',
+                householdId: response.data.household_id || response.data.householdId || null,
+                householdHeadId:
+                  response.data.household_head_id || response.data.householdHeadId || null,
+                ethnicity: response.data.ethnicity || '汉族',
+                relationshipToHead:
+                  response.data.relationship_to_head || response.data.relationshipToHead || '其他',
+                maritalStatus:
+                  response.data.marital_status || response.data.maritalStatus || '未婚',
+                politicalStatus:
+                  response.data.political_status || response.data.politicalStatus || '群众',
+                militaryService:
+                  response.data.military_service || response.data.militaryService || '未服兵役',
+                educationLevel:
+                  response.data.education_level || response.data.educationLevel || '小学',
+                status: response.data.status || 'active',
+                registeredPermanentResidence:
+                  response.data.registered_permanent_residence ||
+                  response.data.registeredPermanentResidence ||
+                  1,
+                registeredDate: response.data.registered_date || response.data.registeredDate || '',
+                statusUpdatedAt:
+                  response.data.status_updated_at || response.data.statusUpdatedAt || '',
+                statusChangeReason:
+                  response.data.status_change_reason || response.data.statusChangeReason || '',
+                deathDate: response.data.death_date || response.data.deathDate || '',
+                equityShares: response.data.equity_shares || response.data.equityShares || 0
+              }
+
+              // 填充迁途改销表单数据 - 从最新的变动记录中获取
+              this.migrationForm = {
+                migrationInDate:
+                  response.data.migration_in_date || response.data.migrationInDate || '',
+                migrationInReason:
+                  response.data.migration_in_reason || response.data.migrationInReason || '',
+                migrationOutDate:
+                  response.data.migration_out_date || response.data.migrationOutDate || '',
+                migrationOutReason:
+                  response.data.migration_out_reason || response.data.migrationOutReason || '',
+                deathDate: response.data.death_date || response.data.deathDate || '',
+                deathReason: response.data.death_reason || response.data.deathReason || '',
+                recoveryReason: ''
+              }
+
+              // 备份迁途改销数据，用于取消编辑时恢复
+              this.originalMigrationForm = JSON.parse(JSON.stringify(this.migrationForm))
             }
-            
-            // 填充迁途改销表单数据 - 从最新的变动记录中获取
-            this.migrationForm = {
-              migrationInDate: response.data.migration_in_date || response.data.migrationInDate || '',
-              migrationInReason: response.data.migration_in_reason || response.data.migrationInReason || '',
-              migrationOutDate: response.data.migration_out_date || response.data.migrationOutDate || '',
-              migrationOutReason: response.data.migration_out_reason || response.data.migrationOutReason || '',
-              deathDate: response.data.death_date || response.data.deathDate || '',
-              deathReason: response.data.death_reason || response.data.deathReason || '',
-              recoveryReason: ''
-            }
-            
-            // 备份迁途改销数据，用于取消编辑时恢复
-            this.originalMigrationForm = JSON.parse(JSON.stringify(this.migrationForm))
-          }
-          resolve()
-        }).catch(error => {
-          console.error('获取成员信息失败:', error)
-          this.$message.error('获取成员信息失败')
-          resolve()
-        })
+            resolve()
+          })
+          .catch((error) => {
+            console.error('获取成员信息失败:', error)
+            this.$message.error('获取成员信息失败')
+            resolve()
+          })
       })
     },
-    
+
     // 切换迁途改销编辑模式
     toggleMigrationEdit() {
       this.isMigrationEditable = true
       // 备份当前数据，用于取消编辑时恢复
       this.originalMigrationForm = JSON.parse(JSON.stringify(this.migrationForm))
     },
-    
+
     // 取消迁途改销编辑
     cancelMigrationEdit() {
       this.isMigrationEditable = false
@@ -875,34 +1043,37 @@ export default {
           return
         }
 
-        request.get(`/households/${householdId}/members`).then(response => {
-          if (response.code === 20000) {
-            // 格式化成员数据，统一使用驼峰命名
-            this.householdMembers = response.data.map(member => ({
-              ...member,
-              idCard: member.id_card || member.idCard || '',
-              phoneNumber: member.phone_number || member.phoneNumber || '',
-              bankCard: member.bank_card || member.bankCard || '',
-              bankName: member.bank_name || member.bankName || '',
-              dateOfBirth: member.date_of_birth || member.dateOfBirth || '',
-              villageGroup: member.village_group || member.villageGroup || '',
-              relationshipToHead: member.relationship_to_head || member.relationshipToHead || '',
-              maritalStatus: member.marital_status || member.maritalStatus || '',
-              politicalStatus: member.political_status || member.politicalStatus || '',
-              militaryService: member.military_service || member.militaryService || '',
-              educationLevel: member.education_level || member.educationLevel || '',
-              statusUpdatedAt: member.status_updated_at || member.statusUpdatedAt || ''
-            }))
-            this.filterHouseholdMembers()
-          }
-          resolve()
-        }).catch(error => {
-          console.error('获取家庭成员失败:', error)
-          this.$message.error('获取家庭成员失败')
-          this.householdMembers = []
-          this.filteredHouseholdMembers = []
-          resolve()
-        })
+        request
+          .get(`/households/${householdId}/members`)
+          .then((response) => {
+            if (response.code === 20000) {
+              // 格式化成员数据，统一使用驼峰命名
+              this.householdMembers = response.data.map((member) => ({
+                ...member,
+                idCard: member.id_card || member.idCard || '',
+                phoneNumber: member.phone_number || member.phoneNumber || '',
+                bankCard: member.bank_card || member.bankCard || '',
+                bankName: member.bank_name || member.bankName || '',
+                dateOfBirth: member.date_of_birth || member.dateOfBirth || '',
+                villageGroup: member.village_group || member.villageGroup || '',
+                relationshipToHead: member.relationship_to_head || member.relationshipToHead || '',
+                maritalStatus: member.marital_status || member.maritalStatus || '',
+                politicalStatus: member.political_status || member.politicalStatus || '',
+                militaryService: member.military_service || member.militaryService || '',
+                educationLevel: member.education_level || member.educationLevel || '',
+                statusUpdatedAt: member.status_updated_at || member.statusUpdatedAt || ''
+              }))
+              this.filterHouseholdMembers()
+            }
+            resolve()
+          })
+          .catch((error) => {
+            console.error('获取家庭成员失败:', error)
+            this.$message.error('获取家庭成员失败')
+            this.householdMembers = []
+            this.filteredHouseholdMembers = []
+            resolve()
+          })
       })
     },
 
@@ -988,7 +1159,11 @@ export default {
 
     // 身份证号变化处理
     handleIdCardChange() {
-      if (!this.isIdCardAutoFill || !this.residentForm.idCard || this.residentForm.idCard.length !== 18) {
+      if (
+        !this.isIdCardAutoFill ||
+        !this.residentForm.idCard ||
+        this.residentForm.idCard.length !== 18
+      ) {
         return
       }
 
@@ -1014,7 +1189,7 @@ export default {
     handleDateOfBirthChange() {
       this.isDateOfBirthAutoFill = false
     },
-    
+
     // 户主身份证号变化处理
     handleHouseholdIdCardChange() {
       const idCard = this.householdForm.householdHeadIdCard
@@ -1025,7 +1200,7 @@ export default {
       // 自动填充性别
       const genderCode = parseInt(idCard.substring(16, 17))
       this.householdForm.gender = genderCode % 2 === 0 ? '女' : '男'
-      
+
       // 自动填充出生日期（虽然户主信息中没有出生日期字段，但可以保留逻辑）
     },
 
@@ -1052,17 +1227,26 @@ export default {
     // 表单验证
     validateForm() {
       // 检查居民信息必填字段
-      if (!this.residentForm.name || (typeof this.residentForm.name === 'string' && this.residentForm.name.trim() === '')) {
+      if (
+        !this.residentForm.name ||
+        (typeof this.residentForm.name === 'string' && this.residentForm.name.trim() === '')
+      ) {
         this.$message.error('请输入居民姓名')
         return false
       }
 
-      if (!this.residentForm.idCard || (typeof this.residentForm.idCard === 'string' && this.residentForm.idCard.trim() === '')) {
+      if (
+        !this.residentForm.idCard ||
+        (typeof this.residentForm.idCard === 'string' && this.residentForm.idCard.trim() === '')
+      ) {
         this.$message.error('请输入身份证号')
         return false
       }
 
-      if (!this.residentForm.gender || (typeof this.residentForm.gender === 'string' && this.residentForm.gender.trim() === '')) {
+      if (
+        !this.residentForm.gender ||
+        (typeof this.residentForm.gender === 'string' && this.residentForm.gender.trim() === '')
+      ) {
         this.$message.error('请选择性别')
         return false
       }
@@ -1072,44 +1256,76 @@ export default {
         return false
       }
 
-      if (!this.residentForm.relationshipToHead || (typeof this.residentForm.relationshipToHead === 'string' && this.residentForm.relationshipToHead.trim() === '')) {
+      if (
+        !this.residentForm.relationshipToHead ||
+        (typeof this.residentForm.relationshipToHead === 'string' &&
+          this.residentForm.relationshipToHead.trim() === '')
+      ) {
         this.$message.error('请选择与户主关系')
         return false
       }
 
-      if (!this.residentForm.villageGroup || (typeof this.residentForm.villageGroup === 'string' && this.residentForm.villageGroup.trim() === '')) {
+      if (
+        !this.residentForm.villageGroup ||
+        (typeof this.residentForm.villageGroup === 'string' &&
+          this.residentForm.villageGroup.trim() === '')
+      ) {
         this.$message.error('请选择村组')
         return false
       }
 
-      if (!this.residentForm.ethnicity || (typeof this.residentForm.ethnicity === 'string' && this.residentForm.ethnicity.trim() === '')) {
+      if (
+        !this.residentForm.ethnicity ||
+        (typeof this.residentForm.ethnicity === 'string' &&
+          this.residentForm.ethnicity.trim() === '')
+      ) {
         this.$message.error('请选择民族')
         return false
       }
 
       // 对于非同户新增，需要验证户主信息
       if (this.isAddingNew && !this.currentHouseholdId) {
-        if (!this.householdForm.householdHeadName || (typeof this.householdForm.householdHeadName === 'string' && this.householdForm.householdHeadName.trim() === '')) {
+        if (
+          !this.householdForm.householdHeadName ||
+          (typeof this.householdForm.householdHeadName === 'string' &&
+            this.householdForm.householdHeadName.trim() === '')
+        ) {
           this.$message.error('请输入户主姓名')
           return false
         }
 
-        if (!this.householdForm.householdHeadIdCard || (typeof this.householdForm.householdHeadIdCard === 'string' && this.householdForm.householdHeadIdCard.trim() === '')) {
+        if (
+          !this.householdForm.householdHeadIdCard ||
+          (typeof this.householdForm.householdHeadIdCard === 'string' &&
+            this.householdForm.householdHeadIdCard.trim() === '')
+        ) {
           this.$message.error('请输入户主身份证号码')
           return false
         }
 
-        if (!this.householdForm.address || (typeof this.householdForm.address === 'string' && this.householdForm.address.trim() === '')) {
+        if (
+          !this.householdForm.address ||
+          (typeof this.householdForm.address === 'string' &&
+            this.householdForm.address.trim() === '')
+        ) {
           this.$message.error('请输入家庭地址')
           return false
         }
 
-        if (!this.householdForm.villageGroup || (typeof this.householdForm.villageGroup === 'string' && this.householdForm.villageGroup.trim() === '')) {
+        if (
+          !this.householdForm.villageGroup ||
+          (typeof this.householdForm.villageGroup === 'string' &&
+            this.householdForm.villageGroup.trim() === '')
+        ) {
           this.$message.error('请选择村组')
           return false
         }
 
-        if (!this.householdForm.ethnicity || (typeof this.householdForm.ethnicity === 'string' && this.householdForm.ethnicity.trim() === '')) {
+        if (
+          !this.householdForm.ethnicity ||
+          (typeof this.householdForm.ethnicity === 'string' &&
+            this.householdForm.ethnicity.trim() === '')
+        ) {
           this.$message.error('请选择民族')
           return false
         }
@@ -1154,23 +1370,27 @@ export default {
         registered_date: this.residentForm.registeredDate || new Date().toISOString().split('T')[0]
       }
 
-      request.post('/residents', residentData).then(response => {
-        if (response.code === 20000) {
-          this.$message.success('新增居民成功')
-          this.$emit('refresh-list')
-          // 强制刷新成员列表
-          this.loadHouseholdMembers(this.currentHouseholdId)
-          // 重置表单
-          this.handleSameHouseholdAdd()
-        } else {
+      request
+        .post('/residents', residentData)
+        .then((response) => {
+          if (response.code === 20000) {
+            this.$message.success('新增居民成功')
+            this.$emit('refresh-list')
+            // 强制刷新成员列表
+            this.loadHouseholdMembers(this.currentHouseholdId)
+            // 重置表单
+            this.handleSameHouseholdAdd()
+          } else {
+            this.$message.error('新增居民失败')
+          }
+        })
+        .catch((error) => {
+          console.error('新增居民失败:', error)
           this.$message.error('新增居民失败')
-        }
-      }).catch(error => {
-        console.error('新增居民失败:', error)
-        this.$message.error('新增居民失败')
-      }).finally(() => {
-        this.loading = false
-      })
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
 
     // 非同户新增居民
@@ -1189,53 +1409,63 @@ export default {
         gender: this.householdForm.gender
       }
 
-      request.post('/households', householdData).then(householdResponse => {
-        if (householdResponse.code === 20000 && householdResponse.data && householdResponse.data.id) {
-          const newHouseholdId = householdResponse.data.id
+      request
+        .post('/households', householdData)
+        .then((householdResponse) => {
+          if (
+            householdResponse.code === 20000 &&
+            householdResponse.data &&
+            householdResponse.data.id
+          ) {
+            const newHouseholdId = householdResponse.data.id
 
-          // 创建居民
-          const residentData = {
-            name: this.residentForm.name,
-            id_card: this.residentForm.idCard,
-            gender: this.residentForm.gender,
-            date_of_birth: this.residentForm.dateOfBirth,
-            village_group: this.residentForm.villageGroup,
-            Home_address: this.residentForm.address,
-            bank_card: this.residentForm.bankCard,
-            phone_number: this.residentForm.phoneNumber,
-            bank_name: this.residentForm.bankName,
-            household_id: newHouseholdId,
-            household_head_id: newHouseholdId,
-            ethnicity: this.residentForm.ethnicity,
-            relationship_to_head: '户主',
-            marital_status: this.residentForm.maritalStatus,
-            political_status: this.residentForm.politicalStatus,
-            military_service: this.residentForm.militaryService,
-            education_level: this.residentForm.educationLevel,
-            status: 'active',
-            registered_permanent_residence: this.residentForm.registeredPermanentResidence,
-            registered_date: this.residentForm.registeredDate || new Date().toISOString().split('T')[0]
+            // 创建居民
+            const residentData = {
+              name: this.residentForm.name,
+              id_card: this.residentForm.idCard,
+              gender: this.residentForm.gender,
+              date_of_birth: this.residentForm.dateOfBirth,
+              village_group: this.residentForm.villageGroup,
+              Home_address: this.residentForm.address,
+              bank_card: this.residentForm.bankCard,
+              phone_number: this.residentForm.phoneNumber,
+              bank_name: this.residentForm.bankName,
+              household_id: newHouseholdId,
+              household_head_id: newHouseholdId,
+              ethnicity: this.residentForm.ethnicity,
+              relationship_to_head: '户主',
+              marital_status: this.residentForm.maritalStatus,
+              political_status: this.residentForm.politicalStatus,
+              military_service: this.residentForm.militaryService,
+              education_level: this.residentForm.educationLevel,
+              status: 'active',
+              registered_permanent_residence: this.residentForm.registeredPermanentResidence,
+              registered_date:
+                this.residentForm.registeredDate || new Date().toISOString().split('T')[0]
+            }
+
+            return request.post('/residents', residentData)
+          } else {
+            throw new Error('创建户主失败')
           }
-
-          return request.post('/residents', residentData)
-        } else {
-          throw new Error('创建户主失败')
-        }
-      }).then(residentResponse => {
-        if (residentResponse.code === 20000) {
-          this.$message.success('新增居民成功')
-          this.$emit('refresh-list')
-          // 重置表单
-          this.resetFormData()
-        } else {
-          throw new Error('创建居民失败')
-        }
-      }).catch(error => {
-        console.error('新增居民失败:', error)
-        this.$message.error('新增居民失败')
-      }).finally(() => {
-        this.loading = false
-      })
+        })
+        .then((residentResponse) => {
+          if (residentResponse.code === 20000) {
+            this.$message.success('新增居民成功')
+            this.$emit('refresh-list')
+            // 重置表单
+            this.resetFormData()
+          } else {
+            throw new Error('创建居民失败')
+          }
+        })
+        .catch((error) => {
+          console.error('新增居民失败:', error)
+          this.$message.error('新增居民失败')
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
 
     // 更新居民
@@ -1264,41 +1494,46 @@ export default {
       }
 
       // 先更新居民信息
-      request.put(`/residents/${this.currentResidentId}`, residentData).then(response => {
-        if (response.code === 20000) {
-          // 再更新户主信息（传递完整的户主信息字段）
-          const householdData = {
-            household_number: this.householdForm.householdNumber,
-            village_group: this.householdForm.villageGroup,
-            household_head_id: this.householdForm.householdHeadId,
-            household_head_name: this.householdForm.householdHeadName,
-            ethnicity: this.householdForm.ethnicity,
-            household_type: this.householdForm.householdType,
-            housing_type: this.householdForm.housingType,
-            address: this.householdForm.address,
-            phone_number: this.householdForm.phoneNumber,
-            gender: this.householdForm.gender,
-            household_head_id_card: this.householdForm.householdHeadIdCard
-          }
+      request
+        .put(`/residents/${this.currentResidentId}`, residentData)
+        .then((response) => {
+          if (response.code === 20000) {
+            // 再更新户主信息（传递完整的户主信息字段）
+            const householdData = {
+              household_number: this.householdForm.householdNumber,
+              village_group: this.householdForm.villageGroup,
+              household_head_id: this.householdForm.householdHeadId,
+              household_head_name: this.householdForm.householdHeadName,
+              ethnicity: this.householdForm.ethnicity,
+              household_type: this.householdForm.householdType,
+              housing_type: this.householdForm.housingType,
+              address: this.householdForm.address,
+              phone_number: this.householdForm.phoneNumber,
+              gender: this.householdForm.gender,
+              household_head_id_card: this.householdForm.householdHeadIdCard
+            }
 
-          return request.put(`/households/${this.currentHouseholdId}`, householdData)
-        } else {
-          throw new Error('更新居民信息失败')
-        }
-      }).then(householdResponse => {
-        this.$message.success('更新居民信息成功')
-        this.$emit('refresh-list')
-        // 强制刷新数据
-        this.initData()
-        // 保存成功后将isEditable设置为false，恢复模态框的只读状态
-        this.isEditable = false
-        this.title = '居民详细信息'
-      }).catch(error => {
-        console.error('更新信息失败:', error)
-        this.$message.error('更新信息失败')
-      }).finally(() => {
-        this.loading = false
-      })
+            return request.put(`/households/${this.currentHouseholdId}`, householdData)
+          } else {
+            throw new Error('更新居民信息失败')
+          }
+        })
+        .then((householdResponse) => {
+          this.$message.success('更新居民信息成功')
+          this.$emit('refresh-list')
+          // 强制刷新数据
+          this.initData()
+          // 保存成功后将isEditable设置为false，恢复模态框的只读状态
+          this.isEditable = false
+          this.title = '居民详细信息'
+        })
+        .catch((error) => {
+          console.error('更新信息失败:', error)
+          this.$message.error('更新信息失败')
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
 
     // 切换迁途改销展开状态
@@ -1317,7 +1552,9 @@ export default {
       if (this.showInactiveMembers) {
         this.filteredHouseholdMembers = [...this.householdMembers]
       } else {
-        this.filteredHouseholdMembers = this.householdMembers.filter(member => member.status === 'active' || member.status === undefined)
+        this.filteredHouseholdMembers = this.householdMembers.filter(
+          (member) => member.status === 'active' || member.status === undefined
+        )
       }
     },
 
@@ -1331,20 +1568,28 @@ export default {
     // 获取成员状态文本
     getMemberStatusText(status) {
       switch (status) {
-        case 'active': return '正常'
-        case 'migrated_out': return '迁出'
-        case 'deceased': return '死亡'
-        default: return '未知'
+        case 'active':
+          return '正常'
+        case 'migrated_out':
+          return '迁出'
+        case 'deceased':
+          return '死亡'
+        default:
+          return '未知'
       }
     },
 
     // 获取成员状态类型
     getMemberStatusType(status) {
       switch (status) {
-        case 'active': return 'success'
-        case 'migrated_out': return 'warning'
-        case 'deceased': return 'danger'
-        default: return 'info'
+        case 'active':
+          return 'success'
+        case 'migrated_out':
+          return 'warning'
+        case 'deceased':
+          return 'danger'
+        default:
+          return 'info'
       }
     },
 
@@ -1354,7 +1599,7 @@ export default {
       const params = {}
       let actionType = ''
       let successMsg = ''
-      
+
       // 检查哪些字段有内容，决定要执行的操作
       if (this.migrationForm.migrationInDate) {
         // 有迁入信息，执行迁入操作
@@ -1363,8 +1608,8 @@ export default {
         params.status = 'active'
         actionType = 'migrated_in'
         successMsg = '迁入信息保存成功'
-      } 
-      
+      }
+
       if (this.migrationForm.migrationOutDate) {
         // 有迁出信息，执行迁出操作
         params.migration_out_date = this.migrationForm.migrationOutDate
@@ -1372,8 +1617,8 @@ export default {
         params.status = 'migrated_out'
         actionType = 'migrated_out'
         successMsg = '迁出信息保存成功'
-      } 
-      
+      }
+
       if (this.migrationForm.deathDate) {
         // 有死亡信息，执行死亡注销操作
         params.death_date = this.migrationForm.deathDate
@@ -1382,67 +1627,74 @@ export default {
         actionType = 'deceased'
         successMsg = '死亡注销信息保存成功'
       }
-      
+
       if (this.migrationForm.recoveryReason) {
         // 有恢复原因，执行状态恢复操作
         params.status = 'active'
         actionType = 'recovered'
         successMsg = '状态恢复成功'
       }
-      
+
       // 验证是否有要保存的内容
       if (Object.keys(params).length === 0) {
         this.$message.warning('请填写至少一个变更信息')
         return
       }
-      
+
       // 调用后端API保存数据
-      request.put(`/residents/${this.currentResidentId}/status`, params).then(response => {
-        if (response.code === 20000) {
-          this.$message.success(successMsg)
+      request
+        .put(`/residents/${this.currentResidentId}/status`, params)
+        .then((response) => {
+          if (response.code === 20000) {
+            this.$message.success(successMsg)
 
-          // 如果居民死亡，自动取消残疾人数据
-          if (params.status === 'deceased') {
-            this.handleDisabledPersonOnDeath(this.currentResidentId)
+            // 如果居民死亡，自动取消残疾人数据
+            if (params.status === 'deceased') {
+              this.handleDisabledPersonOnDeath(this.currentResidentId)
+            }
+
+            this.$emit('refresh-list')
+            // 重新加载居民信息，以显示最新的状态和变动记录
+            this.loadResidentInfo(this.currentResidentId)
+            // 退出编辑模式
+            this.isMigrationEditable = false
+          } else {
+            this.$message.error('保存失败')
           }
-
-          this.$emit('refresh-list')
-          // 重新加载居民信息，以显示最新的状态和变动记录
-          this.loadResidentInfo(this.currentResidentId)
-          // 退出编辑模式
-          this.isMigrationEditable = false
-        } else {
+        })
+        .catch((error) => {
+          console.error('保存失败:', error)
           this.$message.error('保存失败')
-        }
-      }).catch(error => {
-        console.error('保存失败:', error)
-        this.$message.error('保存失败')
-      })
+        })
     },
 
     // 处理居民死亡时的残疾人数据
     handleDisabledPersonOnDeath(residentId) {
       // 获取该居民的残疾人数据
-      getDisabledPersons({ residentId: residentId }).then(response => {
-        if (response.code === 20000 && response.data && response.data.length > 0) {
-          // 存在残疾人数据，删除对应的记录
-          const disabledPersonId = response.data[0].id
-          deleteDisabledPerson(disabledPersonId).then(deleteResponse => {
-            if (deleteResponse.code === 20000) {
-              this.$message.success('残疾人数据已自动取消')
-            } else {
-              console.error('取消残疾人数据失败:', deleteResponse)
-              this.$message.warning('取消残疾人数据失败，请手动处理')
-            }
-          }).catch(error => {
-            console.error('取消残疾人数据失败:', error)
-            this.$message.warning('取消残疾人数据失败，请手动处理')
-          })
-        }
-      }).catch(error => {
-        console.error('获取残疾人数据失败:', error)
-        // 这里不显示错误提示，因为不影响主流程
-      })
+      getDisabledPersons({ residentId: residentId })
+        .then((response) => {
+          if (response.code === 20000 && response.data && response.data.length > 0) {
+            // 存在残疾人数据，删除对应的记录
+            const disabledPersonId = response.data[0].id
+            deleteDisabledPerson(disabledPersonId)
+              .then((deleteResponse) => {
+                if (deleteResponse.code === 20000) {
+                  this.$message.success('残疾人数据已自动取消')
+                } else {
+                  console.error('取消残疾人数据失败:', deleteResponse)
+                  this.$message.warning('取消残疾人数据失败，请手动处理')
+                }
+              })
+              .catch((error) => {
+                console.error('取消残疾人数据失败:', error)
+                this.$message.warning('取消残疾人数据失败，请手动处理')
+              })
+          }
+        })
+        .catch((error) => {
+          console.error('获取残疾人数据失败:', error)
+          // 这里不显示错误提示，因为不影响主流程
+        })
     }
   }
 }

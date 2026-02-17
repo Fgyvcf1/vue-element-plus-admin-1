@@ -5,7 +5,13 @@
         <span>{{ title }}</span>
       </div>
 
-      <el-form ref="disabledForm" :model="formData" label-width="120px" size="small" class="demo-form">
+      <el-form
+        ref="disabledForm"
+        :model="formData"
+        label-width="120px"
+        size="small"
+        class="demo-form"
+      >
         <!-- 居民基本信息（只读，自动填充） -->
         <el-card shadow="hover" class="info-card">
           <div slot="header" class="clearfix">
@@ -138,7 +144,9 @@
         </el-card>
 
         <div class="form-actions">
-          <el-button type="primary" size="small" :loading="loading" @click="handleSave">保存</el-button>
+          <el-button type="primary" size="small" :loading="loading" @click="handleSave"
+            >保存</el-button
+          >
           <el-button size="small" @click="handleCancel">取消</el-button>
         </div>
       </el-form>
@@ -160,7 +168,8 @@ export default {
       // 字典选项
       disabilityTypeOptions: [], // 残疾类型选项
       disabilityLevelOptions: [], // 残疾等级选项
-      certificateStatusOptions: [ // 持证状态选项
+      certificateStatusOptions: [
+        // 持证状态选项
         { label: '在持', value: '在持' },
         { label: '注销', value: '注销' }
       ],
@@ -317,7 +326,7 @@ export default {
         // 加载残疾类型字典
         const disabilityTypeData = await dictionaryCache.getDictionary('残疾类型')
         if (Array.isArray(disabilityTypeData)) {
-          this.disabilityTypeOptions = disabilityTypeData.map(item => ({
+          this.disabilityTypeOptions = disabilityTypeData.map((item) => ({
             label: item.value,
             value: item.value
           }))
@@ -326,7 +335,7 @@ export default {
         // 加载残疾等级字典
         const disabilityLevelData = await dictionaryCache.getDictionary('残疾等级')
         if (Array.isArray(disabilityLevelData)) {
-          this.disabilityLevelOptions = disabilityLevelData.map(item => ({
+          this.disabilityLevelOptions = disabilityLevelData.map((item) => ({
             label: item.value,
             value: item.value
           }))

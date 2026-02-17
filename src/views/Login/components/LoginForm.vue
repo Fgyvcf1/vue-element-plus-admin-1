@@ -4,7 +4,8 @@ import { Form, FormSchema } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ElCheckbox, ElLink, ElMessage } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
-import { loginApi, getTestRoleApi, getAdminRoleApi } from '@/api/login'
+import { loginApi, getTestRoleApi } from '@/api/login'
+import { getMyPermission } from '@/api/permission'
 import { useAppStore } from '@/store/modules/app'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
@@ -15,7 +16,6 @@ import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
 
 const { required } = useValidator()
-const emit = defineEmits(['to-register'])
 
 const appStore = useAppStore()
 const userStore = useUserStore()
@@ -32,6 +32,10 @@ const rules = {
 
 const remember = ref(userStore.getRememberMe)
 const loading = ref(false)
+const handleEnterSubmit = (event: KeyboardEvent) => {
+  if (event.key !== 'Enter' || loading.value) return
+  signIn()
+}
 
 const schema = reactive<FormSchema[]>([
   {
@@ -42,7 +46,8 @@ const schema = reactive<FormSchema[]>([
       span: 24
     },
     componentProps: {
-      size: 'large'
+      size: 'large',
+      onKeyup: handleEnterSubmit
     }
   },
   {
@@ -53,7 +58,8 @@ const schema = reactive<FormSchema[]>([
       span: 24
     },
     componentProps: {
-      size: 'large'
+      size: 'large',
+      onKeyup: handleEnterSubmit
     }
   },
   {
@@ -67,9 +73,6 @@ const schema = reactive<FormSchema[]>([
           return (
             <div class="flex justify-between items-center w-[100%]">
               <ElCheckbox v-model={remember.value} label={t('login.remember')} size="large" />
-              <ElLink type="primary" underline={false} onClick={toRegister}>
-                {t('login.register')}
-              </ElLink>
             </div>
           )
         }
@@ -119,20 +122,30 @@ const getRole = async () => {
   const formData = await getFormData<UserType>()
   const params = { roleName: formData.username }
 
-  const res =
-    appStore.getDynamicRouter && appStore.getServerDynamicRouter
-      ? await getAdminRoleApi(params)
-      : await getTestRoleApi(params)
+  const useMock = import.meta.env.VITE_USE_MOCK === 'true'
 
-  if (!res) return
+  if (appStore.getDynamicRouter) {
+    // 优先使用后端动态路由；mock 关闭时不要走 /mock/*，避免 404
+    if (appStore.getServerDynamicRouter || !useMock) {
+      const res = await getMyPermission()
+      if (!res) return
 
-  const routers = res.data || []
-  userStore.setRoleRouters(routers)
+      const menus = res.data?.menus || []
+      const permissions = res.data?.permissions || []
+      userStore.setRoleRouters(menus)
+      userStore.setPermissions(permissions)
 
-  if (appStore.getDynamicRouter && appStore.getServerDynamicRouter) {
-    await permissionStore.generateRoutes('server', routers).catch(() => {})
-  } else {
-    await permissionStore.generateRoutes('frontEnd', routers).catch(() => {})
+      await permissionStore.generateRoutes('server', menus, permissions).catch(() => {})
+    } else {
+      const res = await getTestRoleApi(params)
+      if (!res) return
+
+      const routers = res.data || []
+      userStore.setRoleRouters(routers)
+      await permissionStore
+        .generateRoutes('frontEnd', routers, userStore.getPermissions)
+        .catch(() => {})
+    }
   }
 
   permissionStore.getAddRouters.forEach((route) => {
@@ -161,12 +174,16 @@ const signIn = async () => {
 
     try {
       const res = await loginApi(formData)
-      if (!res) {
-        console.log('登录失败')
+      if (!res || res.code !== 20000 || !res.data) {
+        ElMessage.error(res?.message || '账号或密码错误')
         return
       }
 
       console.log('登录成功')
+
+      // 登录前先清除旧的权限数据（防止权限残留）
+      userStore.setPermissions([])
+      localStorage.removeItem('pinia-state-user')
 
       // 记住我
       if (unref(remember)) {
@@ -179,19 +196,23 @@ const signIn = async () => {
       }
       userStore.setRememberMe(unref(remember))
       userStore.setUserInfo(res.data)
+      // 保存用户权限
+      if (res.data.permissions) {
+        userStore.setPermissions(res.data.permissions)
+      }
 
       // 路由处理
       if (appStore.getDynamicRouter) {
         await getRole()
       } else {
-        await permissionStore.generateRoutes('static').catch(() => {})
+        await permissionStore.generateRoutes('static', undefined, userStore.getPermissions).catch(() => {})
         permissionStore.getAddRouters.forEach((route) => {
           router.addRoute(route as RouteRecordRaw)
         })
         permissionStore.setIsAddRouters(true)
       }
 
-      console.log('准备跳转到: /dashboard/index')
+      console.log('准备跳转到: /index')
       console.log(
         'permissionStore.routers:',
         permissionStore.getRouters?.map((r) => ({
@@ -203,10 +224,10 @@ const signIn = async () => {
 
       // 方案1: 使用 nextTick 等待路由注册完成后跳转（尝试修复动态路由时序问题）
       await nextTick()
-      await router.replace('/dashboard/index')
+      await router.replace('/index')
 
       // 方案2: 如果方案1不工作，使用硬刷新（备用方案）
-      // window.location.replace('/#/dashboard/index')
+      // window.location.replace('/#/index')
     } catch (error) {
       console.error('登录错误:', error)
       ElMessage.error('登录失败')
@@ -216,10 +237,6 @@ const signIn = async () => {
   })
 }
 
-// 去注册页面
-const toRegister = () => {
-  emit('to-register')
-}
 </script>
 
 <template>

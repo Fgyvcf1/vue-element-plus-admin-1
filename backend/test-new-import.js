@@ -1,8 +1,8 @@
-const axios = require('axios');
+const axios = require('axios')
 
 // 测试导入API的新字段映射逻辑
 async function testImportAPI() {
-  console.log('开始测试导入API...');
+  console.log('开始测试导入API...')
 
   try {
     // 准备测试数据 - 正常导入场景
@@ -21,7 +21,7 @@ async function testImportAPI() {
         { dbField: 'household_head_name', excelField: '户主姓名' },
         { dbField: 'phone_number', excelField: '联系电话' }
       ]
-    };
+    }
 
     // 准备测试数据 - 户主姓名重复场景
     const testData2 = {
@@ -40,7 +40,7 @@ async function testImportAPI() {
         { dbField: 'household_head_name', excelField: '户主姓名' },
         { dbField: 'phone_number', excelField: '联系电话' }
       ]
-    };
+    }
 
     // 准备测试数据 - 部分数据失败场景
     const testData3 = {
@@ -59,32 +59,31 @@ async function testImportAPI() {
         { dbField: 'household_head_name', excelField: '户主姓名' },
         { dbField: 'phone_number', excelField: '联系电话' }
       ]
-    };
+    }
 
     // 测试场景1：正常导入
-    console.log('\n=== 测试场景1：正常导入 ===');
-    const response1 = await axios.post('http://localhost:3002/import-residents', testData1);
-    console.log('正常导入测试结果:', response1.data);
+    console.log('\n=== 测试场景1：正常导入 ===')
+    const response1 = await axios.post('http://localhost:3002/import-residents', testData1)
+    console.log('正常导入测试结果:', response1.data)
 
     // 测试场景2：户主姓名重复
-    console.log('\n=== 测试场景2：户主姓名重复 ===');
-    const response2 = await axios.post('http://localhost:3002/import-residents', testData2);
-    console.log('户主姓名重复测试结果:', response2.data);
+    console.log('\n=== 测试场景2：户主姓名重复 ===')
+    const response2 = await axios.post('http://localhost:3002/import-residents', testData2)
+    console.log('户主姓名重复测试结果:', response2.data)
 
     // 测试场景3：部分数据失败
-    console.log('\n=== 测试场景3：部分数据失败 ===');
-    const response3 = await axios.post('http://localhost:3002/import-residents', testData3);
-    console.log('部分数据失败测试结果:', response3.data);
+    console.log('\n=== 测试场景3：部分数据失败 ===')
+    const response3 = await axios.post('http://localhost:3002/import-residents', testData3)
+    console.log('部分数据失败测试结果:', response3.data)
 
-    console.log('\n所有测试完成！');
-
+    console.log('\n所有测试完成！')
   } catch (error) {
-    console.error('测试失败:', error.message);
+    console.error('测试失败:', error.message)
     if (error.response) {
-      console.error('响应数据:', error.response.data);
+      console.error('响应数据:', error.response.data)
     }
   }
 }
 
 // 运行测试
-testImportAPI();
+testImportAPI()

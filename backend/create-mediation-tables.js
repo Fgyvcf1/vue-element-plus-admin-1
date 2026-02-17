@@ -1,7 +1,7 @@
 // 创建缺失的调解相关表
-const db = require('./db.js');
+const db = require('./db.js')
 
-console.log('=== 创建调解相关表 ===\n');
+console.log('=== 创建调解相关表 ===\n')
 
 // 创建mediation_types表（调解类型表）
 const createMediationTypes = `
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS mediation_types (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-`;
+`
 
 // 创建mediation_cases表（调解案件表）
 const createMediationCases = `
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS mediation_cases (
   FOREIGN KEY (respondent_id) REFERENCES residents(id),
   FOREIGN KEY (mediator_id) REFERENCES mediators(id)
 );
-`;
+`
 
 // 初始化默认调解类型数据
 const initMediationTypes = `
@@ -51,29 +51,29 @@ INSERT INTO mediation_types (type_name, description) VALUES
 ('劳动纠纷', '劳动权益相关的纠纷'),
 ('其他纠纷', '其他类型的纠纷')
 ON CONFLICT DO NOTHING;
-`;
+`
 
 // 执行创建表和初始化数据
-let completed = 0;
-const total = 3;
+let completed = 0
+const total = 3
 
 const executeSql = (sql, description) => {
   db.run(sql, (err) => {
-    completed++;
+    completed++
     if (err) {
-      console.log(`❌ ${description}: ${err.message}`);
+      console.log(`❌ ${description}: ${err.message}`)
     } else {
-      console.log(`✅ ${description}: 成功`);
+      console.log(`✅ ${description}: 成功`)
     }
-    
+
     if (completed === total) {
-      console.log('\n=== 所有操作完成 ===');
-      process.exit(0);
+      console.log('\n=== 所有操作完成 ===')
+      process.exit(0)
     }
-  });
-};
+  })
+}
 
 // 开始执行
-executeSql(createMediationTypes, '创建调解类型表');
-executeSql(createMediationCases, '创建调解案件表');
-executeSql(initMediationTypes, '初始化调解类型数据');
+executeSql(createMediationTypes, '创建调解类型表')
+executeSql(createMediationCases, '创建调解案件表')
+executeSql(initMediationTypes, '初始化调解类型数据')

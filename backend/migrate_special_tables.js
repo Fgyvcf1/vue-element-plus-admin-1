@@ -1,28 +1,31 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const sqlite3 = require('sqlite3').verbose()
+const path = require('path')
 
 // 连接到app.db数据库
-const dbPath = path.join(__dirname, 'app.db');
+const dbPath = path.join(__dirname, 'app.db')
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('连接app.db数据库失败:', err.message);
-    process.exit(1);
+    console.error('连接app.db数据库失败:', err.message)
+    process.exit(1)
   } else {
-    console.log('成功连接到app.db数据库');
+    console.log('成功连接到app.db数据库')
   }
-});
+})
 
 // 检查表是否存在的函数
 function tableExists(tableName) {
   return new Promise((resolve, reject) => {
-    db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}'`, (err, row) => {
-      if (err) {
-        reject(err);
-        return;
+    db.get(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}'`,
+      (err, row) => {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve(!!row)
       }
-      resolve(!!row);
-    });
-  });
+    )
+  })
 }
 
 // 执行SQL语句的函数
@@ -30,12 +33,12 @@ function executeSql(sql) {
   return new Promise((resolve, reject) => {
     db.run(sql, (err) => {
       if (err) {
-        reject(err);
-        return;
+        reject(err)
+        return
       }
-      resolve();
-    });
-  });
+      resolve()
+    })
+  })
 }
 
 // 移植表的函数
@@ -95,34 +98,34 @@ async function migrateTables() {
           FOREIGN KEY (low_income_person_id) REFERENCES low_income_persons(id)
         )`
       }
-    ];
+    ]
 
     // 遍历创建表
     for (const table of tables) {
-      const exists = await tableExists(table.name);
+      const exists = await tableExists(table.name)
       if (exists) {
-        console.log(`表 ${table.name} 已存在，跳过创建`);
+        console.log(`表 ${table.name} 已存在，跳过创建`)
       } else {
-        console.log(`开始创建表 ${table.name}...`);
-        await executeSql(table.sql);
-        console.log(`表 ${table.name} 创建成功`);
+        console.log(`开始创建表 ${table.name}...`)
+        await executeSql(table.sql)
+        console.log(`表 ${table.name} 创建成功`)
       }
     }
 
     // 验证创建结果
-    console.log('\n=== 移植结果验证 ===');
+    console.log('\n=== 移植结果验证 ===')
     for (const table of tables) {
-      const exists = await tableExists(table.name);
-      console.log(`${table.name}: ${exists ? '✓ 已存在' : '✗ 不存在'}`);
+      const exists = await tableExists(table.name)
+      console.log(`${table.name}: ${exists ? '✓ 已存在' : '✗ 不存在'}`)
     }
 
-    console.log('\n特殊人群相关表移植完成！');
+    console.log('\n特殊人群相关表移植完成！')
   } catch (err) {
-    console.error('移植表失败:', err.message);
+    console.error('移植表失败:', err.message)
   } finally {
-    db.close();
+    db.close()
   }
 }
 
 // 执行移植
-migrateTables();
+migrateTables()

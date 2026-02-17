@@ -116,9 +116,13 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="small" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+          <el-button type="primary" size="small" icon="el-icon-search" @click="handleQuery"
+            >搜索</el-button
+          >
           <el-button size="small" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
-          <span style="margin-left: 20px; color: #409EFF; cursor: pointer;" @click="handleExport">导出</span>
+          <span style="margin-left: 20px; color: #409eff; cursor: pointer" @click="handleExport"
+            >导出</span
+          >
         </el-form-item>
       </el-form>
 
@@ -127,13 +131,26 @@
         查询结果：{{ householdCount }}户{{ personCount }}人
       </div>
 
-      <el-table v-loading="loading" :data="showResult ? residentList : []" :row-style="{ height: '26px' }" size="small" class="custom-row-height-table" @row-click="handleRowClick" @row-contextmenu="(row, column, $event) => handleRowContextMenu(row, column, $event)">
+      <el-table
+        v-loading="loading"
+        :data="showResult ? residentList : []"
+        :row-style="{ height: '26px' }"
+        size="small"
+        class="custom-row-height-table"
+        @row-click="handleRowClick"
+        @row-contextmenu="(row, column, $event) => handleRowContextMenu(row, column, $event)"
+      >
         <el-table-column label="序号" type="index" width="60" align="center" />
         <el-table-column prop="name" label="居民姓名" align="center" width="90" />
         <el-table-column prop="idCard" label="身份证号" align="center" width="180" />
         <el-table-column prop="gender" label="性别" align="center" width="60" />
         <el-table-column prop="householdHeadName" label="户主姓名" align="center" width="90" />
-        <el-table-column prop="relationship_to_head" label="与户主关系" align="center" width="100" />
+        <el-table-column
+          prop="relationship_to_head"
+          label="与户主关系"
+          align="center"
+          width="100"
+        />
         <el-table-column prop="dateOfBirth" label="出生日期" align="center" width="120" />
         <el-table-column prop="age" label="年龄" align="center" width="60" />
         <el-table-column prop="villageGroup" label="村组" align="center" width="90" />
@@ -147,13 +164,21 @@
         </el-table-column>
         <el-table-column prop="status" label="状态" align="center" width="80">
           <template slot-scope="scope">
-            {{ scope.row.status === 'active' ? '正常' : scope.row.status === 'migrated_out' ? '迁出' : scope.row.status === 'deceased' ? '死亡' : scope.row.status }}
+            {{
+              scope.row.status === 'active'
+                ? '正常'
+                : scope.row.status === 'migrated_out'
+                  ? '迁出'
+                  : scope.row.status === 'deceased'
+                    ? '死亡'
+                    : scope.row.status
+            }}
           </template>
         </el-table-column>
       </el-table>
 
       <pagination
-        v-show="total>0"
+        v-show="total > 0"
         :total="total"
         :page.sync="queryParams.pageNum"
         :limit.sync="queryParams.pageSize"
@@ -255,70 +280,72 @@ export default {
       // 确保显示查询结果
       this.showResult = true
 
-      getResidents(this.queryParams).then(response => {
-        // 安全地处理后端响应
-        let residents = []
-        let total = 0
-        let totalHouseholds = 0
-        let totalPersons = 0
+      getResidents(this.queryParams)
+        .then((response) => {
+          // 安全地处理后端响应
+          let residents = []
+          let total = 0
+          let totalHouseholds = 0
+          let totalPersons = 0
 
-        try {
-          console.log('API Response:', response)
+          try {
+            console.log('API Response:', response)
 
-          // 检查响应格式是否正确
-          if (response) {
-            // 由于response interceptor已经处理过，response就是后端返回的{ code: 20000, data: residents, total: total }
-            if (Array.isArray(response.data)) {
-              // 处理字段名映射，确保前端能正确显示
-              residents = response.data.map(item => ({
-                ...item,
-                // 处理驼峰命名和下划线命名的字段
-                householdHeadName: item.household_head_name || item.householdHeadName,
-                relationshipToHead: item.relationship_to_head || item.relationshipToHead,
-                phoneNumber: item.phone_number || item.phoneNumber,
-                equityShares: item.equity_shares || item.equityShares || 0,
-                // 同时保留其他字段的原始值
-                relationship_to_head: item.relationship_to_head || item.relationshipToHead,
-                phone_number: item.phone_number || item.phoneNumber,
-                equity_shares: item.equity_shares || item.equityShares || 0
-              }))
+            // 检查响应格式是否正确
+            if (response) {
+              // 由于response interceptor已经处理过，response就是后端返回的{ code: 20000, data: residents, total: total }
+              if (Array.isArray(response.data)) {
+                // 处理字段名映射，确保前端能正确显示
+                residents = response.data.map((item) => ({
+                  ...item,
+                  // 处理驼峰命名和下划线命名的字段
+                  householdHeadName: item.household_head_name || item.householdHeadName,
+                  relationshipToHead: item.relationship_to_head || item.relationshipToHead,
+                  phoneNumber: item.phone_number || item.phoneNumber,
+                  equityShares: item.equity_shares || item.equityShares || 0,
+                  // 同时保留其他字段的原始值
+                  relationship_to_head: item.relationship_to_head || item.relationshipToHead,
+                  phone_number: item.phone_number || item.phoneNumber,
+                  equity_shares: item.equity_shares || item.equityShares || 0
+                }))
+              }
+
+              // 获取总数
+              if (response.total !== undefined) {
+                // 确保total是数字类型
+                total = parseInt(response.total) || 0
+              } else if (Array.isArray(residents)) {
+                total = residents.length
+              }
+
+              // 获取总户数
+              if (response.totalHouseholds !== undefined) {
+                totalHouseholds = parseInt(response.totalHouseholds) || 0
+              }
+
+              // 获取总人数
+              if (response.totalPersons !== undefined) {
+                totalPersons = parseInt(response.totalPersons) || 0
+              } else {
+                totalPersons = total
+              }
             }
-
-            // 获取总数
-            if (response.total !== undefined) {
-              // 确保total是数字类型
-              total = parseInt(response.total) || 0
-            } else if (Array.isArray(residents)) {
-              total = residents.length
-            }
-
-            // 获取总户数
-            if (response.totalHouseholds !== undefined) {
-              totalHouseholds = parseInt(response.totalHouseholds) || 0
-            }
-
-            // 获取总人数
-            if (response.totalPersons !== undefined) {
-              totalPersons = parseInt(response.totalPersons) || 0
-            } else {
-              totalPersons = total
-            }
+          } catch (error) {
+            console.error('处理响应数据时出错:', error)
           }
-        } catch (error) {
-          console.error('处理响应数据时出错:', error)
-        }
 
-        this.residentList = residents
-        this.total = total
-        this.totalHouseholds = totalHouseholds
-        this.totalPersons = totalPersons
-        this.loading = false
-        console.log('获取到居民数据:', residents)
-      }).catch(error => {
-        console.error('获取居民数据失败:', error)
-        this.loading = false
-        this.$message.error('获取居民数据失败')
-      })
+          this.residentList = residents
+          this.total = total
+          this.totalHouseholds = totalHouseholds
+          this.totalPersons = totalPersons
+          this.loading = false
+          console.log('获取到居民数据:', residents)
+        })
+        .catch((error) => {
+          console.error('获取居民数据失败:', error)
+          this.loading = false
+          this.$message.error('获取居民数据失败')
+        })
     },
     // 加载村组字典数据
     async loadVillageGroups() {
@@ -334,8 +361,13 @@ export default {
 
         // 过滤出有效的村组数据（category为"村组"且status为"active"）
         const validGroups = dictionaries
-          .filter(item => item.category && item.category.includes('村组') && (item.status === 'active' || item.status === undefined))
-          .map(item => ({
+          .filter(
+            (item) =>
+              item.category &&
+              item.category.includes('村组') &&
+              (item.status === 'active' || item.status === undefined)
+          )
+          .map((item) => ({
             label: item.value, // 使用字典中的value作为显示文本
             value: item.value // 使用字典中的value作为值
           }))
@@ -401,15 +433,17 @@ export default {
         return
       }
 
-      getSearchSuggestions({ keyword: queryString, type: 'residentNames' }).then(response => {
-        if (response && response.code === 20000) {
-          callback(response.residentNames || [])
-        } else {
+      getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
+        .then((response) => {
+          if (response && response.code === 20000) {
+            callback(response.residentNames || [])
+          } else {
+            callback([])
+          }
+        })
+        .catch(() => {
           callback([])
-        }
-      }).catch(() => {
-        callback([])
-      })
+        })
     },
     // 获取户主姓名搜索建议
     fetchHouseholdHeadNameSuggestions(queryString, callback) {
@@ -418,15 +452,17 @@ export default {
         return
       }
 
-      getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' }).then(response => {
-        if (response && response.code === 20000) {
-          callback(response.householdHeadNames || [])
-        } else {
+      getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
+        .then((response) => {
+          if (response && response.code === 20000) {
+            callback(response.householdHeadNames || [])
+          } else {
+            callback([])
+          }
+        })
+        .catch(() => {
           callback([])
-        }
-      }).catch(() => {
-        callback([])
-      })
+        })
     },
     handleQuery() {
       this.queryParams.pageNum = 1
@@ -469,7 +505,7 @@ export default {
         // 这里应该调用删除API，暂时使用模拟删除
         setTimeout(() => {
           // 从当前列表中移除该居民
-          this.residentList = this.residentList.filter(item => item.id !== row.id)
+          this.residentList = this.residentList.filter((item) => item.id !== row.id)
           this.total = this.residentList.length
           this.$message.success('删除成功')
         }, 500)
@@ -490,7 +526,8 @@ export default {
     // 右键菜单事件处理
     handleRowContextMenu(row, column, event) {
       // 获取原始DOM事件
-      const originalEvent = event instanceof Event ? event : (event.event || event.$event || window.event)
+      const originalEvent =
+        event instanceof Event ? event : event.event || event.$event || window.event
 
       // 确保阻止默认右键菜单
       if (originalEvent) {
@@ -549,7 +586,21 @@ export default {
       }
 
       // 定义Excel表头
-      const headers = ['序号', '居民姓名', '身份证号', '性别', '户主姓名', '与户主关系', '出生日期', '年龄', '村组', '家庭地址', '联系电话', '银行帐号', '状态']
+      const headers = [
+        '序号',
+        '居民姓名',
+        '身份证号',
+        '性别',
+        '户主姓名',
+        '与户主关系',
+        '出生日期',
+        '年龄',
+        '村组',
+        '家庭地址',
+        '联系电话',
+        '银行帐号',
+        '状态'
+      ]
       const textColumns = [2, 11] // 身份证号(索引2)、银行账号(索引11)设置为文本格式
 
       // 转换数据
@@ -566,7 +617,13 @@ export default {
         item.address || '',
         item.phoneNumber || item.phone_number || '',
         item.bankCard || '',
-        item.status === 'active' ? '正常' : item.status === 'migrated_out' ? '迁出' : item.status === 'deceased' ? '死亡' : item.status || ''
+        item.status === 'active'
+          ? '正常'
+          : item.status === 'migrated_out'
+            ? '迁出'
+            : item.status === 'deceased'
+              ? '死亡'
+              : item.status || ''
       ])
 
       export_json_to_excel({
@@ -634,4 +691,3 @@ export default {
   background-color: #f5f7fa;
 }
 </style>
-

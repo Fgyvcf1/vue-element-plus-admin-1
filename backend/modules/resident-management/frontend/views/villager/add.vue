@@ -58,23 +58,21 @@ export default {
           { required: true, message: '请输入居民姓名', trigger: 'blur' },
           { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
-        gender: [
-          { required: true, message: '请选择性别', trigger: 'change' }
-        ],
-        age: [
-          { required: true, message: '请输入年龄', trigger: 'blur' }
-        ],
+        gender: [{ required: true, message: '请选择性别', trigger: 'change' }],
+        age: [{ required: true, message: '请输入年龄', trigger: 'blur' }],
         idCard: [
           { required: true, message: '请输入身份证号', trigger: 'blur' },
-          { pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, message: '请输入正确的身份证号码', trigger: 'blur' }
+          {
+            pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/,
+            message: '请输入正确的身份证号码',
+            trigger: 'blur'
+          }
         ],
         phone: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
           { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
         ],
-        address: [
-          { required: true, message: '请输入地址', trigger: 'blur' }
-        ]
+        address: [{ required: true, message: '请输入地址', trigger: 'blur' }]
       }
     }
   },
@@ -103,5 +101,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -1,51 +1,58 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const mysql = require('mysql2/promise')
 
-// 连接到SQLite数据库
-const dbPath = path.join(__dirname, 'app.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('连接数据库失败:', err.message);
-    return;
-  }
-  console.log('成功连接到SQLite数据库');
-  
-  // 查询dictionaries表中的所有数据
-  db.all('SELECT * FROM dictionaries', [], (err, rows) => {
-    if (err) {
-      console.error('查询字典数据失败:', err.message);
-      return;
+async function checkDictionaries() {
+  const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'app_user',
+    password: process.env.DB_PASSWORD || 'strongpass791002',
+    database: process.env.DB_NAME || 'village',
+    port: process.env.DB_PORT || 3306,
+    charset: 'utf8mb4'
+  })
+
+  try {
+    const connection = await pool.getConnection()
+    console.log('成功连接到数据库')
+
+    // 1. 检查表是否存在
+    const [tables] = await connection.query("SHOW TABLES LIKE 'dictionaries'")
+    if (tables.length === 0) {
+      console.log('❌ dictionaries 表不存在')
+
+      // 检查所有表
+      const [allTables] = await connection.query('SHOW TABLES')
+      console.log(
+        '数据库中的所有表:',
+        allTables.map((t) => Object.values(t)[0])
+      )
+    } else {
+      console.log('✅ dictionaries 表存在')
+
+      // 2. 检查表结构
+      const [columns] = await connection.query('SHOW COLUMNS FROM dictionaries')
+      console.log(
+        '表结构:',
+        columns.map((c) => c.Field)
+      )
+
+      // 3. 检查 "档次" 数据
+      const [rows] = await connection.query("SELECT * FROM dictionaries WHERE category = '档次'")
+      console.log('查询 "档次" 分类的结果:', rows)
+
+      // 4. 检查所有分类
+      const [categories] = await connection.query('SELECT DISTINCT category FROM dictionaries')
+      console.log(
+        '所有可用分类:',
+        categories.map((c) => c.category)
+      )
     }
-    
-    console.log('=== 字典表所有数据 ===');
-    console.log(`共找到 ${rows.length} 条记录`);
-    console.log('\n详细数据:');
-    rows.forEach(row => {
-      console.log(`ID: ${row.id}, Category: "${row.category}", Value: "${row.value}", Status: "${row.status}"`);
-    });
-    
-    // 专门查询category为"村组"的数据
-    db.all('SELECT * FROM dictionaries WHERE category = ?', ['村组'], (err, villageGroupRows) => {
-      if (err) {
-        console.error('查询category为"村组"的数据失败:', err.message);
-        return;
-      }
-      
-      console.log('\n=== Category为"村组"的数据 ===');
-      console.log(`共找到 ${villageGroupRows.length} 条记录`);
-      console.log('\n详细数据:');
-      villageGroupRows.forEach(row => {
-        console.log(`ID: ${row.id}, Category: "${row.category}", Value: "${row.value}", Status: "${row.status}"`);
-      });
-      
-      // 关闭数据库连接
-      db.close((err) => {
-        if (err) {
-          console.error('关闭数据库连接失败:', err.message);
-          return;
-        }
-        console.log('\n数据库连接已关闭');
-      });
-    });
-  });
-});
+
+    connection.release()
+  } catch (err) {
+    console.error('数据库错误:', err)
+  } finally {
+    pool.end()
+  }
+}
+
+checkDictionaries()

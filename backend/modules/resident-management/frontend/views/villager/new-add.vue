@@ -2,7 +2,20 @@
   <div class="app-container">
     <el-card style="padding: 10px">
       <!-- 表单提示信息和导入按钮 -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 12px 20px; background-color: #ecf5ff; border-radius: 4px; border-left: 4px solid #409eff; font-size: 14px; line-height: 1.5">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+          padding: 12px 20px;
+          background-color: #ecf5ff;
+          border-radius: 4px;
+          border-left: 4px solid #409eff;
+          font-size: 14px;
+          line-height: 1.5;
+        "
+      >
         <span>提示：同户新增时，输入户主姓名后系统会自动填充户主信息和家庭ID</span>
         <el-button type="primary" size="mini" @click="handleImport">导入</el-button>
       </div>
@@ -43,7 +56,11 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="户编号">
-                <el-input v-model="householdForm.household_number" disabled placeholder="自动生成" />
+                <el-input
+                  v-model="householdForm.household_number"
+                  disabled
+                  placeholder="自动生成"
+                />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -57,13 +74,23 @@
             <el-col :span="6">
               <el-form-item label="民族">
                 <el-select v-model="householdForm.ethnicity" placeholder="请选择民族" size="small">
-                  <el-option v-for="item in ethnicityOptions" :key="item.value" :label="item.label" :value="item.value" />
+                  <el-option
+                    v-for="item in ethnicityOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="身份证号">
-                <el-input v-model="householdForm.householdHeadIdCard" placeholder="请输入身份证号" maxlength="18" @input="handleHouseholdIdCardInput" />
+                <el-input
+                  v-model="householdForm.householdHeadIdCard"
+                  placeholder="请输入身份证号"
+                  maxlength="18"
+                  @input="handleHouseholdIdCardInput"
+                />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -73,22 +100,49 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="户口类型">
-                <el-select v-model="householdForm.householdType" placeholder="请选择户口类型" size="small">
-                  <el-option v-for="item in householdTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="householdForm.householdType"
+                  placeholder="请选择户口类型"
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in householdTypeOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="住房类型">
-                <el-select v-model="householdForm.housingType" placeholder="请选择住房类型" size="small">
-                  <el-option v-for="item in housingTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="householdForm.housingType"
+                  placeholder="请选择住房类型"
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in housingTypeOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="村组">
-                <el-select v-model="householdForm.villageGroup" placeholder="请选择村组" size="small">
-                  <el-option v-for="item in villageGroupOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="householdForm.villageGroup"
+                  placeholder="请选择村组"
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in villageGroupOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -106,7 +160,13 @@
         <div slot="header" class="section-header">
           <span>居民信息</span>
         </div>
-        <el-form ref="residentForm" :model="residentForm" label-width="100px" size="small" :rules="residentRules">
+        <el-form
+          ref="residentForm"
+          :model="residentForm"
+          label-width="100px"
+          size="small"
+          :rules="residentRules"
+        >
           <el-row :gutter="10">
             <el-col :span="6">
               <el-form-item label="居民姓名" prop="name">
@@ -137,12 +197,21 @@
           <el-row :gutter="10">
             <el-col :span="6">
               <el-form-item label="身份证号" prop="id_card">
-                <el-input v-model="residentForm.id_card" placeholder="请输入身份证号" maxlength="18" @input="handleIdCardInput" />
+                <el-input
+                  v-model="residentForm.id_card"
+                  placeholder="请输入身份证号"
+                  maxlength="18"
+                  @input="handleIdCardInput"
+                />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="与户主关系" prop="relationship_to_head">
-                <el-select v-model="residentForm.relationship_to_head" placeholder="请选择与户主关系" size="small">
+                <el-select
+                  v-model="residentForm.relationship_to_head"
+                  placeholder="请选择与户主关系"
+                  size="small"
+                >
                   <el-option label="本人" value="本人" />
                   <el-option label="配偶" value="配偶" />
                   <el-option label="子" value="子" />
@@ -175,28 +244,60 @@
             <el-col :span="6">
               <el-form-item label="民族" prop="ethnicity">
                 <el-select v-model="residentForm.ethnicity" placeholder="请选择民族" size="small">
-                  <el-option v-for="item in ethnicityOptions" :key="item.value" :label="item.label" :value="item.value" />
+                  <el-option
+                    v-for="item in ethnicityOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="婚姻状况" prop="marital_status">
-                <el-select v-model="residentForm.marital_status" placeholder="请选择婚姻状况" size="small">
-                  <el-option v-for="item in maritalStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.marital_status"
+                  placeholder="请选择婚姻状况"
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in maritalStatusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="政治面貌" prop="political_status">
-                <el-select v-model="residentForm.political_status" placeholder="请选择政治面貌" size="small">
-                  <el-option v-for="item in politicalStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.political_status"
+                  placeholder="请选择政治面貌"
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in politicalStatusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="兵役状况" prop="military_service">
-                <el-select v-model="residentForm.military_service" placeholder="请选择兵役状况" size="small">
-                  <el-option v-for="item in militaryServiceOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.military_service"
+                  placeholder="请选择兵役状况"
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in militaryServiceOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -212,15 +313,33 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="村组" prop="village_group">
-                <el-select v-model="residentForm.village_group" placeholder="请选择村组" size="small">
-                  <el-option v-for="item in villageGroupOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.village_group"
+                  placeholder="请选择村组"
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in villageGroupOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="文化程度" prop="education_level">
-                <el-select v-model="residentForm.education_level" placeholder="请选择文化程度" size="small">
-                  <el-option v-for="item in educationLevelOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select
+                  v-model="residentForm.education_level"
+                  placeholder="请选择文化程度"
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in educationLevelOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -293,7 +412,9 @@
 
       <!-- 操作按钮 -->
       <div class="action-buttons" style="text-align: center; margin-top: 10px">
-        <el-button type="primary" :loading="loading" size="small" @click="submitForm">提交</el-button>
+        <el-button type="primary" :loading="loading" size="small" @click="submitForm"
+          >提交</el-button
+        >
         <el-button size="small" @click="resetForm">重置</el-button>
         <el-button size="small" @click="goBack">返回</el-button>
       </div>
@@ -366,28 +487,20 @@ export default {
       },
       // 表单验证规则
       residentRules: {
-        name: [
-          { required: true, message: '请输入居民姓名', trigger: 'blur' }
-        ],
-        gender: [
-          { required: true, message: '请选择性别', trigger: 'change' }
-        ],
-        date_of_birth: [
-          { required: true, message: '请选择出生日期', trigger: 'change' }
-        ],
+        name: [{ required: true, message: '请输入居民姓名', trigger: 'blur' }],
+        gender: [{ required: true, message: '请选择性别', trigger: 'change' }],
+        date_of_birth: [{ required: true, message: '请选择出生日期', trigger: 'change' }],
         id_card: [
           { required: true, message: '请输入身份证号', trigger: 'blur' },
-          { pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, message: '请输入正确的身份证号码', trigger: 'blur' }
+          {
+            pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/,
+            message: '请输入正确的身份证号码',
+            trigger: 'blur'
+          }
         ],
-        relationship_to_head: [
-          { required: true, message: '请输入与户主关系', trigger: 'blur' }
-        ],
-        ethnicity: [
-          { required: true, message: '请输入民族', trigger: 'blur' }
-        ],
-        village_group: [
-          { required: true, message: '请选择村组', trigger: 'change' }
-        ]
+        relationship_to_head: [{ required: true, message: '请输入与户主关系', trigger: 'blur' }],
+        ethnicity: [{ required: true, message: '请输入民族', trigger: 'blur' }],
+        village_group: [{ required: true, message: '请选择村组', trigger: 'change' }]
       },
       // 用于存储完整的户主信息
       fullHouseholdData: {}
@@ -405,15 +518,17 @@ export default {
         return
       }
 
-      getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' }).then(response => {
-        if (response && response.code === 20000) {
-          callback(response.householdHeadNames || [])
-        } else {
+      getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
+        .then((response) => {
+          if (response && response.code === 20000) {
+            callback(response.householdHeadNames || [])
+          } else {
+            callback([])
+          }
+        })
+        .catch(() => {
           callback([])
-        }
-      }).catch(() => {
-        callback([])
-      })
+        })
     },
 
     // 处理户主姓名输入
@@ -441,35 +556,40 @@ export default {
     handleHouseholdHeadSelect(item) {
       // 根据户主姓名查询完整信息
       this.loading = true
-      request.get(`/households?household_head_name=${encodeURIComponent(item.value)}`).then(response => {
-        if (response && response.code === 20000 && response.data && response.data.length > 0) {
-          const householdData = response.data[0]
-          this.fullHouseholdData = householdData
+      request
+        .get(`/households?household_head_name=${encodeURIComponent(item.value)}`)
+        .then((response) => {
+          if (response && response.code === 20000 && response.data && response.data.length > 0) {
+            const householdData = response.data[0]
+            this.fullHouseholdData = householdData
 
-          // 填充户主信息
-          this.householdForm.id = householdData.id
-          this.householdForm.household_number = householdData.household_number
-          this.householdForm.gender = householdData.gender
-          this.householdForm.ethnicity = householdData.ethnicity
-          this.householdForm.householdHeadIdCard = householdData.household_head_id_card
-          this.householdForm.phoneNumber = householdData.phone_number
-          this.householdForm.householdType = householdData.household_type
-          this.householdForm.housingType = householdData.housing_type
-          this.householdForm.villageGroup = householdData.village_group
-          this.householdForm.address = householdData.address
+            // 填充户主信息
+            this.householdForm.id = householdData.id
+            this.householdForm.household_number = householdData.household_number
+            this.householdForm.gender = householdData.gender
+            this.householdForm.ethnicity = householdData.ethnicity
+            this.householdForm.householdHeadIdCard = householdData.household_head_id_card
+            this.householdForm.phoneNumber = householdData.phone_number
+            this.householdForm.householdType = householdData.household_type
+            this.householdForm.housingType = householdData.housing_type
+            this.householdForm.villageGroup = householdData.village_group
+            this.householdForm.address = householdData.address
 
-          // 填充居民的家庭信息
-          this.residentForm.household_id = householdData.id
-          this.residentForm.household_head_id = householdData.household_head_id || householdData.id
-          this.residentForm.village_group = householdData.village_group
-          this.residentForm.Home_address = householdData.address
-        }
-      }).catch(error => {
-        console.error('获取户主信息失败:', error)
-        this.$message.error('获取户主信息失败')
-      }).finally(() => {
-        this.loading = false
-      })
+            // 填充居民的家庭信息
+            this.residentForm.household_id = householdData.id
+            this.residentForm.household_head_id =
+              householdData.household_head_id || householdData.id
+            this.residentForm.village_group = householdData.village_group
+            this.residentForm.Home_address = householdData.address
+          }
+        })
+        .catch((error) => {
+          console.error('获取户主信息失败:', error)
+          this.$message.error('获取户主信息失败')
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
 
     // 提交表单
@@ -533,23 +653,26 @@ export default {
       console.log('提交的居民数据:', residentData)
 
       // 返回Promise，以便调用者处理异步流程
-      return addResident(residentData).then(response => {
-        console.log('新增居民响应:', response)
-        if (response && response.code === 20000) {
-          this.$message.success('新增居民成功')
-          this.$router.push('/resident/list')
-        } else {
-          this.$message.error(response.message || '新增居民失败')
-        }
-        return response
-      }).catch(error => {
-        console.error('新增居民失败:', error)
-        const errorMessage = error.response?.data?.message || error.message || '新增居民失败'
-        this.$message.error(errorMessage)
-        throw error
-      }).finally(() => {
-        this.loading = false
-      })
+      return addResident(residentData)
+        .then((response) => {
+          console.log('新增居民响应:', response)
+          if (response && response.code === 20000) {
+            this.$message.success('新增居民成功')
+            this.$router.push('/resident/list')
+          } else {
+            this.$message.error(response.message || '新增居民失败')
+          }
+          return response
+        })
+        .catch((error) => {
+          console.error('新增居民失败:', error)
+          const errorMessage = error.response?.data?.message || error.message || '新增居民失败'
+          this.$message.error(errorMessage)
+          throw error
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
 
     // 生成基础户编号（村组拼音首字母+身份证后6位）
@@ -561,74 +684,542 @@ export default {
       // 简单的中文首字母提取函数
       const getChineseFirstLetter = (char) => {
         const pinyinMap = {
-          '赵': 'Z', '钱': 'Q', '孙': 'S', '李': 'L', '周': 'Z', '吴': 'W', '郑': 'Z', '王': 'W',
-          '冯': 'F', '陈': 'C', '褚': 'C', '卫': 'W', '蒋': 'J', '沈': 'S', '韩': 'H', '杨': 'Y',
-          '朱': 'Z', '秦': 'Q', '尤': 'Y', '许': 'X', '何': 'H', '吕': 'L', '施': 'S', '张': 'Z',
-          '孔': 'K', '曹': 'C', '严': 'Y', '华': 'H', '金': 'J', '魏': 'W', '陶': 'T', '姜': 'J',
-          '戚': 'Q', '谢': 'X', '邹': 'Z', '喻': 'Y', '柏': 'B', '水': 'S', '窦': 'D', '章': 'Z',
-          '云': 'Y', '苏': 'S', '潘': 'P', '葛': 'G', '奚': 'X', '范': 'F', '彭': 'P', '郎': 'L',
-          '鲁': 'L', '韦': 'W', '昌': 'C', '马': 'M', '苗': 'M', '凤': 'F', '花': 'H', '方': 'F',
-          '俞': 'Y', '任': 'R', '袁': 'Y', '柳': 'L', '酆': 'F', '鲍': 'B', '史': 'S', '唐': 'T',
-          '费': 'F', '廉': 'L', '岑': 'C', '薛': 'X', '雷': 'L', '贺': 'H', '倪': 'N', '汤': 'T',
-          '滕': 'T', '殷': 'Y', '罗': 'L', '毕': 'B', '郝': 'H', '邬': 'W', '安': 'A', '常': 'C',
-          '乐': 'L', '于': 'Y', '时': 'S', '傅': 'F', '皮': 'P', '卞': 'B', '齐': 'Q', '康': 'K',
-          '伍': 'W', '余': 'Y', '元': 'Y', '卜': 'B', '顾': 'G', '孟': 'M', '平': 'P', '黄': 'H',
-          '和': 'H', '穆': 'M', '萧': 'X', '尹': 'Y', '姚': 'Y', '邵': 'S', '湛': 'Z', '汪': 'W',
-          '祁': 'Q', '毛': 'M', '禹': 'Y', '狄': 'D', '米': 'M', '贝': 'B', '明': 'M', '臧': 'Z',
-          '计': 'J', '伏': 'F', '成': 'C', '戴': 'D', '谈': 'T', '宋': 'S', '茅': 'M', '庞': 'P',
-          '熊': 'X', '纪': 'J', '舒': 'S', '屈': 'Q', '项': 'X', '祝': 'Z', '董': 'D', '梁': 'L',
-          '杜': 'D', '阮': 'R', '蓝': 'L', '闵': 'M', '席': 'X', '季': 'J', '麻': 'M', '强': 'Q',
-          '贾': 'J', '路': 'L', '娄': 'L', '江': 'J', '童': 'T', '颜': 'Y', '郭': 'G', '梅': 'M',
-          '盛': 'S', '林': 'L', '刁': 'D', '钟': 'Z', '徐': 'X', '邱': 'Q', '骆': 'L', '高': 'G',
-          '夏': 'X', '蔡': 'C', '田': 'T', '樊': 'F', '胡': 'H', '凌': 'L', '霍': 'H', '虞': 'Y',
-          '万': 'W', '支': 'Z', '柯': 'K', '昝': 'Z', '管': 'G', '卢': 'L', '莫': 'M', '经': 'J',
-          '房': 'F', '裘': 'Q', '缪': 'M', '干': 'G', '解': 'X', '应': 'Y', '宗': 'Z', '丁': 'D',
-          '宣': 'X', '贲': 'B', '邓': 'D', '郁': 'Y', '单': 'S', '杭': 'H', '洪': 'H', '包': 'B',
-          '诸': 'Z', '左': 'Z', '石': 'S', '崔': 'C', '吉': 'J', '钮': 'N', '龚': 'G', '程': 'C',
-          '嵇': 'J', '邢': 'X', '滑': 'H', '裴': 'P', '陆': 'L', '荣': 'R', '翁': 'W', '荀': 'X',
-          '羊': 'Y', '於': 'Y', '惠': 'H', '甄': 'Z', '曲': 'Q', '家': 'J', '封': 'F', '芮': 'R',
-          '羿': 'Y', '储': 'C', '靳': 'J', '汲': 'J', '邴': 'B', '糜': 'M', '松': 'S', '井': 'J',
-          '段': 'D', '富': 'F', '巫': 'W', '乌': 'W', '焦': 'J', '巴': 'B', '弓': 'G', '牧': 'M',
-          '隗': 'K', '山': 'S', '谷': 'G', '车': 'C', '侯': 'H', '宓': 'M', '蓬': 'P', '全': 'Q',
-          '郗': 'X', '班': 'B', '仰': 'Y', '秋': 'Q', '仲': 'Z', '伊': 'Y', '宫': 'G', '宁': 'N',
-          '仇': 'Q', '栾': 'L', '暴': 'B', '甘': 'G', '钭': 'T', '厉': 'L', '戎': 'R', '祖': 'Z',
-          '武': 'W', '符': 'F', '刘': 'L', '景': 'J', '詹': 'Z', '束': 'S', '龙': 'L', '叶': 'Y',
-          '幸': 'X', '司': 'S', '韶': 'S', '郜': 'G', '黎': 'L', '蓟': 'J', '薄': 'B', '印': 'Y',
-          '宿': 'S', '白': 'B', '怀': 'H', '蒲': 'P', '邰': 'T', '从': 'C', '鄂': 'E', '索': 'S',
-          '咸': 'X', '籍': 'J', '赖': 'L', '卓': 'Z', '蔺': 'L', '屠': 'T', '蒙': 'M', '池': 'C',
-          '乔': 'Q', '阴': 'Y', '郁': 'Y', '胥': 'X', '能': 'N', '苍': 'C', '双': 'S', '闻': 'W',
-          '莘': 'S', '党': 'D', '翟': 'Z', '谭': 'T', '贡': 'G', '劳': 'L', '逄': 'P', '姬': 'J',
-          '申': 'S', '扶': 'F', '堵': 'D', '冉': 'R', '宰': 'Z', '郦': 'L', '雍': 'Y', '却': 'Q',
-          '璩': 'Q', '桑': 'S', '桂': 'G', '濮': 'P', '牛': 'N', '寿': 'S', '通': 'T', '边': 'B',
-          '扈': 'H', '燕': 'Y', '冀': 'J', '僪': 'Y', '浦': 'P', '尚': 'S', '农': 'N', '温': 'W',
-          '别': 'B', '庄': 'Z', '晏': 'Y', '柴': 'C', '瞿': 'Q', '阎': 'Y', '充': 'C', '慕': 'M',
-          '连': 'L', '茹': 'R', '习': 'X', '宦': 'H', '艾': 'Y', '鱼': 'Y', '容': 'R', '向': 'X',
-          '古': 'G', '易': 'Y', '慎': 'S', '戈': 'G', '廖': 'L', '庾': 'Y', '终': 'Z', '暨': 'J',
-          '居': 'J', '衡': 'H', '步': 'B', '都': 'D', '耿': 'G', '满': 'M', '弘': 'H', '匡': 'K',
-          '国': 'G', '文': 'W', '寇': 'K', '广': 'G', '禄': 'L', '阙': 'Q', '东': 'D', '欧': 'O',
-          '殳': 'S', '沃': 'W', '利': 'L', '蔚': 'W', '越': 'Y', '夔': 'K', '隆': 'L', '师': 'S',
-          '巩': 'G', '厍': 'S', '聂': 'N', '晁': 'C', '勾': 'G', '敖': 'O', '融': 'R', '冷': 'L',
-          '訾': 'Z', '辛': 'X', '阚': 'K', '那': 'N', '简': 'J', '饶': 'R', '空': 'K', '曾': 'Z',
-          '毋': 'W', '沙': 'S', '乜': 'N', '养': 'Y', '鞠': 'J', '须': 'X', '丰': 'F', '巢': 'C',
-          '关': 'G', '蒯': 'K', '相': 'X', '查': 'Z', '后': 'H', '荆': 'J', '红': 'H', '游': 'Y',
-          '竺': 'Z', '权': 'Q', '逯': 'L', '盖': 'G', '益': 'Y', '桓': 'H', '公': 'G', '万俟': 'M',
-          '司马': 'S', '上官': 'S', '欧阳': 'O', '夏侯': 'X', '诸葛': 'Z', '闻人': 'W', '东方': 'D',
-          '赫连': 'H', '皇甫': 'H', '尉迟': 'Y', '公羊': 'G', '澹台': 'D', '公冶': 'G', '宗政': 'Z',
-          '濮阳': 'P', '淳于': 'C', '单于': 'C', '太叔': 'T', '申屠': 'S', '公孙': 'G', '慕容': 'M',
-          '仲孙': 'Z', '钟离': 'Z', '长孙': 'Z', '宇文': 'Y', '司徒': 'S', '鲜于': 'X', '司空': 'S',
-          '闾丘': 'L', '司徒': 'S', '亓官': 'Q', '司寇': 'S', '仉': 'Z', '督': 'D', '子车': 'Z',
-          '颛孙': 'Z', '端木': 'D', '巫马': 'W', '公西': 'G', '漆雕': 'Q', '乐正': 'L', '壤驷': 'R',
-          '公良': 'G', '拓跋': 'T', '夹谷': 'J', '宰父': 'Z', '谷梁': 'G', '晋': 'J', '楚': 'C',
-          '闫': 'Y', '法': 'F', '汝': 'R', '鄢': 'Y', '涂': 'T', '钦': 'Q', '段干': 'D', '百里': 'B',
-          '东郭': 'D', '南门': 'N', '呼延': 'H', '归': 'G', '海': 'H', '羊舌': 'Y', '微生': 'W',
-          '岳': 'Y', '帅': 'S', '亢': 'K', '况': 'K', '郈': 'H', '有': 'Y', '琴': 'Q', '梁丘': 'L',
-          '左丘': 'Z', '东门': 'D', '西门': 'X', '商': 'S', '牟': 'M', '佘': 'S', '佴': 'N', '伯': 'B',
-          '赏': 'S', '南宫': 'N', '墨': 'M', '哈': 'H', '谯': 'Q', '笪': 'D', '年': 'N', '爱': 'A',
-          '阳': 'Y', '佟': 'T', '第五': 'D', '言': 'Y', '福': 'F', '百': 'B', '家': 'J', '姓': 'X',
-          '终': 'Z', '梁': 'L', '丘': 'Q', '左': 'Z', '丘': 'Q', '东': 'D', '门': 'M', '西': 'X',
-          '门': 'M', '商': 'S', '牟': 'M', '佘': 'S', '佴': 'N', '伯': 'B', '赏': 'S', '南': 'N',
-          '宫': 'G', '墨': 'M', '哈': 'H', '谯': 'Q', '笪': 'D', '年': 'N', '爱': 'A', '阳': 'Y',
-          '佟': 'T', '第': 'D', '五': 'W', '言': 'Y', '福': 'F', '百': 'B', '家': 'J', '姓': 'X'
+          赵: 'Z',
+          钱: 'Q',
+          孙: 'S',
+          李: 'L',
+          周: 'Z',
+          吴: 'W',
+          郑: 'Z',
+          王: 'W',
+          冯: 'F',
+          陈: 'C',
+          褚: 'C',
+          卫: 'W',
+          蒋: 'J',
+          沈: 'S',
+          韩: 'H',
+          杨: 'Y',
+          朱: 'Z',
+          秦: 'Q',
+          尤: 'Y',
+          许: 'X',
+          何: 'H',
+          吕: 'L',
+          施: 'S',
+          张: 'Z',
+          孔: 'K',
+          曹: 'C',
+          严: 'Y',
+          华: 'H',
+          金: 'J',
+          魏: 'W',
+          陶: 'T',
+          姜: 'J',
+          戚: 'Q',
+          谢: 'X',
+          邹: 'Z',
+          喻: 'Y',
+          柏: 'B',
+          水: 'S',
+          窦: 'D',
+          章: 'Z',
+          云: 'Y',
+          苏: 'S',
+          潘: 'P',
+          葛: 'G',
+          奚: 'X',
+          范: 'F',
+          彭: 'P',
+          郎: 'L',
+          鲁: 'L',
+          韦: 'W',
+          昌: 'C',
+          马: 'M',
+          苗: 'M',
+          凤: 'F',
+          花: 'H',
+          方: 'F',
+          俞: 'Y',
+          任: 'R',
+          袁: 'Y',
+          柳: 'L',
+          酆: 'F',
+          鲍: 'B',
+          史: 'S',
+          唐: 'T',
+          费: 'F',
+          廉: 'L',
+          岑: 'C',
+          薛: 'X',
+          雷: 'L',
+          贺: 'H',
+          倪: 'N',
+          汤: 'T',
+          滕: 'T',
+          殷: 'Y',
+          罗: 'L',
+          毕: 'B',
+          郝: 'H',
+          邬: 'W',
+          安: 'A',
+          常: 'C',
+          乐: 'L',
+          于: 'Y',
+          时: 'S',
+          傅: 'F',
+          皮: 'P',
+          卞: 'B',
+          齐: 'Q',
+          康: 'K',
+          伍: 'W',
+          余: 'Y',
+          元: 'Y',
+          卜: 'B',
+          顾: 'G',
+          孟: 'M',
+          平: 'P',
+          黄: 'H',
+          和: 'H',
+          穆: 'M',
+          萧: 'X',
+          尹: 'Y',
+          姚: 'Y',
+          邵: 'S',
+          湛: 'Z',
+          汪: 'W',
+          祁: 'Q',
+          毛: 'M',
+          禹: 'Y',
+          狄: 'D',
+          米: 'M',
+          贝: 'B',
+          明: 'M',
+          臧: 'Z',
+          计: 'J',
+          伏: 'F',
+          成: 'C',
+          戴: 'D',
+          谈: 'T',
+          宋: 'S',
+          茅: 'M',
+          庞: 'P',
+          熊: 'X',
+          纪: 'J',
+          舒: 'S',
+          屈: 'Q',
+          项: 'X',
+          祝: 'Z',
+          董: 'D',
+          梁: 'L',
+          杜: 'D',
+          阮: 'R',
+          蓝: 'L',
+          闵: 'M',
+          席: 'X',
+          季: 'J',
+          麻: 'M',
+          强: 'Q',
+          贾: 'J',
+          路: 'L',
+          娄: 'L',
+          江: 'J',
+          童: 'T',
+          颜: 'Y',
+          郭: 'G',
+          梅: 'M',
+          盛: 'S',
+          林: 'L',
+          刁: 'D',
+          钟: 'Z',
+          徐: 'X',
+          邱: 'Q',
+          骆: 'L',
+          高: 'G',
+          夏: 'X',
+          蔡: 'C',
+          田: 'T',
+          樊: 'F',
+          胡: 'H',
+          凌: 'L',
+          霍: 'H',
+          虞: 'Y',
+          万: 'W',
+          支: 'Z',
+          柯: 'K',
+          昝: 'Z',
+          管: 'G',
+          卢: 'L',
+          莫: 'M',
+          经: 'J',
+          房: 'F',
+          裘: 'Q',
+          缪: 'M',
+          干: 'G',
+          解: 'X',
+          应: 'Y',
+          宗: 'Z',
+          丁: 'D',
+          宣: 'X',
+          贲: 'B',
+          邓: 'D',
+          郁: 'Y',
+          单: 'S',
+          杭: 'H',
+          洪: 'H',
+          包: 'B',
+          诸: 'Z',
+          左: 'Z',
+          石: 'S',
+          崔: 'C',
+          吉: 'J',
+          钮: 'N',
+          龚: 'G',
+          程: 'C',
+          嵇: 'J',
+          邢: 'X',
+          滑: 'H',
+          裴: 'P',
+          陆: 'L',
+          荣: 'R',
+          翁: 'W',
+          荀: 'X',
+          羊: 'Y',
+          於: 'Y',
+          惠: 'H',
+          甄: 'Z',
+          曲: 'Q',
+          家: 'J',
+          封: 'F',
+          芮: 'R',
+          羿: 'Y',
+          储: 'C',
+          靳: 'J',
+          汲: 'J',
+          邴: 'B',
+          糜: 'M',
+          松: 'S',
+          井: 'J',
+          段: 'D',
+          富: 'F',
+          巫: 'W',
+          乌: 'W',
+          焦: 'J',
+          巴: 'B',
+          弓: 'G',
+          牧: 'M',
+          隗: 'K',
+          山: 'S',
+          谷: 'G',
+          车: 'C',
+          侯: 'H',
+          宓: 'M',
+          蓬: 'P',
+          全: 'Q',
+          郗: 'X',
+          班: 'B',
+          仰: 'Y',
+          秋: 'Q',
+          仲: 'Z',
+          伊: 'Y',
+          宫: 'G',
+          宁: 'N',
+          仇: 'Q',
+          栾: 'L',
+          暴: 'B',
+          甘: 'G',
+          钭: 'T',
+          厉: 'L',
+          戎: 'R',
+          祖: 'Z',
+          武: 'W',
+          符: 'F',
+          刘: 'L',
+          景: 'J',
+          詹: 'Z',
+          束: 'S',
+          龙: 'L',
+          叶: 'Y',
+          幸: 'X',
+          司: 'S',
+          韶: 'S',
+          郜: 'G',
+          黎: 'L',
+          蓟: 'J',
+          薄: 'B',
+          印: 'Y',
+          宿: 'S',
+          白: 'B',
+          怀: 'H',
+          蒲: 'P',
+          邰: 'T',
+          从: 'C',
+          鄂: 'E',
+          索: 'S',
+          咸: 'X',
+          籍: 'J',
+          赖: 'L',
+          卓: 'Z',
+          蔺: 'L',
+          屠: 'T',
+          蒙: 'M',
+          池: 'C',
+          乔: 'Q',
+          阴: 'Y',
+          郁: 'Y',
+          胥: 'X',
+          能: 'N',
+          苍: 'C',
+          双: 'S',
+          闻: 'W',
+          莘: 'S',
+          党: 'D',
+          翟: 'Z',
+          谭: 'T',
+          贡: 'G',
+          劳: 'L',
+          逄: 'P',
+          姬: 'J',
+          申: 'S',
+          扶: 'F',
+          堵: 'D',
+          冉: 'R',
+          宰: 'Z',
+          郦: 'L',
+          雍: 'Y',
+          却: 'Q',
+          璩: 'Q',
+          桑: 'S',
+          桂: 'G',
+          濮: 'P',
+          牛: 'N',
+          寿: 'S',
+          通: 'T',
+          边: 'B',
+          扈: 'H',
+          燕: 'Y',
+          冀: 'J',
+          僪: 'Y',
+          浦: 'P',
+          尚: 'S',
+          农: 'N',
+          温: 'W',
+          别: 'B',
+          庄: 'Z',
+          晏: 'Y',
+          柴: 'C',
+          瞿: 'Q',
+          阎: 'Y',
+          充: 'C',
+          慕: 'M',
+          连: 'L',
+          茹: 'R',
+          习: 'X',
+          宦: 'H',
+          艾: 'Y',
+          鱼: 'Y',
+          容: 'R',
+          向: 'X',
+          古: 'G',
+          易: 'Y',
+          慎: 'S',
+          戈: 'G',
+          廖: 'L',
+          庾: 'Y',
+          终: 'Z',
+          暨: 'J',
+          居: 'J',
+          衡: 'H',
+          步: 'B',
+          都: 'D',
+          耿: 'G',
+          满: 'M',
+          弘: 'H',
+          匡: 'K',
+          国: 'G',
+          文: 'W',
+          寇: 'K',
+          广: 'G',
+          禄: 'L',
+          阙: 'Q',
+          东: 'D',
+          欧: 'O',
+          殳: 'S',
+          沃: 'W',
+          利: 'L',
+          蔚: 'W',
+          越: 'Y',
+          夔: 'K',
+          隆: 'L',
+          师: 'S',
+          巩: 'G',
+          厍: 'S',
+          聂: 'N',
+          晁: 'C',
+          勾: 'G',
+          敖: 'O',
+          融: 'R',
+          冷: 'L',
+          訾: 'Z',
+          辛: 'X',
+          阚: 'K',
+          那: 'N',
+          简: 'J',
+          饶: 'R',
+          空: 'K',
+          曾: 'Z',
+          毋: 'W',
+          沙: 'S',
+          乜: 'N',
+          养: 'Y',
+          鞠: 'J',
+          须: 'X',
+          丰: 'F',
+          巢: 'C',
+          关: 'G',
+          蒯: 'K',
+          相: 'X',
+          查: 'Z',
+          后: 'H',
+          荆: 'J',
+          红: 'H',
+          游: 'Y',
+          竺: 'Z',
+          权: 'Q',
+          逯: 'L',
+          盖: 'G',
+          益: 'Y',
+          桓: 'H',
+          公: 'G',
+          万俟: 'M',
+          司马: 'S',
+          上官: 'S',
+          欧阳: 'O',
+          夏侯: 'X',
+          诸葛: 'Z',
+          闻人: 'W',
+          东方: 'D',
+          赫连: 'H',
+          皇甫: 'H',
+          尉迟: 'Y',
+          公羊: 'G',
+          澹台: 'D',
+          公冶: 'G',
+          宗政: 'Z',
+          濮阳: 'P',
+          淳于: 'C',
+          单于: 'C',
+          太叔: 'T',
+          申屠: 'S',
+          公孙: 'G',
+          慕容: 'M',
+          仲孙: 'Z',
+          钟离: 'Z',
+          长孙: 'Z',
+          宇文: 'Y',
+          司徒: 'S',
+          鲜于: 'X',
+          司空: 'S',
+          闾丘: 'L',
+          司徒: 'S',
+          亓官: 'Q',
+          司寇: 'S',
+          仉: 'Z',
+          督: 'D',
+          子车: 'Z',
+          颛孙: 'Z',
+          端木: 'D',
+          巫马: 'W',
+          公西: 'G',
+          漆雕: 'Q',
+          乐正: 'L',
+          壤驷: 'R',
+          公良: 'G',
+          拓跋: 'T',
+          夹谷: 'J',
+          宰父: 'Z',
+          谷梁: 'G',
+          晋: 'J',
+          楚: 'C',
+          闫: 'Y',
+          法: 'F',
+          汝: 'R',
+          鄢: 'Y',
+          涂: 'T',
+          钦: 'Q',
+          段干: 'D',
+          百里: 'B',
+          东郭: 'D',
+          南门: 'N',
+          呼延: 'H',
+          归: 'G',
+          海: 'H',
+          羊舌: 'Y',
+          微生: 'W',
+          岳: 'Y',
+          帅: 'S',
+          亢: 'K',
+          况: 'K',
+          郈: 'H',
+          有: 'Y',
+          琴: 'Q',
+          梁丘: 'L',
+          左丘: 'Z',
+          东门: 'D',
+          西门: 'X',
+          商: 'S',
+          牟: 'M',
+          佘: 'S',
+          佴: 'N',
+          伯: 'B',
+          赏: 'S',
+          南宫: 'N',
+          墨: 'M',
+          哈: 'H',
+          谯: 'Q',
+          笪: 'D',
+          年: 'N',
+          爱: 'A',
+          阳: 'Y',
+          佟: 'T',
+          第五: 'D',
+          言: 'Y',
+          福: 'F',
+          百: 'B',
+          家: 'J',
+          姓: 'X',
+          终: 'Z',
+          梁: 'L',
+          丘: 'Q',
+          左: 'Z',
+          丘: 'Q',
+          东: 'D',
+          门: 'M',
+          西: 'X',
+          门: 'M',
+          商: 'S',
+          牟: 'M',
+          佘: 'S',
+          佴: 'N',
+          伯: 'B',
+          赏: 'S',
+          南: 'N',
+          宫: 'G',
+          墨: 'M',
+          哈: 'H',
+          谯: 'Q',
+          笪: 'D',
+          年: 'N',
+          爱: 'A',
+          阳: 'Y',
+          佟: 'T',
+          第: 'D',
+          五: 'W',
+          言: 'Y',
+          福: 'F',
+          百: 'B',
+          家: 'J',
+          姓: 'X'
         }
 
         // 先检查是否在映射表中
@@ -669,74 +1260,542 @@ export default {
       // 简单的中文首字母提取函数
       const getChineseFirstLetter = (char) => {
         const pinyinMap = {
-          '赵': 'Z', '钱': 'Q', '孙': 'S', '李': 'L', '周': 'Z', '吴': 'W', '郑': 'Z', '王': 'W',
-          '冯': 'F', '陈': 'C', '褚': 'C', '卫': 'W', '蒋': 'J', '沈': 'S', '韩': 'H', '杨': 'Y',
-          '朱': 'Z', '秦': 'Q', '尤': 'Y', '许': 'X', '何': 'H', '吕': 'L', '施': 'S', '张': 'Z',
-          '孔': 'K', '曹': 'C', '严': 'Y', '华': 'H', '金': 'J', '魏': 'W', '陶': 'T', '姜': 'J',
-          '戚': 'Q', '谢': 'X', '邹': 'Z', '喻': 'Y', '柏': 'B', '水': 'S', '窦': 'D', '章': 'Z',
-          '云': 'Y', '苏': 'S', '潘': 'P', '葛': 'G', '奚': 'X', '范': 'F', '彭': 'P', '郎': 'L',
-          '鲁': 'L', '韦': 'W', '昌': 'C', '马': 'M', '苗': 'M', '凤': 'F', '花': 'H', '方': 'F',
-          '俞': 'Y', '任': 'R', '袁': 'Y', '柳': 'L', '酆': 'F', '鲍': 'B', '史': 'S', '唐': 'T',
-          '费': 'F', '廉': 'L', '岑': 'C', '薛': 'X', '雷': 'L', '贺': 'H', '倪': 'N', '汤': 'T',
-          '滕': 'T', '殷': 'Y', '罗': 'L', '毕': 'B', '郝': 'H', '邬': 'W', '安': 'A', '常': 'C',
-          '乐': 'L', '于': 'Y', '时': 'S', '傅': 'F', '皮': 'P', '卞': 'B', '齐': 'Q', '康': 'K',
-          '伍': 'W', '余': 'Y', '元': 'Y', '卜': 'B', '顾': 'G', '孟': 'M', '平': 'P', '黄': 'H',
-          '和': 'H', '穆': 'M', '萧': 'X', '尹': 'Y', '姚': 'Y', '邵': 'S', '湛': 'Z', '汪': 'W',
-          '祁': 'Q', '毛': 'M', '禹': 'Y', '狄': 'D', '米': 'M', '贝': 'B', '明': 'M', '臧': 'Z',
-          '计': 'J', '伏': 'F', '成': 'C', '戴': 'D', '谈': 'T', '宋': 'S', '茅': 'M', '庞': 'P',
-          '熊': 'X', '纪': 'J', '舒': 'S', '屈': 'Q', '项': 'X', '祝': 'Z', '董': 'D', '梁': 'L',
-          '杜': 'D', '阮': 'R', '蓝': 'L', '闵': 'M', '席': 'X', '季': 'J', '麻': 'M', '强': 'Q',
-          '贾': 'J', '路': 'L', '娄': 'L', '江': 'J', '童': 'T', '颜': 'Y', '郭': 'G', '梅': 'M',
-          '盛': 'S', '林': 'L', '刁': 'D', '钟': 'Z', '徐': 'X', '邱': 'Q', '骆': 'L', '高': 'G',
-          '夏': 'X', '蔡': 'C', '田': 'T', '樊': 'F', '胡': 'H', '凌': 'L', '霍': 'H', '虞': 'Y',
-          '万': 'W', '支': 'Z', '柯': 'K', '昝': 'Z', '管': 'G', '卢': 'L', '莫': 'M', '经': 'J',
-          '房': 'F', '裘': 'Q', '缪': 'M', '干': 'G', '解': 'X', '应': 'Y', '宗': 'Z', '丁': 'D',
-          '宣': 'X', '贲': 'B', '邓': 'D', '郁': 'Y', '单': 'S', '杭': 'H', '洪': 'H', '包': 'B',
-          '诸': 'Z', '左': 'Z', '石': 'S', '崔': 'C', '吉': 'J', '钮': 'N', '龚': 'G', '程': 'C',
-          '嵇': 'J', '邢': 'X', '滑': 'H', '裴': 'P', '陆': 'L', '荣': 'R', '翁': 'W', '荀': 'X',
-          '羊': 'Y', '於': 'Y', '惠': 'H', '甄': 'Z', '曲': 'Q', '家': 'J', '封': 'F', '芮': 'R',
-          '羿': 'Y', '储': 'C', '靳': 'J', '汲': 'J', '邴': 'B', '糜': 'M', '松': 'S', '井': 'J',
-          '段': 'D', '富': 'F', '巫': 'W', '乌': 'W', '焦': 'J', '巴': 'B', '弓': 'G', '牧': 'M',
-          '隗': 'K', '山': 'S', '谷': 'G', '车': 'C', '侯': 'H', '宓': 'M', '蓬': 'P', '全': 'Q',
-          '郗': 'X', '班': 'B', '仰': 'Y', '秋': 'Q', '仲': 'Z', '伊': 'Y', '宫': 'N', '宁': 'N',
-          '仇': 'Q', '栾': 'L', '暴': 'B', '甘': 'G', '钭': 'T', '厉': 'L', '戎': 'R', '祖': 'Z',
-          '武': 'W', '符': 'F', '刘': 'L', '景': 'J', '詹': 'Z', '束': 'S', '龙': 'L', '叶': 'Y',
-          '幸': 'X', '司': 'S', '韶': 'S', '郜': 'G', '黎': 'L', '蓟': 'J', '薄': 'B', '印': 'Y',
-          '宿': 'S', '白': 'B', '怀': 'H', '蒲': 'P', '邰': 'T', '从': 'C', '鄂': 'E', '索': 'S',
-          '咸': 'X', '籍': 'J', '赖': 'L', '卓': 'Z', '蔺': 'L', '屠': 'T', '蒙': 'M', '池': 'C',
-          '乔': 'Q', '阴': 'Y', '郁': 'Y', '胥': 'X', '能': 'N', '苍': 'C', '双': 'S', '闻': 'W',
-          '莘': 'S', '党': 'D', '翟': 'Z', '谭': 'T', '贡': 'G', '劳': 'L', '逄': 'P', '姬': 'J',
-          '申': 'S', '扶': 'F', '堵': 'D', '冉': 'R', '宰': 'Z', '郦': 'L', '雍': 'Y', '却': 'Q',
-          '璩': 'Q', '桑': 'S', '桂': 'G', '濮': 'P', '牛': 'N', '寿': 'S', '通': 'T', '边': 'B',
-          '扈': 'H', '燕': 'Y', '冀': 'J', '僪': 'Y', '浦': 'P', '尚': 'S', '农': 'N', '温': 'W',
-          '别': 'B', '庄': 'Z', '晏': 'Y', '柴': 'C', '瞿': 'Q', '阎': 'Y', '充': 'C', '慕': 'M',
-          '连': 'L', '茹': 'R', '习': 'X', '宦': 'H', '艾': 'Y', '鱼': 'Y', '容': 'R', '向': 'X',
-          '古': 'G', '易': 'Y', '慎': 'S', '戈': 'G', '廖': 'L', '庾': 'Y', '终': 'Z', '暨': 'J',
-          '居': 'J', '衡': 'H', '步': 'B', '都': 'D', '耿': 'G', '满': 'M', '弘': 'H', '匡': 'K',
-          '国': 'G', '文': 'W', '寇': 'K', '广': 'G', '禄': 'L', '阙': 'Q', '东': 'D', '欧': 'O',
-          '殳': 'S', '沃': 'W', '利': 'L', '蔚': 'W', '越': 'Y', '夔': 'K', '隆': 'L', '师': 'S',
-          '巩': 'G', '厍': 'S', '聂': 'N', '晁': 'C', '勾': 'G', '敖': 'O', '融': 'R', '冷': 'L',
-          '訾': 'Z', '辛': 'X', '阚': 'K', '那': 'N', '简': 'J', '饶': 'R', '空': 'K', '曾': 'Z',
-          '毋': 'W', '沙': 'S', '乜': 'N', '养': 'Y', '鞠': 'J', '须': 'X', '丰': 'F', '巢': 'C',
-          '关': 'G', '蒯': 'K', '相': 'X', '查': 'Z', '后': 'H', '荆': 'J', '红': 'H', '游': 'Y',
-          '竺': 'Z', '权': 'Q', '逯': 'L', '盖': 'G', '益': 'Y', '桓': 'H', '公': 'G', '万俟': 'M',
-          '司马': 'S', '上官': 'S', '欧阳': 'O', '夏侯': 'X', '诸葛': 'Z', '闻人': 'W', '东方': 'D',
-          '赫连': 'H', '皇甫': 'H', '尉迟': 'Y', '公羊': 'G', '澹台': 'D', '公冶': 'G', '宗政': 'Z',
-          '濮阳': 'P', '淳于': 'C', '单于': 'C', '太叔': 'T', '申屠': 'S', '公孙': 'G', '慕容': 'M',
-          '仲孙': 'Z', '钟离': 'Z', '长孙': 'Z', '宇文': 'Y', '司徒': 'S', '鲜于': 'X', '司空': 'S',
-          '闾丘': 'L', '司徒': 'S', '亓官': 'Q', '司寇': 'S', '仉': 'Z', '督': 'D', '子车': 'Z',
-          '颛孙': 'Z', '端木': 'D', '巫马': 'W', '公西': 'G', '漆雕': 'Q', '乐正': 'L', '壤驷': 'R',
-          '公良': 'G', '拓跋': 'T', '夹谷': 'J', '宰父': 'Z', '谷梁': 'G', '晋': 'J', '楚': 'C',
-          '闫': 'Y', '法': 'F', '汝': 'R', '鄢': 'Y', '涂': 'T', '钦': 'Q', '段干': 'D', '百里': 'B',
-          '东郭': 'D', '南门': 'N', '呼延': 'H', '归': 'G', '海': 'H', '羊舌': 'Y', '微生': 'W',
-          '岳': 'Y', '帅': 'S', '亢': 'K', '况': 'K', '郈': 'H', '有': 'Y', '琴': 'Q', '梁丘': 'L',
-          '左丘': 'Z', '东门': 'D', '西门': 'X', '商': 'S', '牟': 'M', '佘': 'S', '佴': 'N', '伯': 'B',
-          '赏': 'S', '南宫': 'N', '墨': 'M', '哈': 'H', '谯': 'Q', '笪': 'D', '年': 'N', '爱': 'A',
-          '阳': 'Y', '佟': 'T', '第五': 'D', '言': 'Y', '福': 'F', '百': 'B', '家': 'J', '姓': 'X',
-          '终': 'Z', '梁': 'L', '丘': 'Q', '左': 'Z', '丘': 'Q', '东': 'D', '门': 'M', '西': 'X',
-          '门': 'M', '商': 'S', '牟': 'M', '佘': 'S', '佴': 'N', '伯': 'B', '赏': 'S', '南': 'N',
-          '宫': 'G', '墨': 'M', '哈': 'H', '谯': 'Q', '笪': 'D', '年': 'N', '爱': 'A', '阳': 'Y',
-          '佟': 'T', '第': 'D', '五': 'W', '言': 'Y', '福': 'F', '百': 'B', '家': 'J', '姓': 'X'
+          赵: 'Z',
+          钱: 'Q',
+          孙: 'S',
+          李: 'L',
+          周: 'Z',
+          吴: 'W',
+          郑: 'Z',
+          王: 'W',
+          冯: 'F',
+          陈: 'C',
+          褚: 'C',
+          卫: 'W',
+          蒋: 'J',
+          沈: 'S',
+          韩: 'H',
+          杨: 'Y',
+          朱: 'Z',
+          秦: 'Q',
+          尤: 'Y',
+          许: 'X',
+          何: 'H',
+          吕: 'L',
+          施: 'S',
+          张: 'Z',
+          孔: 'K',
+          曹: 'C',
+          严: 'Y',
+          华: 'H',
+          金: 'J',
+          魏: 'W',
+          陶: 'T',
+          姜: 'J',
+          戚: 'Q',
+          谢: 'X',
+          邹: 'Z',
+          喻: 'Y',
+          柏: 'B',
+          水: 'S',
+          窦: 'D',
+          章: 'Z',
+          云: 'Y',
+          苏: 'S',
+          潘: 'P',
+          葛: 'G',
+          奚: 'X',
+          范: 'F',
+          彭: 'P',
+          郎: 'L',
+          鲁: 'L',
+          韦: 'W',
+          昌: 'C',
+          马: 'M',
+          苗: 'M',
+          凤: 'F',
+          花: 'H',
+          方: 'F',
+          俞: 'Y',
+          任: 'R',
+          袁: 'Y',
+          柳: 'L',
+          酆: 'F',
+          鲍: 'B',
+          史: 'S',
+          唐: 'T',
+          费: 'F',
+          廉: 'L',
+          岑: 'C',
+          薛: 'X',
+          雷: 'L',
+          贺: 'H',
+          倪: 'N',
+          汤: 'T',
+          滕: 'T',
+          殷: 'Y',
+          罗: 'L',
+          毕: 'B',
+          郝: 'H',
+          邬: 'W',
+          安: 'A',
+          常: 'C',
+          乐: 'L',
+          于: 'Y',
+          时: 'S',
+          傅: 'F',
+          皮: 'P',
+          卞: 'B',
+          齐: 'Q',
+          康: 'K',
+          伍: 'W',
+          余: 'Y',
+          元: 'Y',
+          卜: 'B',
+          顾: 'G',
+          孟: 'M',
+          平: 'P',
+          黄: 'H',
+          和: 'H',
+          穆: 'M',
+          萧: 'X',
+          尹: 'Y',
+          姚: 'Y',
+          邵: 'S',
+          湛: 'Z',
+          汪: 'W',
+          祁: 'Q',
+          毛: 'M',
+          禹: 'Y',
+          狄: 'D',
+          米: 'M',
+          贝: 'B',
+          明: 'M',
+          臧: 'Z',
+          计: 'J',
+          伏: 'F',
+          成: 'C',
+          戴: 'D',
+          谈: 'T',
+          宋: 'S',
+          茅: 'M',
+          庞: 'P',
+          熊: 'X',
+          纪: 'J',
+          舒: 'S',
+          屈: 'Q',
+          项: 'X',
+          祝: 'Z',
+          董: 'D',
+          梁: 'L',
+          杜: 'D',
+          阮: 'R',
+          蓝: 'L',
+          闵: 'M',
+          席: 'X',
+          季: 'J',
+          麻: 'M',
+          强: 'Q',
+          贾: 'J',
+          路: 'L',
+          娄: 'L',
+          江: 'J',
+          童: 'T',
+          颜: 'Y',
+          郭: 'G',
+          梅: 'M',
+          盛: 'S',
+          林: 'L',
+          刁: 'D',
+          钟: 'Z',
+          徐: 'X',
+          邱: 'Q',
+          骆: 'L',
+          高: 'G',
+          夏: 'X',
+          蔡: 'C',
+          田: 'T',
+          樊: 'F',
+          胡: 'H',
+          凌: 'L',
+          霍: 'H',
+          虞: 'Y',
+          万: 'W',
+          支: 'Z',
+          柯: 'K',
+          昝: 'Z',
+          管: 'G',
+          卢: 'L',
+          莫: 'M',
+          经: 'J',
+          房: 'F',
+          裘: 'Q',
+          缪: 'M',
+          干: 'G',
+          解: 'X',
+          应: 'Y',
+          宗: 'Z',
+          丁: 'D',
+          宣: 'X',
+          贲: 'B',
+          邓: 'D',
+          郁: 'Y',
+          单: 'S',
+          杭: 'H',
+          洪: 'H',
+          包: 'B',
+          诸: 'Z',
+          左: 'Z',
+          石: 'S',
+          崔: 'C',
+          吉: 'J',
+          钮: 'N',
+          龚: 'G',
+          程: 'C',
+          嵇: 'J',
+          邢: 'X',
+          滑: 'H',
+          裴: 'P',
+          陆: 'L',
+          荣: 'R',
+          翁: 'W',
+          荀: 'X',
+          羊: 'Y',
+          於: 'Y',
+          惠: 'H',
+          甄: 'Z',
+          曲: 'Q',
+          家: 'J',
+          封: 'F',
+          芮: 'R',
+          羿: 'Y',
+          储: 'C',
+          靳: 'J',
+          汲: 'J',
+          邴: 'B',
+          糜: 'M',
+          松: 'S',
+          井: 'J',
+          段: 'D',
+          富: 'F',
+          巫: 'W',
+          乌: 'W',
+          焦: 'J',
+          巴: 'B',
+          弓: 'G',
+          牧: 'M',
+          隗: 'K',
+          山: 'S',
+          谷: 'G',
+          车: 'C',
+          侯: 'H',
+          宓: 'M',
+          蓬: 'P',
+          全: 'Q',
+          郗: 'X',
+          班: 'B',
+          仰: 'Y',
+          秋: 'Q',
+          仲: 'Z',
+          伊: 'Y',
+          宫: 'N',
+          宁: 'N',
+          仇: 'Q',
+          栾: 'L',
+          暴: 'B',
+          甘: 'G',
+          钭: 'T',
+          厉: 'L',
+          戎: 'R',
+          祖: 'Z',
+          武: 'W',
+          符: 'F',
+          刘: 'L',
+          景: 'J',
+          詹: 'Z',
+          束: 'S',
+          龙: 'L',
+          叶: 'Y',
+          幸: 'X',
+          司: 'S',
+          韶: 'S',
+          郜: 'G',
+          黎: 'L',
+          蓟: 'J',
+          薄: 'B',
+          印: 'Y',
+          宿: 'S',
+          白: 'B',
+          怀: 'H',
+          蒲: 'P',
+          邰: 'T',
+          从: 'C',
+          鄂: 'E',
+          索: 'S',
+          咸: 'X',
+          籍: 'J',
+          赖: 'L',
+          卓: 'Z',
+          蔺: 'L',
+          屠: 'T',
+          蒙: 'M',
+          池: 'C',
+          乔: 'Q',
+          阴: 'Y',
+          郁: 'Y',
+          胥: 'X',
+          能: 'N',
+          苍: 'C',
+          双: 'S',
+          闻: 'W',
+          莘: 'S',
+          党: 'D',
+          翟: 'Z',
+          谭: 'T',
+          贡: 'G',
+          劳: 'L',
+          逄: 'P',
+          姬: 'J',
+          申: 'S',
+          扶: 'F',
+          堵: 'D',
+          冉: 'R',
+          宰: 'Z',
+          郦: 'L',
+          雍: 'Y',
+          却: 'Q',
+          璩: 'Q',
+          桑: 'S',
+          桂: 'G',
+          濮: 'P',
+          牛: 'N',
+          寿: 'S',
+          通: 'T',
+          边: 'B',
+          扈: 'H',
+          燕: 'Y',
+          冀: 'J',
+          僪: 'Y',
+          浦: 'P',
+          尚: 'S',
+          农: 'N',
+          温: 'W',
+          别: 'B',
+          庄: 'Z',
+          晏: 'Y',
+          柴: 'C',
+          瞿: 'Q',
+          阎: 'Y',
+          充: 'C',
+          慕: 'M',
+          连: 'L',
+          茹: 'R',
+          习: 'X',
+          宦: 'H',
+          艾: 'Y',
+          鱼: 'Y',
+          容: 'R',
+          向: 'X',
+          古: 'G',
+          易: 'Y',
+          慎: 'S',
+          戈: 'G',
+          廖: 'L',
+          庾: 'Y',
+          终: 'Z',
+          暨: 'J',
+          居: 'J',
+          衡: 'H',
+          步: 'B',
+          都: 'D',
+          耿: 'G',
+          满: 'M',
+          弘: 'H',
+          匡: 'K',
+          国: 'G',
+          文: 'W',
+          寇: 'K',
+          广: 'G',
+          禄: 'L',
+          阙: 'Q',
+          东: 'D',
+          欧: 'O',
+          殳: 'S',
+          沃: 'W',
+          利: 'L',
+          蔚: 'W',
+          越: 'Y',
+          夔: 'K',
+          隆: 'L',
+          师: 'S',
+          巩: 'G',
+          厍: 'S',
+          聂: 'N',
+          晁: 'C',
+          勾: 'G',
+          敖: 'O',
+          融: 'R',
+          冷: 'L',
+          訾: 'Z',
+          辛: 'X',
+          阚: 'K',
+          那: 'N',
+          简: 'J',
+          饶: 'R',
+          空: 'K',
+          曾: 'Z',
+          毋: 'W',
+          沙: 'S',
+          乜: 'N',
+          养: 'Y',
+          鞠: 'J',
+          须: 'X',
+          丰: 'F',
+          巢: 'C',
+          关: 'G',
+          蒯: 'K',
+          相: 'X',
+          查: 'Z',
+          后: 'H',
+          荆: 'J',
+          红: 'H',
+          游: 'Y',
+          竺: 'Z',
+          权: 'Q',
+          逯: 'L',
+          盖: 'G',
+          益: 'Y',
+          桓: 'H',
+          公: 'G',
+          万俟: 'M',
+          司马: 'S',
+          上官: 'S',
+          欧阳: 'O',
+          夏侯: 'X',
+          诸葛: 'Z',
+          闻人: 'W',
+          东方: 'D',
+          赫连: 'H',
+          皇甫: 'H',
+          尉迟: 'Y',
+          公羊: 'G',
+          澹台: 'D',
+          公冶: 'G',
+          宗政: 'Z',
+          濮阳: 'P',
+          淳于: 'C',
+          单于: 'C',
+          太叔: 'T',
+          申屠: 'S',
+          公孙: 'G',
+          慕容: 'M',
+          仲孙: 'Z',
+          钟离: 'Z',
+          长孙: 'Z',
+          宇文: 'Y',
+          司徒: 'S',
+          鲜于: 'X',
+          司空: 'S',
+          闾丘: 'L',
+          司徒: 'S',
+          亓官: 'Q',
+          司寇: 'S',
+          仉: 'Z',
+          督: 'D',
+          子车: 'Z',
+          颛孙: 'Z',
+          端木: 'D',
+          巫马: 'W',
+          公西: 'G',
+          漆雕: 'Q',
+          乐正: 'L',
+          壤驷: 'R',
+          公良: 'G',
+          拓跋: 'T',
+          夹谷: 'J',
+          宰父: 'Z',
+          谷梁: 'G',
+          晋: 'J',
+          楚: 'C',
+          闫: 'Y',
+          法: 'F',
+          汝: 'R',
+          鄢: 'Y',
+          涂: 'T',
+          钦: 'Q',
+          段干: 'D',
+          百里: 'B',
+          东郭: 'D',
+          南门: 'N',
+          呼延: 'H',
+          归: 'G',
+          海: 'H',
+          羊舌: 'Y',
+          微生: 'W',
+          岳: 'Y',
+          帅: 'S',
+          亢: 'K',
+          况: 'K',
+          郈: 'H',
+          有: 'Y',
+          琴: 'Q',
+          梁丘: 'L',
+          左丘: 'Z',
+          东门: 'D',
+          西门: 'X',
+          商: 'S',
+          牟: 'M',
+          佘: 'S',
+          佴: 'N',
+          伯: 'B',
+          赏: 'S',
+          南宫: 'N',
+          墨: 'M',
+          哈: 'H',
+          谯: 'Q',
+          笪: 'D',
+          年: 'N',
+          爱: 'A',
+          阳: 'Y',
+          佟: 'T',
+          第五: 'D',
+          言: 'Y',
+          福: 'F',
+          百: 'B',
+          家: 'J',
+          姓: 'X',
+          终: 'Z',
+          梁: 'L',
+          丘: 'Q',
+          左: 'Z',
+          丘: 'Q',
+          东: 'D',
+          门: 'M',
+          西: 'X',
+          门: 'M',
+          商: 'S',
+          牟: 'M',
+          佘: 'S',
+          佴: 'N',
+          伯: 'B',
+          赏: 'S',
+          南: 'N',
+          宫: 'G',
+          墨: 'M',
+          哈: 'H',
+          谯: 'Q',
+          笪: 'D',
+          年: 'N',
+          爱: 'A',
+          阳: 'Y',
+          佟: 'T',
+          第: 'D',
+          五: 'W',
+          言: 'Y',
+          福: 'F',
+          百: 'B',
+          家: 'J',
+          姓: 'X'
         }
 
         // 先检查是否在映射表中
@@ -847,7 +1906,12 @@ export default {
         const householdResponse = await addHousehold(householdData)
         console.log('新增户主响应:', householdResponse)
 
-        if (householdResponse && householdResponse.code === 20000 && householdResponse.data && householdResponse.data.id) {
+        if (
+          householdResponse &&
+          householdResponse.code === 20000 &&
+          householdResponse.data &&
+          householdResponse.data.id
+        ) {
           // 户主创建成功，获取新的household_id
           const newHouseholdId = householdResponse.data.id
 
@@ -859,7 +1923,12 @@ export default {
           const residentResponse = await this.createResident()
 
           // 居民创建成功后，更新household的household_head_id为居民id
-          if (residentResponse && residentResponse.code === 20000 && residentResponse.data && residentResponse.data.id) {
+          if (
+            residentResponse &&
+            residentResponse.code === 20000 &&
+            residentResponse.data &&
+            residentResponse.data.id
+          ) {
             const newResidentId = residentResponse.data.id
 
             // 更新household的household_head_id
@@ -946,7 +2015,16 @@ export default {
     async loadDictionaries() {
       try {
         // 同时加载多个字典数据，使用Promise.all提高效率
-        const [ethnicityData, villageGroupData, householdTypeData, housingTypeData, maritalStatusData, politicalStatusData, militaryServiceData, educationLevelData] = await Promise.all([
+        const [
+          ethnicityData,
+          villageGroupData,
+          householdTypeData,
+          housingTypeData,
+          maritalStatusData,
+          politicalStatusData,
+          militaryServiceData,
+          educationLevelData
+        ] = await Promise.all([
           dictionaryCache.getDictionary('民族'),
           dictionaryCache.getDictionary('村组'),
           dictionaryCache.getDictionary('户口类型'),
@@ -959,7 +2037,7 @@ export default {
 
         // 处理民族数据
         if (Array.isArray(ethnicityData)) {
-          this.ethnicityOptions = ethnicityData.map(item => ({
+          this.ethnicityOptions = ethnicityData.map((item) => ({
             label: item.value,
             value: item.value
           }))
@@ -967,7 +2045,7 @@ export default {
 
         // 处理村组数据
         if (Array.isArray(villageGroupData)) {
-          this.villageGroupOptions = villageGroupData.map(item => ({
+          this.villageGroupOptions = villageGroupData.map((item) => ({
             label: item.value,
             value: item.value
           }))
@@ -975,7 +2053,7 @@ export default {
 
         // 处理户口类型数据
         if (Array.isArray(householdTypeData)) {
-          this.householdTypeOptions = householdTypeData.map(item => ({
+          this.householdTypeOptions = householdTypeData.map((item) => ({
             label: item.value,
             value: item.value
           }))
@@ -983,7 +2061,7 @@ export default {
 
         // 处理住房类型数据
         if (Array.isArray(housingTypeData)) {
-          this.housingTypeOptions = housingTypeData.map(item => ({
+          this.housingTypeOptions = housingTypeData.map((item) => ({
             label: item.value,
             value: item.value
           }))
@@ -991,7 +2069,7 @@ export default {
 
         // 处理婚姻状况数据
         if (Array.isArray(maritalStatusData)) {
-          this.maritalStatusOptions = maritalStatusData.map(item => ({
+          this.maritalStatusOptions = maritalStatusData.map((item) => ({
             label: item.value,
             value: item.value
           }))
@@ -999,7 +2077,7 @@ export default {
 
         // 处理政治面貌数据
         if (Array.isArray(politicalStatusData)) {
-          this.politicalStatusOptions = politicalStatusData.map(item => ({
+          this.politicalStatusOptions = politicalStatusData.map((item) => ({
             label: item.value,
             value: item.value
           }))
@@ -1007,7 +2085,7 @@ export default {
 
         // 处理兵役状况数据
         if (Array.isArray(militaryServiceData)) {
-          this.militaryServiceOptions = militaryServiceData.map(item => ({
+          this.militaryServiceOptions = militaryServiceData.map((item) => ({
             label: item.value,
             value: item.value
           }))
@@ -1015,7 +2093,7 @@ export default {
 
         // 处理文化程度数据
         if (Array.isArray(educationLevelData)) {
-          this.educationLevelOptions = educationLevelData.map(item => ({
+          this.educationLevelOptions = educationLevelData.map((item) => ({
             label: item.value,
             value: item.value
           }))

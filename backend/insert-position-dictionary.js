@@ -1,4 +1,4 @@
-const db = require('./db');
+const db = require('./db')
 
 const positions = [
   // 支部委员会
@@ -26,26 +26,26 @@ const positions = [
   // 青年团妇组织
   { org: 'youth_women', position: '团委书记', category: '团妇组织职务' },
   { org: 'youth_women', position: '妇联主任', category: '团妇组织职务' }
-];
+]
 
-console.log('开始插入职务字典数据...');
+console.log('开始插入职务字典数据...')
 
-const insertSql = `INSERT OR IGNORE INTO dictionaries (category, value, display_order, status, created_at) VALUES (?, ?, ?, 'active', CURRENT_TIMESTAMP)`;
-let count = 0;
-let successCount = 0;
+const insertSql = `INSERT OR IGNORE INTO dictionaries (category, value, display_order, status, created_at) VALUES (?, ?, ?, 'active', CURRENT_TIMESTAMP)`
+let count = 0
+let successCount = 0
 
 positions.forEach((pos, index) => {
-  db.run(insertSql, [pos.category, pos.position, index + 1], function(err) {
+  db.run(insertSql, [pos.category, pos.position, index + 1], function (err) {
     if (err) {
-      console.error(`插入职务 ${pos.position} 失败:`, err.message);
+      console.error(`插入职务 ${pos.position} 失败:`, err.message)
     } else {
-      successCount++;
-      console.log(`✓ ${pos.category}: ${pos.position}`);
+      successCount++
+      console.log(`✓ ${pos.category}: ${pos.position}`)
     }
-    count++;
+    count++
     if (count === positions.length) {
-      console.log(`\n职务字典插入完成，共 ${positions.length} 条，成功 ${successCount} 条`);
-      db.close();
+      console.log(`\n职务字典插入完成，共 ${positions.length} 条，成功 ${successCount} 条`)
+      db.close()
     }
-  });
-});
+  })
+})

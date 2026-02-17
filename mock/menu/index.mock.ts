@@ -31,32 +31,32 @@ export default [
               },
               children: [
                 {
-                path: 'analysis',
-                component: 'views/Dashboard/Analysis',
-                name: 'DashboardAnalysis',
-                status: Mock.Random.integer(0, 1),
-                id: 2,
-                type: 1,
-                parentId: 1,
-                title: '分析页',
-                permissionList: [
-                  {
-                    id: 1,
-                    label: '新增',
-                    value: 'add'
-                  },
-                  {
-                    id: 2,
-                    label: '编辑',
-                    value: 'edit'
-                  }
-                ],
-                meta: {
+                  path: 'analysis',
+                  component: 'views/Dashboard/Analysis',
+                  name: 'DashboardAnalysis',
+                  status: Mock.Random.integer(0, 1),
+                  id: 2,
+                  type: 1,
+                  parentId: 1,
                   title: '分析页',
-                  noCache: true,
-                  permission: ['add', 'edit']
-                }
-              },
+                  permissionList: [
+                    {
+                      id: 1,
+                      label: '新增',
+                      value: 'add'
+                    },
+                    {
+                      id: 2,
+                      label: '编辑',
+                      value: 'edit'
+                    }
+                  ],
+                  meta: {
+                    title: '分析页',
+                    noCache: true,
+                    permission: ['add', 'edit']
+                  }
+                },
                 {
                   path: 'workplace',
                   component: 'views/Dashboard/Workplace',

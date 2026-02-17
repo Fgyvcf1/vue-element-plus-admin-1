@@ -57,9 +57,13 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="small" :icon="Search" @click="handleQuery">搜索</el-button>
+          <el-button type="primary" size="small" :icon="Search" @click="handleQuery"
+            >搜索</el-button
+          >
           <el-button size="small" :icon="Refresh" @click="resetQuery">重置</el-button>
-          <el-button type="info" size="small" :icon="Download" @click="handleExport">导出</el-button>
+          <el-button type="info" size="small" :icon="Download" @click="handleExport"
+            >导出</el-button
+          >
         </el-form-item>
       </el-form>
 
@@ -77,6 +81,8 @@
         <el-table-column prop="idCard" label="身份证号" align="center" width="160" />
         <el-table-column prop="gender" label="性别" align="center" width="40" />
         <el-table-column prop="age" label="年龄" align="center" width="40" />
+        <el-table-column prop="phoneNumber" label="联系电话" align="center" width="120" />
+        <el-table-column prop="address" label="家庭地址" align="center" min-width="220" />
         <el-table-column prop="disabilityType" label="残疾类型" align="center" width="100" />
         <el-table-column prop="disabilityLevel" label="残疾等级" align="center" width="100" />
         <el-table-column prop="certificateNumber" label="残疾证号" align="center" width="160" />
@@ -92,8 +98,10 @@
         :close-on-click-modal="true"
         @close="handleDialogClose"
       >
-        <div style="margin-bottom: 16px; text-align: right;">
-          <el-button v-if="!isEditing" type="primary" size="small" @click="handleEditDetail">编辑</el-button>
+        <div style="margin-bottom: 16px; text-align: right">
+          <el-button v-if="!isEditing" type="primary" size="small" @click="handleEditDetail"
+            >编辑</el-button
+          >
           <template v-else>
             <el-button type="primary" size="small" @click="handleSave">保存</el-button>
             <el-button size="small" @click="handleCancelEdit">取消</el-button>
@@ -101,7 +109,7 @@
         </div>
 
         <!-- 第一部分：户主信息 -->
-        <el-card shadow="hover" class="info-card" style="margin-bottom: 16px;">
+        <el-card shadow="hover" class="info-card" style="margin-bottom: 16px">
           <template #header>
             <div class="clearfix">
               <span>户主信息</span>
@@ -129,7 +137,7 @@
         </el-card>
 
         <!-- 第二部分：残疾人个人信息 -->
-        <el-card shadow="hover" class="info-card" style="margin-bottom: 16px;">
+        <el-card shadow="hover" class="info-card" style="margin-bottom: 16px">
           <template #header>
             <div class="clearfix">
               <span>残疾人个人信息</span>
@@ -167,7 +175,7 @@
         </el-card>
 
         <!-- 第三部分：残疾信息 -->
-        <el-card shadow="hover" class="info-card" style="margin-bottom: 16px;">
+        <el-card shadow="hover" class="info-card" style="margin-bottom: 16px">
           <template #header>
             <div class="clearfix">
               <span>残疾信息</span>
@@ -177,7 +185,11 @@
             <el-row :gutter="12">
               <el-col :span="8">
                 <el-form-item label="残疾类型">
-                  <el-select v-model="disabilityInfo.disabilityType" :disabled="!isEditing" style="width: 100%">
+                  <el-select
+                    v-model="disabilityInfo.disabilityType"
+                    :disabled="!isEditing"
+                    style="width: 100%"
+                  >
                     <el-option
                       v-for="item in disabilityTypeOptions"
                       :key="item.value"
@@ -189,7 +201,11 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="残疾等级">
-                  <el-select v-model="disabilityInfo.disabilityLevel" :disabled="!isEditing" style="width: 100%">
+                  <el-select
+                    v-model="disabilityInfo.disabilityLevel"
+                    :disabled="!isEditing"
+                    style="width: 100%"
+                  >
                     <el-option label="一级" value="一级" />
                     <el-option label="二级" value="二级" />
                     <el-option label="三级" value="三级" />
@@ -199,11 +215,20 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="持证状态">
-                  <el-select v-if="isEditing" v-model="disabilityInfo.certificateStatus" placeholder="请选择持证状态" style="width: 100%">
+                  <el-select
+                    v-if="isEditing"
+                    v-model="disabilityInfo.certificateStatus"
+                    placeholder="请选择持证状态"
+                    style="width: 100%"
+                  >
                     <el-option label="在持" value="在持" />
                     <el-option label="注销" value="注销" />
                   </el-select>
-                  <el-tag v-else :type="disabilityInfo.certificateStatus === '在持' ? 'success' : 'info'" size="medium">
+                  <el-tag
+                    v-else
+                    :type="disabilityInfo.certificateStatus === '在持' ? 'success' : 'info'"
+                    size="medium"
+                  >
                     {{ disabilityInfo.certificateStatus }}
                   </el-tag>
                 </el-form-item>
@@ -404,7 +429,7 @@ const resetQuery = () => {
   queryParams.disabilityType = ''
   queryParams.disabilityLevel = ''
   queryParams.pageNum = 1
-  
+
   // 清空列表数据
   disabledList.value = []
   total.value = 0

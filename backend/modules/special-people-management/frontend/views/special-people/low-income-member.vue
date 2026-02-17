@@ -1,7 +1,13 @@
 <template>
   <div class="app-container">
     <el-card>
-      <el-form ref="lowIncomeForm" :model="formData" label-width="100px" size="small" class="demo-form">
+      <el-form
+        ref="lowIncomeForm"
+        :model="formData"
+        label-width="100px"
+        size="small"
+        class="demo-form"
+      >
         <!-- 居民基本信息（只读，自动填充） -->
         <el-card class="section-card" style="margin-bottom: 10px; padding: 5px">
           <div slot="header" class="section-header">
@@ -98,11 +104,7 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="状态" prop="status">
-                <el-select
-                  v-model="formData.status"
-                  placeholder="请选择状态"
-                  size="small"
-                >
+                <el-select v-model="formData.status" placeholder="请选择状态" size="small">
                   <el-option label="在享" value="active" />
                   <el-option label="暂停" value="suspended" />
                   <el-option label="取消" value="cancelled" />
@@ -153,7 +155,12 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="补贴金额" prop="subsidyAmount">
-                <el-input v-model="formData.subsidyAmount" placeholder="请输入补贴金额" size="small" type="number" />
+                <el-input
+                  v-model="formData.subsidyAmount"
+                  placeholder="请输入补贴金额"
+                  size="small"
+                  type="number"
+                />
               </el-form-item>
             </el-col>
 
@@ -186,7 +193,12 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="账户关系" prop="accountRelationship">
-                <el-input v-model="formData.accountRelationship" placeholder="自动填充" size="small" readonly />
+                <el-input
+                  v-model="formData.accountRelationship"
+                  placeholder="自动填充"
+                  size="small"
+                  readonly
+                />
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -203,7 +215,13 @@
             </el-col>
             <el-col :span="18">
               <el-form-item label="备注" prop="remark">
-                <el-input v-model="formData.remark" placeholder="请输入备注" size="small" type="textarea" :rows="2" />
+                <el-input
+                  v-model="formData.remark"
+                  placeholder="请输入备注"
+                  size="small"
+                  type="textarea"
+                  :rows="2"
+                />
               </el-form-item>
             </el-col>
           </el-row>
@@ -222,12 +240,16 @@
             <el-table-column prop="createTime" label="创建时间" width="180" align="center" />
           </el-table>
           <div style="margin-top: 10px; text-align: right">
-            <el-button type="primary" size="small" icon="el-icon-plus" @click="handleAddRecord">添加记录</el-button>
+            <el-button type="primary" size="small" icon="el-icon-plus" @click="handleAddRecord"
+              >添加记录</el-button
+            >
           </div>
         </el-card>
 
         <div class="form-actions">
-          <el-button type="primary" size="small" :loading="loading" @click="handleSave">保存</el-button>
+          <el-button type="primary" size="small" :loading="loading" @click="handleSave"
+            >保存</el-button
+          >
           <el-button size="small" @click="handleCancel">取消</el-button>
         </div>
       </el-form>
@@ -408,7 +430,8 @@ export default {
             this.formData.bankAccount = matchedResident.bankCard || matchedResident.bank_card || ''
 
             // 自动填充账户关系
-            this.formData.accountRelationship = matchedResident.relationshipToHead || matchedResident.relationship_to_head || ''
+            this.formData.accountRelationship =
+              matchedResident.relationshipToHead || matchedResident.relationship_to_head || ''
           }
         } catch (error) {
           console.error('查询居民信息失败:', error)
@@ -419,7 +442,8 @@ export default {
 
     // 计算账户名称
     calculateAccountName() {
-      const relationship = this.residentInfo.relationshipToHead || this.residentInfo.relationship_to_head
+      const relationship =
+        this.residentInfo.relationshipToHead || this.residentInfo.relationship_to_head
       if (!relationship) return
 
       let accountName = ''

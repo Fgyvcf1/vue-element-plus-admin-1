@@ -1,6 +1,6 @@
-const sqlite3 = require('sqlite3').verbose();
+const sqlite3 = require('sqlite3').verbose()
 
-const db = new sqlite3.Database('app.db');
+const db = new sqlite3.Database('app.db')
 
 const sql = `CREATE TABLE IF NOT EXISTS event_reminders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,13 +13,13 @@ const sql = `CREATE TABLE IF NOT EXISTS event_reminders (
   status TEXT NOT NULL DEFAULT 'pending',
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-)`;
+)`
 
 db.run(sql, (err) => {
   if (err) {
-    console.error('创建表失败:', err.message);
-    process.exit(1);
+    console.error('创建表失败:', err.message)
+    process.exit(1)
   }
-  console.log('event_reminders 表创建成功');
-  db.close();
-});
+  console.log('event_reminders 表创建成功')
+  db.close()
+})

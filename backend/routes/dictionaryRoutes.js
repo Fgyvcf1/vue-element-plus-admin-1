@@ -1,339 +1,264 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../db'); // 使用新的MySQL数据库连接
+/**
+ * 字典管理模块 - API路由
+ * 适配 MariaDB 数据库
+ */
 
-// 管理员权限验证中间件
-const requireAdmin = (req, res, next) => {
-  // TODO: 根据实际的用户认证系统实现权限验证
-  next();
-};
+const express = require('express')
+const router = express.Router()
+const db = require('../db')
+const { checkPermission } = require('../middleware/auth')
 
-// 获取所有字典分类
-router.get('/categories', (req, res) => {
-  db.all(
-    `SELECT category, COUNT(*) as count 
-     FROM dictionaries 
-     GROUP BY category 
-     ORDER BY category`,
-    [],
-    (err, rows) => {
-      if (err) {
-        console.error('查询字典分类失败:', err.message);
-        return res.status(500).json({
-          code: 50000,
-          message: '查询字典分类失败',
-          error: err.message
-        });
-      }
+const isNoSuchTable = (err) => err && err.code === 'ER_NO_SUCH_TABLE'
 
-      res.json({
-        code: 20000,
-        data: rows.map(row => ({
-          category: row.category,
-          count: row.count
-        }))
-      });
+/**
+ * 根据分类获取字典数据（仅启用）
+ * GET /dictionary/category?category=xxx
+ */
+router.get('/category', async (req, res) => {
+  try {
+    const { category } = req.query
+    if (!category) {
+      return res.status(400).json({ code: 400, message: '分类参数不能为空' })
     }
-  );
-});
 
-// 根据ID获取字典项 - 必须放在 / 路由之前
-router.get('/:id', (req, res) => {
-  const { id } = req.params;
-
-  // 排除特殊路由
-  if (id === 'categories') {
-    return res.status(404).json({
-      code: 40400,
-      message: '路由不存在'
-    });
+    const sql =
+      "SELECT id, category, value, display_order, status, created_at, updated_at FROM dictionaries WHERE category = ? AND status = 'active' ORDER BY display_order ASC, id ASC"
+    const [rows] = await db.pool.execute(sql, [category])
+    const formatted = rows.map((r) => ({ ...r, label: r.value }))
+    res.json({ code: 20000, message: 'success', data: formatted })
+  } catch (error) {
+    console.error('获取字典数据失败:', error)
+    if (isNoSuchTable(error)) {
+      return res.json({ code: 20000, message: '字典表不存在，返回空数据', data: [] })
+    }
+    res.status(500).json({ code: 50000, message: '获取字典数据失败: ' + error.message })
   }
+})
 
-  db.get('SELECT * FROM dictionaries WHERE id = ?', [id], (err, row) => {
-    if (err) {
-      console.error('查询字典项失败:', err.message);
-      return res.status(500).json({
-        code: 50000,
-        message: '查询字典项失败',
-        error: err.message
-      });
+/**
+ * 获取所有字典分类
+ * GET /dictionary/categories?withCount=1
+ */
+router.get('/categories', async (req, res) => {
+  try {
+    const withCount = String(req.query.withCount || '') === '1'
+    if (withCount) {
+      const [rows] = await db.pool.execute(
+        'SELECT category, COUNT(*) as count FROM dictionaries GROUP BY category ORDER BY category ASC'
+      )
+      return res.json({ code: 20000, message: 'success', data: rows })
     }
 
-    if (!row) {
-      return res.status(404).json({
-        code: 40400,
-        message: '字典项不存在'
-      });
-    }
-
+    const [rows] = await db.pool.execute(
+      'SELECT DISTINCT category FROM dictionaries ORDER BY category ASC'
+    )
     res.json({
       code: 20000,
-      data: row
-    });
-  });
-});
-
-// 获取字典项列表
-router.get('/', (req, res) => {
-  const { category, include_all } = req.query;
-
-  let whereClause = 'WHERE 1=1';
-  const params = [];
-
-  if (category) {
-    whereClause += ' AND category = ?';
-    params.push(category);
+      message: 'success',
+      data: rows.map((row) => row.category)
+    })
+  } catch (error) {
+    console.error('获取字典分类失败:', error)
+    if (isNoSuchTable(error)) {
+      return res.json({ code: 20000, message: '字典表不存在，返回空数据', data: [] })
+    }
+    res.status(500).json({ code: 50000, message: '获取字典分类失败: ' + error.message })
   }
+})
 
-  // 默认只返回 active 状态的字典项，include_all=1 时返回所有
-  if (include_all !== '1') {
-    whereClause += " AND status = 'active'";
+/**
+ * 获取字典项列表
+ * GET /dictionary?category=xxx&include_all=1
+ */
+router.get('/', async (req, res) => {
+  try {
+    const { category, include_all } = req.query
+    if (!category) {
+      return res.status(400).json({ code: 400, message: '分类参数不能为空' })
+    }
+
+    const includeAll = String(include_all || '') === '1'
+    let sql =
+      'SELECT id, category, value, display_order, status, created_at, updated_at FROM dictionaries WHERE category = ?'
+    const params = [category]
+    if (!includeAll) {
+      sql += " AND status = 'active'"
+    }
+    sql += ' ORDER BY display_order ASC, id ASC'
+
+    const [rows] = await db.pool.execute(sql, params)
+    res.json({ code: 20000, message: 'success', data: rows })
+  } catch (error) {
+    console.error('获取字典项失败:', error)
+    if (isNoSuchTable(error)) {
+      return res.json({ code: 20000, message: '字典表不存在，返回空数据', data: [] })
+    }
+    res.status(500).json({ code: 50000, message: '获取字典项失败: ' + error.message })
   }
+})
 
-  db.all(
-    `SELECT * FROM dictionaries ${whereClause} ORDER BY category, display_order, id`,
-    params,
-    (err, rows) => {
-      if (err) {
-        console.error('查询字典项失败:', err.message);
-        return res.status(500).json({
-          code: 50000,
-          message: '查询字典项失败',
-          error: err.message
-        });
-      }
-
-      res.json({
-        code: 20000,
-        data: rows
-      });
+/**
+ * 获取单个字典项
+ * GET /dictionary/:id
+ */
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const [rows] = await db.pool.execute(
+      'SELECT id, category, value, display_order, status, created_at, updated_at FROM dictionaries WHERE id = ?',
+      [id]
+    )
+    if (rows.length === 0) {
+      return res.status(404).json({ code: 40400, message: '字典项不存在' })
     }
-  );
-});
-
-// 新增字典项
-router.post('/', requireAdmin, (req, res) => {
-  const { category, value, display_order = 0 } = req.body;
-
-  if (!category || !value) {
-    return res.status(400).json({
-      code: 40000,
-      message: '分类和字典值不能为空'
-    });
+    res.json({ code: 20000, data: rows[0] })
+  } catch (error) {
+    console.error('获取字典项失败:', error)
+    if (isNoSuchTable(error)) {
+      return res.status(404).json({ code: 40400, message: '字典表不存在' })
+    }
+    res.status(500).json({ code: 50000, message: '获取字典项失败: ' + error.message })
   }
+})
 
-  // 检查同分类下是否已存在相同的值
-  db.get(
-    'SELECT id FROM dictionaries WHERE category = ? AND value = ?',
-    [category, value],
-    (err, row) => {
-      if (err) {
-        console.error('检查字典项失败:', err.message);
-        return res.status(500).json({
-          code: 50000,
-          message: '检查字典项失败',
-          error: err.message
-        });
-      }
-
-      if (row) {
-        return res.status(400).json({
-          code: 40000,
-          message: '该分类下已存在相同的字典值'
-        });
-      }
-
-      // 插入新字典项
-      db.run(
-        `INSERT INTO dictionaries (category, value, display_order, status, created_at, updated_at) 
-         VALUES (?, ?, ?, 'active', NOW(), NOW())`,
-        [category, value, display_order],
-        function(err) {
-          if (err) {
-            console.error('创建字典项失败:', err.message);
-            return res.status(500).json({
-              code: 50000,
-              message: '创建字典项失败',
-              error: err.message
-            });
-          }
-
-          res.json({
-            code: 20000,
-            message: '字典项创建成功',
-            data: { id: this.lastID }
-          });
-        }
-      );
-    }
-  );
-});
-
-// 修改字典项
-router.put('/:id', requireAdmin, (req, res) => {
-  const { id } = req.params;
-  const { value, display_order } = req.body;
-
-  // 先获取原字典项信息
-  db.get('SELECT * FROM dictionaries WHERE id = ?', [id], (err, row) => {
-    if (err) {
-      console.error('查询字典项失败:', err.message);
-      return res.status(500).json({
-        code: 50000,
-        message: '查询字典项失败',
-        error: err.message
-      });
+/**
+ * 新增字典项
+ * POST /dictionary
+ */
+router.post('/', checkPermission('system:role'), async (req, res) => {
+  try {
+    const { category, value, display_order, status } = req.body
+    if (!category || !value) {
+      return res.status(400).json({ code: 40000, message: '分类和字典值不能为空' })
     }
 
-    if (!row) {
-      return res.status(404).json({
-        code: 40400,
-        message: '字典项不存在'
-      });
+    let order = display_order
+    if (order === undefined || order === null) {
+      const [rows] = await db.pool.execute(
+        'SELECT MAX(display_order) as max_order FROM dictionaries WHERE category = ?',
+        [category]
+      )
+      order = (rows[0]?.max_order || 0) + 1
     }
 
-    // 如果修改了值，检查同分类下是否已存在相同的值
-    if (value && value !== row.value) {
-      db.get(
-        'SELECT id FROM dictionaries WHERE category = ? AND value = ? AND id != ?',
-        [row.category, value, id],
-        (err, existing) => {
-          if (err) {
-            console.error('检查字典项失败:', err.message);
-            return res.status(500).json({
-              code: 50000,
-              message: '检查字典项失败',
-              error: err.message
-            });
-          }
+    const itemStatus = status || 'active'
+    const [result] = await db.pool.execute(
+      `INSERT INTO dictionaries (category, value, display_order, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, NOW(), NOW())`,
+      [category, value, order, itemStatus]
+    )
 
-          if (existing) {
-            return res.status(400).json({
-              code: 40000,
-              message: '该分类下已存在相同的字典值'
-            });
-          }
-
-          doUpdate();
-        }
-      );
-    } else {
-      doUpdate();
+    res.json({ code: 20000, message: '字典项创建成功', data: { id: result.insertId } })
+  } catch (error) {
+    console.error('创建字典项失败:', error)
+    if (isNoSuchTable(error)) {
+      return res.status(500).json({ code: 50000, message: '字典表不存在' })
     }
-
-    function doUpdate() {
-      const updates = [];
-      const params = [];
-
-      if (value !== undefined) {
-        updates.push('value = ?');
-        params.push(value);
-      }
-
-      if (display_order !== undefined) {
-        updates.push('display_order = ?');
-        params.push(display_order);
-      }
-
-      if (updates.length === 0) {
-        return res.status(400).json({
-          code: 40000,
-          message: '没有需要更新的字段'
-        });
-      }
-
-      updates.push('updated_at = NOW()');
-      params.push(id);
-
-      db.run(
-        `UPDATE dictionaries SET ${updates.join(', ')} WHERE id = ?`,
-        params,
-        function(err) {
-          if (err) {
-            console.error('更新字典项失败:', err.message);
-            return res.status(500).json({
-              code: 50000,
-              message: '更新字典项失败',
-              error: err.message
-            });
-          }
-
-          res.json({
-            code: 20000,
-            message: '字典项更新成功'
-          });
-        }
-      );
-    }
-  });
-});
-
-// 切换字典项状态（启用/停用）
-router.put('/:id/status', requireAdmin, (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-
-  if (!status || !['active', 'inactive'].includes(status)) {
-    return res.status(400).json({
-      code: 40000,
-      message: '状态值必须是 active 或 inactive'
-    });
+    res.status(500).json({ code: 50000, message: '创建字典项失败: ' + error.message })
   }
+})
 
-  db.run(
-    'UPDATE dictionaries SET status = ?, updated_at = NOW() WHERE id = ?',
-    [status, id],
-    function(err) {
-      if (err) {
-        console.error('更新状态失败:', err.message);
-        return res.status(500).json({
-          code: 50000,
-          message: '更新状态失败',
-          error: err.message
-        });
-      }
+/**
+ * 更新字典项
+ * PUT /dictionary/:id
+ */
+router.put('/:id', checkPermission('system:role'), async (req, res) => {
+  try {
+    const { id } = req.params
+    const { category, value, display_order } = req.body
 
-      if (this.changes === 0) {
-        return res.status(404).json({
-          code: 40400,
-          message: '字典项不存在'
-        });
-      }
-
-      res.json({
-        code: 20000,
-        message: status === 'active' ? '字典项已启用' : '字典项已停用'
-      });
+    const updates = []
+    const params = []
+    if (category !== undefined) {
+      updates.push('category = ?')
+      params.push(category)
     }
-  );
-});
+    if (value !== undefined) {
+      updates.push('value = ?')
+      params.push(value)
+    }
+    if (display_order !== undefined) {
+      updates.push('display_order = ?')
+      params.push(display_order)
+    }
+    updates.push('updated_at = NOW()')
 
-// 删除字典项
-router.delete('/:id', requireAdmin, (req, res) => {
-  const { id } = req.params;
-
-  db.run('DELETE FROM dictionaries WHERE id = ?', [id], function(err) {
-    if (err) {
-      console.error('删除字典项失败:', err.message);
-      return res.status(500).json({
-        code: 50000,
-        message: '删除字典项失败',
-        error: err.message
-      });
+    if (updates.length === 1) {
+      return res.status(400).json({ code: 40000, message: '没有可更新的字段' })
     }
 
-    if (this.changes === 0) {
-      return res.status(404).json({
-        code: 40400,
-        message: '字典项不存在'
-      });
+    params.push(id)
+    const [result] = await db.pool.execute(
+      `UPDATE dictionaries SET ${updates.join(', ')} WHERE id = ?`,
+      params
+    )
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ code: 40400, message: '字典项不存在' })
+    }
+    res.json({ code: 20000, message: '字典项更新成功' })
+  } catch (error) {
+    console.error('更新字典项失败:', error)
+    if (isNoSuchTable(error)) {
+      return res.status(500).json({ code: 50000, message: '字典表不存在' })
+    }
+    res.status(500).json({ code: 50000, message: '更新字典项失败: ' + error.message })
+  }
+})
+
+/**
+ * 更新字典项状态
+ * PUT /dictionary/:id/status
+ */
+router.put('/:id/status', checkPermission('system:role'), async (req, res) => {
+  try {
+    const { id } = req.params
+    const { status } = req.body
+
+    if (!status || !['active', 'inactive'].includes(status)) {
+      return res.status(400).json({ code: 40000, message: '状态值不正确' })
     }
 
-    res.json({
-      code: 20000,
-      message: '字典项删除成功'
-    });
-  });
-});
+    const [result] = await db.pool.execute(
+      'UPDATE dictionaries SET status = ?, updated_at = NOW() WHERE id = ?',
+      [status, id]
+    )
 
-module.exports = router;
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ code: 40400, message: '字典项不存在' })
+    }
+
+    res.json({ code: 20000, message: '状态更新成功' })
+  } catch (error) {
+    console.error('更新字典项状态失败:', error)
+    if (isNoSuchTable(error)) {
+      return res.status(500).json({ code: 50000, message: '字典表不存在' })
+    }
+    res.status(500).json({ code: 50000, message: '更新字典项状态失败: ' + error.message })
+  }
+})
+
+/**
+ * 删除字典项
+ * DELETE /dictionary/:id
+ */
+router.delete('/:id', checkPermission('system:role'), async (req, res) => {
+  try {
+    const { id } = req.params
+    const [result] = await db.pool.execute('DELETE FROM dictionaries WHERE id = ?', [id])
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ code: 40400, message: '字典项不存在' })
+    }
+
+    res.json({ code: 20000, message: '字典项删除成功' })
+  } catch (error) {
+    console.error('删除字典项失败:', error)
+    if (isNoSuchTable(error)) {
+      return res.status(500).json({ code: 50000, message: '字典表不存在' })
+    }
+    res.status(500).json({ code: 50000, message: '删除字典项失败: ' + error.message })
+  }
+})
+
+module.exports = router

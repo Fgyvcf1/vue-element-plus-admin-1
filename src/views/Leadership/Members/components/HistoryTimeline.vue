@@ -33,7 +33,9 @@
           <template #default="{ row }">{{ row.term_end_date || '至今' }}</template>
         </el-table-column>
         <el-table-column label="任职时长" width="100" align="center">
-          <template #default="{ row }">{{ calculateServiceTime(row.term_start_date, row.term_end_date) }}</template>
+          <template #default="{ row }">{{
+            calculateServiceTime(row.term_start_date, row.term_end_date)
+          }}</template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="80" align="center">
           <template #default="{ row }">
@@ -42,7 +44,13 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="remarks" label="备注" min-width="140" align="center" show-overflow-tooltip />
+        <el-table-column
+          prop="remarks"
+          label="备注"
+          min-width="140"
+          align="center"
+          show-overflow-tooltip
+        />
       </el-table>
     </el-card>
   </div>
@@ -70,7 +78,9 @@ const sortedHistoryList = computed(() => {
   return list.sort((a, b) => {
     if (a.status === 'current' && b.status !== 'current') return -1
     if (a.status !== 'current' && b.status === 'current') return 1
-    return new Date(String(b.term_start_date)).getTime() - new Date(String(a.term_start_date)).getTime()
+    return (
+      new Date(String(b.term_start_date)).getTime() - new Date(String(a.term_start_date)).getTime()
+    )
   })
 })
 
@@ -90,7 +100,9 @@ const calculateStats = () => {
   const mergedIntervals = mergeOverlappingIntervals(intervals)
   let totalDays = 0
   for (const interval of mergedIntervals) {
-    const diffDays = Math.ceil((interval.end.getTime() - interval.start.getTime()) / (1000 * 60 * 60 * 24))
+    const diffDays = Math.ceil(
+      (interval.end.getTime() - interval.start.getTime()) / (1000 * 60 * 60 * 24)
+    )
     if (diffDays >= 182.5) {
       totalDays += diffDays
     }

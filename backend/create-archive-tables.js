@@ -1,7 +1,7 @@
 // 创建人民调解档案管理系统的数据库表
-const db = require('./db.js');
+const db = require('./db.js')
 
-console.log('=== 创建人民调解档案管理系统表结构 ===\n');
+console.log('=== 创建人民调解档案管理系统表结构 ===\n')
 
 // 创建档案主表
 const createArchivesTable = `
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS mediation_archives (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-`;
+`
 
 // 创建调解申请书表
 const createApplicationsTable = `
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS mediation_applications (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (archive_id) REFERENCES mediation_archives(archive_id) ON DELETE CASCADE
 );
-`;
+`
 
 // 创建申请人表
 const createApplicantsTable = `
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS mediation_applicants (
   FOREIGN KEY (archive_id) REFERENCES mediation_archives(archive_id) ON DELETE CASCADE,
   FOREIGN KEY (resident_id) REFERENCES residents(id) ON DELETE SET NULL
 );
-`;
+`
 
 // 创建被申请人表
 const createRespondentsTable = `
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS mediation_respondents (
   FOREIGN KEY (archive_id) REFERENCES mediation_archives(archive_id) ON DELETE CASCADE,
   FOREIGN KEY (resident_id) REFERENCES residents(id) ON DELETE SET NULL
 );
-`;
+`
 
 // 创建调解记录表
 const createRecordsTable = `
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS mediation_records (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (archive_id) REFERENCES mediation_archives(archive_id) ON DELETE CASCADE
 );
-`;
+`
 
 // 创建调解协议书表
 const createAgreementsTable = `
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS mediation_agreements (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (archive_id) REFERENCES mediation_archives(archive_id) ON DELETE CASCADE
 );
-`;
+`
 
 // 创建档案编号序号表
 const createSequencesTable = `
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS archive_sequences (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-`;
+`
 
 // 创建附件表
 const createAttachmentsTable = `
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS archive_attachments (
   FOREIGN KEY (archive_id) REFERENCES mediation_archives(archive_id) ON DELETE CASCADE,
   FOREIGN KEY (record_id) REFERENCES mediation_records(id) ON DELETE CASCADE
 );
-`;
+`
 
 // 初始化默认档案编号前缀
 const initPrefixes = `
@@ -139,7 +139,7 @@ INSERT INTO archive_sequences (prefix, current_number) VALUES
   ('二组', 0),
   ('三组', 0)
 ON CONFLICT(prefix) DO UPDATE SET current_number = 0;
-`;
+`
 
 // 创建索引
 const createIndexes = `
@@ -153,7 +153,7 @@ CREATE INDEX IF NOT EXISTS idx_records_archive_id ON mediation_records(archive_i
 CREATE INDEX IF NOT EXISTS idx_agreements_archive_id ON mediation_agreements(archive_id);
 CREATE INDEX IF NOT EXISTS idx_attachments_archive_id ON archive_attachments(archive_id);
 CREATE INDEX IF NOT EXISTS idx_attachments_record_id ON archive_attachments(record_id);
-`;
+`
 
 const tables = [
   { sql: createArchivesTable, name: '档案主表 (mediation_archives)' },
@@ -164,52 +164,48 @@ const tables = [
   { sql: createRecordsTable, name: '调解记录表 (mediation_records)' },
   { sql: createAgreementsTable, name: '调解协议书表 (mediation_agreements)' },
   { sql: createAttachmentsTable, name: '附件表 (archive_attachments)' }
-];
+]
 
-const initData = [
-  { sql: initPrefixes, name: '初始化默认前缀数据' }
-];
+const initData = [{ sql: initPrefixes, name: '初始化默认前缀数据' }]
 
-const createIndexData = [
-  { sql: createIndexes, name: '创建索引' }
-];
+const createIndexData = [{ sql: createIndexes, name: '创建索引' }]
 
-let completed = 0;
-const total = tables.length + initData.length + createIndexData.length;
+let completed = 0
+const total = tables.length + initData.length + createIndexData.length
 
 const executeSql = (sql, name) => {
   db.run(sql, (err) => {
-    completed++;
+    completed++
     if (err) {
-      console.log(`❌ ${name}: ${err.message}`);
+      console.log(`❌ ${name}: ${err.message}`)
     } else {
-      console.log(`✅ ${name}: 成功`);
+      console.log(`✅ ${name}: 成功`)
     }
-    
-    if (completed === total) {
-      console.log('\n=== 所有表创建完成 ===');
-      db.close();
-    }
-  });
-};
 
-console.log('准备创建以下表:');
-tables.forEach(t => console.log(`  - ${t.name}`));
-console.log('准备初始化数据:');
-initData.forEach(t => console.log(`  - ${t.name}`));
-console.log('准备创建索引:');
-createIndexData.forEach(t => console.log(`  - ${t.name}`));
-console.log('');
+    if (completed === total) {
+      console.log('\n=== 所有表创建完成 ===')
+      db.close()
+    }
+  })
+}
+
+console.log('准备创建以下表:')
+tables.forEach((t) => console.log(`  - ${t.name}`))
+console.log('准备初始化数据:')
+initData.forEach((t) => console.log(`  - ${t.name}`))
+console.log('准备创建索引:')
+createIndexData.forEach((t) => console.log(`  - ${t.name}`))
+console.log('')
 
 // 先创建所有表
-tables.forEach(table => executeSql(table.sql, table.name));
+tables.forEach((table) => executeSql(table.sql, table.name))
 
 // 等待表创建完成后再初始化数据
 setTimeout(() => {
-  initData.forEach(data => executeSql(data.sql, data.name));
-}, 500);
+  initData.forEach((data) => executeSql(data.sql, data.name))
+}, 500)
 
 // 再等待数据初始化完成后创建索引
 setTimeout(() => {
-  createIndexData.forEach(index => executeSql(index.sql, index.name));
-}, 1000);
+  createIndexData.forEach((index) => executeSql(index.sql, index.name))
+}, 1000)

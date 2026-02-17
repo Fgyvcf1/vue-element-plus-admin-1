@@ -1,15 +1,15 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const sqlite3 = require('sqlite3').verbose()
+const path = require('path')
 
 // 连接到SQLite数据库
-const dbPath = path.join(__dirname, 'app.db');
+const dbPath = path.join(__dirname, 'app.db')
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('连接数据库失败:', err.message);
-    process.exit(1);
+    console.error('连接数据库失败:', err.message)
+    process.exit(1)
   }
-  console.log('成功连接到SQLite数据库\n');
-});
+  console.log('成功连接到SQLite数据库\n')
+})
 
 // 全局索引定义
 const indexes = [
@@ -188,71 +188,79 @@ const indexes = [
     column: 'term_start_date',
     desc: '任期开始索引 - 用于按任期查询和排序'
   }
-];
+]
 
 // 创建所有索引
-let createdCount = 0;
-let skippedCount = 0;
-let errorCount = 0;
+let createdCount = 0
+let skippedCount = 0
+let errorCount = 0
 
-console.log('========== 开始创建全局索引 ==========\n');
+console.log('========== 开始创建全局索引 ==========\n')
 
 indexes.forEach((index, indexNum) => {
   // 检查表是否存在
-  db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='${index.table}';`, (err, row) => {
-    if (err) {
-      console.error(`[错误] 检查表 ${index.table} 失败:`, err.message);
-      errorCount++;
-      return;
-    }
-
-    if (!row) {
-      console.log(`[跳过] 表 ${index.table} 不存在，跳过索引创建`);
-      skippedCount++;
-      return;
-    }
-
-    // 创建索引
-    const createIndexSql = `CREATE INDEX IF NOT EXISTS ${index.name} ON ${index.table}(${index.column});`;
-
-    db.run(createIndexSql, (err) => {
+  db.get(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='${index.table}';`,
+    (err, row) => {
       if (err) {
-        console.error(`[错误] 创建索引失败 ${index.name}:`, err.message);
-        errorCount++;
-      } else {
-        createdCount++;
-        console.log(`[${createdCount + skippedCount + errorCount}/${indexes.length}] ✓ ${index.desc}`);
+        console.error(`[错误] 检查表 ${index.table} 失败:`, err.message)
+        errorCount++
+        return
       }
 
-      // 检查是否所有索引都处理完成
-      if (createdCount + skippedCount + errorCount === indexes.length) {
-        printSummary();
+      if (!row) {
+        console.log(`[跳过] 表 ${index.table} 不存在，跳过索引创建`)
+        skippedCount++
+        return
       }
-    });
-  });
-});
+
+      // 创建索引
+      const createIndexSql = `CREATE INDEX IF NOT EXISTS ${index.name} ON ${index.table}(${index.column});`
+
+      db.run(createIndexSql, (err) => {
+        if (err) {
+          console.error(`[错误] 创建索引失败 ${index.name}:`, err.message)
+          errorCount++
+        } else {
+          createdCount++
+          console.log(
+            `[${createdCount + skippedCount + errorCount}/${indexes.length}] ✓ ${index.desc}`
+          )
+        }
+
+        // 检查是否所有索引都处理完成
+        if (createdCount + skippedCount + errorCount === indexes.length) {
+          printSummary()
+        }
+      })
+    }
+  )
+})
 
 // 打印汇总信息
 function printSummary() {
-  console.log('\n========== 索引创建完成 ==========');
-  console.log(`总计: ${indexes.length} 个索引`);
-  console.log(`成功: ${createdCount} 个`);
-  console.log(`跳过: ${skippedCount} 个 (表不存在)`);
-  console.log(`失败: ${errorCount} 个`);
+  console.log('\n========== 索引创建完成 ==========')
+  console.log(`总计: ${indexes.length} 个索引`)
+  console.log(`成功: ${createdCount} 个`)
+  console.log(`跳过: ${skippedCount} 个 (表不存在)`)
+  console.log(`失败: ${errorCount} 个`)
 
   // 查询所有索引
-  db.all("SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%';", (err, indexes) => {
-    if (err) {
-      console.error('\n查询索引列表失败:', err.message);
-    } else {
-      console.log(`\n当前数据库中存在的所有索引: ${indexes.length} 个`);
-      indexes.forEach(idx => {
-        console.log(`  - ${idx.name}`);
-      });
-    }
+  db.all(
+    "SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%';",
+    (err, indexes) => {
+      if (err) {
+        console.error('\n查询索引列表失败:', err.message)
+      } else {
+        console.log(`\n当前数据库中存在的所有索引: ${indexes.length} 个`)
+        indexes.forEach((idx) => {
+          console.log(`  - ${idx.name}`)
+        })
+      }
 
-    db.close(() => {
-      console.log('\n数据库连接已关闭');
-    });
-  });
+      db.close(() => {
+        console.log('\n数据库连接已关闭')
+      })
+    }
+  )
 }

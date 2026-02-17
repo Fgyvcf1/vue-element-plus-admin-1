@@ -102,6 +102,19 @@ export const generateRoutesByServer = (routes: AppCustomRouteRecordRaw[]): AppRo
       redirect: route.redirect,
       meta: route.meta
     }
+
+    // @/views/Authorization/Menu.vue
+    if (
+      (route.path === 'menu' && route.component === 'Authorization/Menu') ||
+      route.name === 'AuthorizationMenu'
+    ) {
+      if (!data.meta) {
+        data.meta = {}
+      }
+      data.meta.affix = true
+      console.log('Fixed affix for authorization menu:', data)
+    }
+
     if (route.component) {
       const comModule = modules[`../${route.component}.vue`] || modules[`../${route.component}.tsx`]
       const component = route.component as string

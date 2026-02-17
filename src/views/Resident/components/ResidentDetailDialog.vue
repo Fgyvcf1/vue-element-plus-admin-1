@@ -14,11 +14,34 @@
       <div class="dialog-header">
         <span class="dialog-title">{{ title }}</span>
         <div class="dialog-header-buttons">
-          <el-button :style="{ visibility: !isAddingNew && !isEditable ? 'visible' : 'hidden' }" type="primary" size="small" :loading="loading" @click="handleEdit">修改</el-button>
-          <el-button :style="{ visibility: !isAddingNew ? 'visible' : 'hidden' }" type="primary" size="small" :loading="loading" @click="handleSameHouseholdAdd">同户新增</el-button>
-          <el-button type="success" size="small" :loading="loading" @click="handleSave">保存</el-button>
+          <el-button
+            v-if="canEditResident"
+            :style="{ visibility: !isAddingNew && !isEditable ? 'visible' : 'hidden' }"
+            type="primary"
+            size="small"
+            :loading="loading"
+            @click="handleEdit"
+            >修改</el-button
+          >
+          <el-button
+            v-if="canAddResident"
+            :style="{ visibility: !isAddingNew ? 'visible' : 'hidden' }"
+            type="primary"
+            size="small"
+            :loading="loading"
+            @click="handleSameHouseholdAdd"
+            >同户新增</el-button
+          >
+          <el-button
+            v-if="(isAddingNew && canAddResident) || (isEditable && canEditResident)"
+            type="success"
+            size="small"
+            :loading="loading"
+            @click="handleSave"
+            >保存</el-button
+          >
           <el-dropdown
-            v-if="!isAddingNew && isCurrentUserHead"
+            v-if="canEditResident && !isAddingNew && isCurrentUserHead"
             trigger="click"
             :teleported="true"
             popper-class="header-dropdown-popper"
@@ -35,7 +58,7 @@
             </template>
           </el-dropdown>
           <el-dropdown
-            v-if="!isAddingNew && !isCurrentUserHead"
+            v-if="canEditResident && !isAddingNew && !isCurrentUserHead"
             trigger="click"
             :teleported="true"
             popper-class="header-dropdown-popper"
@@ -51,7 +74,14 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <el-button :style="{ visibility: isEditable ? 'visible' : 'hidden' }" type="info" size="small" @click="cancelEdit">取消</el-button>
+          <el-button
+            v-if="canEditResident"
+            :style="{ visibility: isEditable ? 'visible' : 'hidden' }"
+            type="info"
+            size="small"
+            @click="cancelEdit"
+            >取消</el-button
+          >
         </div>
       </div>
     </template>
@@ -67,13 +97,17 @@
         <el-row :gutter="12">
           <el-col :span="8">
             <el-form-item label="户主姓名">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ householdForm.householdHeadName }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                householdForm.householdHeadName
+              }}</div>
               <el-input v-else v-model="householdForm.householdHeadName" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="性别">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ householdForm.gender }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                householdForm.gender
+              }}</div>
               <el-select v-else v-model="householdForm.gender" placeholder="请选择性别">
                 <el-option label="男" value="男" />
                 <el-option label="女" value="女" />
@@ -82,51 +116,89 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="电话号码">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ householdForm.phoneNumber }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                householdForm.phoneNumber
+              }}</div>
               <el-input v-else v-model="householdForm.phoneNumber" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="民族">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ householdForm.ethnicity }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                householdForm.ethnicity
+              }}</div>
               <el-select v-else v-model="householdForm.ethnicity" placeholder="请选择民族">
-                <el-option v-for="option in ethnicityOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in ethnicityOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="身份证号码">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ householdForm.householdHeadIdCard }}</div>
-              <el-input v-else v-model="householdForm.householdHeadIdCard" @change="handleHouseholdIdCardChange" />
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                householdForm.householdHeadIdCard
+              }}</div>
+              <el-input
+                v-else
+                v-model="householdForm.householdHeadIdCard"
+                @change="handleHouseholdIdCardChange"
+              />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="户口类型">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ householdForm.householdType }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                householdForm.householdType
+              }}</div>
               <el-select v-else v-model="householdForm.householdType" placeholder="请选择户口类型">
-                <el-option v-for="option in householdTypeOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in householdTypeOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="住房类型">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ householdForm.housingType }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                householdForm.housingType
+              }}</div>
               <el-select v-else v-model="householdForm.housingType" placeholder="请选择住房类型">
-                <el-option v-for="option in housingTypeOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in housingTypeOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="村组">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ householdForm.villageGroup }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                householdForm.villageGroup
+              }}</div>
               <el-select v-else v-model="householdForm.villageGroup" placeholder="请选择村组">
-                <el-option v-for="option in villageGroupOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in villageGroupOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="16">
             <el-form-item label="家庭地址">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ householdForm.address }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                householdForm.address
+              }}</div>
               <el-input v-else v-model="householdForm.address" />
             </el-form-item>
           </el-col>
@@ -145,20 +217,31 @@
         <el-row :gutter="12">
           <el-col :span="8">
             <el-form-item label="居民姓名">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.name }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.name
+              }}</div>
               <el-input v-else v-model="residentForm.name" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="身份证号">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.idCard }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.idCard
+              }}</div>
               <el-input v-else v-model="residentForm.idCard" @change="handleIdCardChange" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="性别">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.gender }}</div>
-              <el-select v-else v-model="residentForm.gender" placeholder="请选择性别" @change="handleGenderChange">
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.gender
+              }}</div>
+              <el-select
+                v-else
+                v-model="residentForm.gender"
+                placeholder="请选择性别"
+                @change="handleGenderChange"
+              >
                 <el-option label="男" value="男" />
                 <el-option label="女" value="女" />
               </el-select>
@@ -166,8 +249,14 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="与户主关系">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.relationshipToHead }}</div>
-              <el-select v-else v-model="residentForm.relationshipToHead" placeholder="请选择与户主关系">
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.relationshipToHead
+              }}</div>
+              <el-select
+                v-else
+                v-model="residentForm.relationshipToHead"
+                placeholder="请选择与户主关系"
+              >
                 <el-option
                   v-for="option in relationshipOptions"
                   :key="option.id"
@@ -179,15 +268,24 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="民族">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.ethnicity }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.ethnicity
+              }}</div>
               <el-select v-else v-model="residentForm.ethnicity" placeholder="请选择民族">
-                <el-option v-for="option in ethnicityOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in ethnicityOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="出生日期">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.dateOfBirth }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.dateOfBirth
+              }}</div>
               <el-date-picker
                 v-else
                 v-model="residentForm.dateOfBirth"
@@ -207,77 +305,122 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="婚姻状况">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.maritalStatus }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.maritalStatus
+              }}</div>
               <el-select v-else v-model="residentForm.maritalStatus" placeholder="请选择婚姻状况">
-                <el-option v-for="option in maritalStatusOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in maritalStatusOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="兵役状况">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.militaryService }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.militaryService
+              }}</div>
               <el-select v-else v-model="residentForm.militaryService" placeholder="请选择兵役状况">
-                <el-option v-for="option in militaryServiceOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in militaryServiceOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="政治面貌">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.politicalStatus }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.politicalStatus
+              }}</div>
               <el-select v-else v-model="residentForm.politicalStatus" placeholder="请选择政治面貌">
-                <el-option v-for="option in politicalStatusOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in politicalStatusOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="文化程度">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.educationLevel }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.educationLevel
+              }}</div>
               <el-select v-else v-model="residentForm.educationLevel" placeholder="请选择文化程度">
-                <el-option v-for="option in educationLevelOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in educationLevelOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="村组">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.villageGroup }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.villageGroup
+              }}</div>
               <el-select v-else v-model="residentForm.villageGroup" placeholder="请选择村组">
-                <el-option v-for="option in villageGroupOptions" :key="option.id" :label="option.value" :value="option.value" />
+                <el-option
+                  v-for="option in villageGroupOptions"
+                  :key="option.id"
+                  :label="option.value"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="16">
             <el-form-item label="家庭地址">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.address }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.address
+              }}</div>
               <el-input v-else v-model="residentForm.address" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="联系电话">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.phoneNumber }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.phoneNumber
+              }}</div>
               <el-input v-else v-model="residentForm.phoneNumber" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="银行帐号">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.bankCard }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.bankCard
+              }}</div>
               <el-input v-else v-model="residentForm.bankCard" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="开户行">
-              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.bankName }}</div>
+              <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                residentForm.bankName
+              }}</div>
               <el-input v-else v-model="residentForm.bankName" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <div style="display: flex; flex-direction: row; gap: 20px; align-items: center;">
-              <div style="flex: 1;">
+            <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
+              <div style="flex: 1">
                 <el-form-item label="股权">
-                  <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{ residentForm.equityShares }}</div>
+                  <div v-if="!isEditable && !isAddingNew" class="readonly-text">{{
+                    residentForm.equityShares
+                  }}</div>
                   <el-input v-else v-model="residentForm.equityShares" />
                 </el-form-item>
               </div>
-              <div style="flex: 1;">
+              <div style="flex: 1">
                 <el-form-item label="当前状态">
                   <el-tag :type="statusType" size="small">
                     {{ statusText }}
@@ -302,7 +445,7 @@
         <el-form-item label="当前户主">
           <span class="readonly-text">{{ householdForm.householdHeadName }}</span>
         </el-form-item>
-        
+
         <!-- 选择更换类型 -->
         <el-form-item label="更换类型">
           <el-radio-group v-model="changeHeadType">
@@ -310,7 +453,7 @@
             <el-radio label="other">跨户迁移</el-radio>
           </el-radio-group>
         </el-form-item>
-        
+
         <!-- 同户更换：选择新户主 -->
         <template v-if="changeHeadType === 'same'">
           <el-form-item v-if="isCurrentUserHead" label="新户主" required>
@@ -327,7 +470,7 @@
             <span class="readonly-text">{{ residentForm.name }} (将自己设为户主)</span>
           </el-form-item>
         </template>
-        
+
         <!-- 跨户迁移：搜索并选择目标家庭 -->
         <template v-if="changeHeadType === 'other'">
           <el-form-item label="目标户主" required>
@@ -350,9 +493,13 @@
             <span class="readonly-text">{{ selectedTargetHousehold.address }}</span>
           </el-form-item>
         </template>
-        
+
         <el-form-item label="与户主关系" required>
-          <el-select v-model="oldHeadNewRelationship" placeholder="请选择与户主的关系" style="width: 100%">
+          <el-select
+            v-model="oldHeadNewRelationship"
+            placeholder="请选择与户主的关系"
+            style="width: 100%"
+          >
             <el-option
               v-for="option in relationshipOptions"
               :key="option.id"
@@ -364,7 +511,9 @@
       </el-form>
       <template #footer>
         <el-button size="small" @click="changeHeadDialogVisible = false">取消</el-button>
-        <el-button type="primary" size="small" :loading="loading" @click="confirmChangeHead">确定</el-button>
+        <el-button type="primary" size="small" :loading="loading" @click="confirmChangeHead"
+          >确定</el-button
+        >
       </template>
     </el-dialog>
 
@@ -373,7 +522,13 @@
       <template #header>
         <div class="clearfix">
           <span>家庭成员列表（{{ filteredHouseholdMembers.length }}人）</span>
-          <el-button type="primary" link size="small" class="header-button" @click="toggleShowInactive">
+          <el-button
+            type="primary"
+            link
+            size="small"
+            class="header-button"
+            @click="toggleShowInactive"
+          >
             {{ showInactiveMembers ? '仅显示正常成员' : '显示所有成员' }}
           </el-button>
         </div>
@@ -421,7 +576,9 @@
           <el-row :gutter="12">
             <el-col :span="6">
               <el-form-item label="迁入日期">
-                <div v-if="!isMigrationEditable" class="readonly-text">{{ migrationForm.migrationInDate || '-' }}</div>
+                <div v-if="!isMigrationEditable" class="readonly-text">{{
+                  migrationForm.migrationInDate || '-'
+                }}</div>
                 <el-date-picker
                   v-else
                   v-model="migrationForm.migrationInDate"
@@ -436,7 +593,9 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="迁入原因">
-                <div v-if="!isMigrationEditable" class="readonly-text">{{ migrationForm.migrationInReason || '-' }}</div>
+                <div v-if="!isMigrationEditable" class="readonly-text">{{
+                  migrationForm.migrationInReason || '-'
+                }}</div>
                 <el-input
                   v-else
                   v-model="migrationForm.migrationInReason"
@@ -447,7 +606,9 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="迁出日期">
-                <div v-if="!isMigrationEditable" class="readonly-text">{{ migrationForm.migrationOutDate || '-' }}</div>
+                <div v-if="!isMigrationEditable" class="readonly-text">{{
+                  migrationForm.migrationOutDate || '-'
+                }}</div>
                 <el-date-picker
                   v-else
                   v-model="migrationForm.migrationOutDate"
@@ -462,7 +623,9 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="迁出原因">
-                <div v-if="!isMigrationEditable" class="readonly-text">{{ migrationForm.migrationOutReason || '-' }}</div>
+                <div v-if="!isMigrationEditable" class="readonly-text">{{
+                  migrationForm.migrationOutReason || '-'
+                }}</div>
                 <el-input
                   v-else
                   v-model="migrationForm.migrationOutReason"
@@ -477,7 +640,9 @@
           <el-row :gutter="12">
             <el-col :span="6">
               <el-form-item label="死亡时间">
-                <div v-if="!isMigrationEditable" class="readonly-text">{{ migrationForm.deathDate || '-' }}</div>
+                <div v-if="!isMigrationEditable" class="readonly-text">{{
+                  migrationForm.deathDate || '-'
+                }}</div>
                 <el-date-picker
                   v-else
                   v-model="migrationForm.deathDate"
@@ -492,7 +657,9 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="死亡原因">
-                <div v-if="!isMigrationEditable" class="readonly-text">{{ migrationForm.deathReason || '-' }}</div>
+                <div v-if="!isMigrationEditable" class="readonly-text">{{
+                  migrationForm.deathReason || '-'
+                }}</div>
                 <el-input
                   v-else
                   v-model="migrationForm.deathReason"
@@ -503,7 +670,9 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="恢复原因">
-                <div v-if="!isMigrationEditable" class="readonly-text">{{ migrationForm.recoveryReason || '-' }}</div>
+                <div v-if="!isMigrationEditable" class="readonly-text">{{
+                  migrationForm.recoveryReason || '-'
+                }}</div>
                 <el-input
                   v-else
                   v-model="migrationForm.recoveryReason"
@@ -516,7 +685,7 @@
         </el-form>
 
         <!-- 操作按钮区域 -->
-        <div class="migration-buttons" style="margin-top: 15px; text-align: right">
+        <div v-if="canEditResident" class="migration-buttons" style="margin-top: 15px; text-align: right">
           <el-button
             v-if="!isMigrationEditable"
             type="primary"
@@ -534,13 +703,7 @@
             >
               取消
             </el-button>
-            <el-button
-              type="primary"
-              size="small"
-              @click="handleMigrationSave"
-            >
-              保存
-            </el-button>
+            <el-button type="primary" size="small" @click="handleMigrationSave"> 保存 </el-button>
           </div>
         </div>
       </div>
@@ -576,10 +739,22 @@ import {
   ElAutocomplete
 } from 'element-plus'
 import { CaretBottom, ArrowDown } from '@element-plus/icons-vue'
-import { getResidentDetail, addResident, updateResident, updateResidentStatus, getSearchSuggestions } from '@/api/resident'
-import { getHouseholdDetail, getHouseholdMembers, updateHousehold, createHousehold } from '@/api/household'
+import {
+  getResidentDetail,
+  addResident,
+  updateResident,
+  updateResidentStatus,
+  getSearchSuggestions
+} from '@/api/resident'
+import {
+  getHouseholdDetail,
+  getHouseholdMembers,
+  updateHousehold,
+  createHousehold
+} from '@/api/household'
 import { getDictApi } from '@/api/common'
 import request from '@/axios'
+import { useUserStoreWithOut } from '@/store/modules/user'
 
 const props = defineProps<{
   modelValue: boolean
@@ -591,6 +766,10 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   'refresh-list': []
 }>()
+
+const userStore = useUserStoreWithOut()
+const canAddResident = computed(() => userStore.hasPermission('resident:add'))
+const canEditResident = computed(() => userStore.hasPermission('resident:edit'))
 
 // 对话框可见性
 const dialogVisible = computed({
@@ -686,14 +865,16 @@ const selectedTargetHousehold = ref<any>(null)
 
 // 当前居民是否是户主
 const isCurrentUserHead = computed(() => {
-  return residentForm.value.relationshipToHead === '本人' || residentForm.value.relationshipToHead === '户主'
+  return (
+    residentForm.value.relationshipToHead === '本人' ||
+    residentForm.value.relationshipToHead === '户主'
+  )
 })
 
 // 可作为新户主的成员列表（排除当前户主）
 const eligibleNewHeads = computed(() => {
-  return householdMembers.value.filter(member => 
-    member.id !== currentResidentId.value && 
-    member.status === 'active'
+  return householdMembers.value.filter(
+    (member) => member.id !== currentResidentId.value && member.status === 'active'
   )
 })
 
@@ -749,29 +930,41 @@ const age = computed(() => {
 })
 
 // 监听对话框显示
-watch(() => props.modelValue, (val) => {
-  if (val) {
-    currentResidentId.value = null
-    currentHouseholdId.value = null
-    isMigrationExpanded.value = false
-    isEditable.value = false
-    isAddingNew.value = false
-    title.value = '居民详细信息'
-    initData()
-  } else {
-    resetFormData()
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      currentResidentId.value = null
+      currentHouseholdId.value = null
+      isMigrationExpanded.value = false
+      isEditable.value = false
+      isAddingNew.value = false
+      title.value = '居民详细信息'
+      initData()
+    } else {
+      resetFormData()
+    }
   }
-})
+)
 
 // 监听residentData变化
-watch(() => props.residentId, (newVal, oldVal) => {
-  // 只在对话框打开、ID变化且不在编辑状态下才重新加载数据
-  if (dialogVisible.value && newVal && newVal !== oldVal && !isEditable.value && !isMigrationEditable.value) {
-    currentResidentId.value = null
-    currentHouseholdId.value = null
-    initData()
+watch(
+  () => props.residentId,
+  (newVal, oldVal) => {
+    // 只在对话框打开、ID变化且不在编辑状态下才重新加载数据
+    if (
+      dialogVisible.value &&
+      newVal &&
+      newVal !== oldVal &&
+      !isEditable.value &&
+      !isMigrationEditable.value
+    ) {
+      currentResidentId.value = null
+      currentHouseholdId.value = null
+      initData()
+    }
   }
-})
+)
 
 // 初始化数据
 const initData = async () => {
@@ -903,7 +1096,7 @@ const loadAllDictionaries = async () => {
       })
 
       // 对每个分类内的选项按 display_order 排序
-      Object.keys(dictData).forEach(key => {
+      Object.keys(dictData).forEach((key) => {
         dictData[key].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
       })
 
@@ -924,6 +1117,10 @@ const loadAllDictionaries = async () => {
 
 // 点击修改按钮
 const handleEdit = () => {
+  if (!canEditResident.value) {
+    ElMessage.warning('当前账号没有编辑居民权限')
+    return
+  }
   isEditable.value = true
   title.value = '修改居民信息'
 }
@@ -988,12 +1185,16 @@ const loadResidentInfo = async (residentId: string | number) => {
         militaryService: data.military_service || data.militaryService || '未服兵役',
         educationLevel: data.education_level || data.educationLevel || '小学',
         status: data.status || 'active',
-        registeredPermanentResidence: data.registered_permanent_residence || data.registeredPermanentResidence || 1,
+        registeredPermanentResidence:
+          data.registered_permanent_residence || data.registeredPermanentResidence || 1,
         registeredDate: data.registered_date || data.registeredDate || '',
         statusUpdatedAt: data.status_updated_at || data.statusUpdatedAt || '',
         statusChangeReason: data.status_change_reason || data.statusChangeReason || '',
         deathDate: data.death_date || data.deathDate || '',
-        equityShares: data.equity_shares !== undefined && data.equity_shares !== null ? data.equity_shares : (data.equityShares || 0)
+        equityShares:
+          data.equity_shares !== undefined && data.equity_shares !== null
+            ? data.equity_shares
+            : data.equityShares || 0
       }
 
       // 填充迁途改销数据
@@ -1047,6 +1248,10 @@ const loadHouseholdMembers = async (householdId: string | number) => {
 
 // 同户新增
 const handleSameHouseholdAdd = () => {
+  if (!canAddResident.value) {
+    ElMessage.warning('当前账号没有新增居民权限')
+    return
+  }
   isAddingNew.value = true
   residentForm.value = {
     ...residentForm.value,
@@ -1073,7 +1278,11 @@ const handleSameHouseholdAdd = () => {
 
 // 身份证号变化处理
 const handleIdCardChange = () => {
-  if (!isIdCardAutoFill.value || !residentForm.value.idCard || residentForm.value.idCard.length !== 18) {
+  if (
+    !isIdCardAutoFill.value ||
+    !residentForm.value.idCard ||
+    residentForm.value.idCard.length !== 18
+  ) {
     return
   }
 
@@ -1114,6 +1323,14 @@ const handleHouseholdIdCardChange = () => {
 
 // 保存数据
 const handleSave = async () => {
+  if (isAddingNew.value && !canAddResident.value) {
+    ElMessage.warning('当前账号没有新增居民权限')
+    return
+  }
+  if (!isAddingNew.value && !canEditResident.value) {
+    ElMessage.warning('当前账号没有编辑居民权限')
+    return
+  }
   if (!validateForm()) {
     return
   }
@@ -1156,7 +1373,10 @@ const validateForm = () => {
     return false
   }
 
-  if (!residentForm.value.relationshipToHead || residentForm.value.relationshipToHead.trim() === '') {
+  if (
+    !residentForm.value.relationshipToHead ||
+    residentForm.value.relationshipToHead.trim() === ''
+  ) {
     ElMessage.error('请选择与户主关系')
     return false
   }
@@ -1173,12 +1393,18 @@ const validateForm = () => {
 
   // 对于非同户新增，需要验证户主信息
   if (isAddingNew.value && !currentHouseholdId.value) {
-    if (!householdForm.value.householdHeadName || householdForm.value.householdHeadName.trim() === '') {
+    if (
+      !householdForm.value.householdHeadName ||
+      householdForm.value.householdHeadName.trim() === ''
+    ) {
       ElMessage.error('请输入户主姓名')
       return false
     }
 
-    if (!householdForm.value.householdHeadIdCard || householdForm.value.householdHeadIdCard.trim() === '') {
+    if (
+      !householdForm.value.householdHeadIdCard ||
+      householdForm.value.householdHeadIdCard.trim() === ''
+    ) {
       ElMessage.error('请输入户主身份证号码')
       return false
     }
@@ -1391,12 +1617,12 @@ const openChangeHeadDialog = () => {
   oldHeadNewRelationship.value = ''
   targetHouseholdHeadName.value = ''
   selectedTargetHousehold.value = null
-  
+
   // 如果当前用户不是户主，自动将自己设为新户主（同户更换时）
   if (!isCurrentUserHead.value) {
     newHeadId.value = currentResidentId.value
   }
-  
+
   changeHeadDialogVisible.value = true
 }
 
@@ -1406,20 +1632,20 @@ const fetchHouseholdHeadSuggestions = async (queryString: string, cb: any) => {
     cb([])
     return
   }
-  
+
   try {
     const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
     if (res.code === 20000 && res.householdHeadNames) {
       // 过滤掉当前家庭
-      const results = res.householdHeadNames.filter((item: any) => 
-        item.householdNumber !== currentHouseholdId.value
-      ).map((item: any) => ({
-        householdNumber: item.householdNumber,
-        householdHeadName: item.householdHeadName,
-        address: item.address,
-        householdHeadId: item.householdHeadId,
-        value: item.householdHeadName
-      }))
+      const results = res.householdHeadNames
+        .filter((item: any) => item.householdNumber !== currentHouseholdId.value)
+        .map((item: any) => ({
+          householdNumber: item.householdNumber,
+          householdHeadName: item.householdHeadName,
+          address: item.address,
+          householdHeadId: item.householdHeadId,
+          value: item.householdHeadName
+        }))
       cb(results)
     } else {
       cb([])
@@ -1446,7 +1672,7 @@ const confirmChangeHead = async () => {
   loading.value = true
   try {
     let res
-    
+
     if (changeHeadType.value === 'same') {
       // 同户更换
       if (!newHeadId.value) {
@@ -1454,7 +1680,7 @@ const confirmChangeHead = async () => {
         loading.value = false
         return
       }
-      
+
       res = await request.post({
         url: `/households/${currentHouseholdId.value}/change-head`,
         data: {
@@ -1469,7 +1695,7 @@ const confirmChangeHead = async () => {
         loading.value = false
         return
       }
-      
+
       res = await request.post({
         url: `/residents/${currentResidentId.value}/migrate-household`,
         data: {
@@ -1498,6 +1724,10 @@ const confirmChangeHead = async () => {
 
 // 处理户主信息下拉菜单命令
 const handleHouseholdCommand = (command: string) => {
+  if (!canEditResident.value) {
+    ElMessage.warning('当前账号没有编辑居民权限')
+    return
+  }
   console.log('handleHouseholdCommand 被调用:', command)
   if (command === 'changeHead') {
     openChangeHeadDialog()
@@ -1513,7 +1743,7 @@ const handleSplitHousehold = async () => {
     isCurrentUserHead: isCurrentUserHead.value,
     relationshipToHead: residentForm.value.relationshipToHead
   })
-  
+
   if (isCurrentUserHead.value) {
     ElMessage.warning('当前居民是户主，无法独立成户')
     return
@@ -1565,6 +1795,10 @@ const toggleMigration = () => {
 
 // 切换迁途改销编辑模式
 const toggleMigrationEdit = () => {
+  if (!canEditResident.value) {
+    ElMessage.warning('当前账号没有编辑居民权限')
+    return
+  }
   isMigrationEditable.value = true
   originalMigrationForm.value = JSON.parse(JSON.stringify(migrationForm.value))
 }
@@ -1586,7 +1820,9 @@ const filterHouseholdMembers = () => {
   if (showInactiveMembers.value) {
     filteredHouseholdMembers.value = [...householdMembers.value]
   } else {
-    filteredHouseholdMembers.value = householdMembers.value.filter(member => member.status === 'active' || member.status === undefined)
+    filteredHouseholdMembers.value = householdMembers.value.filter(
+      (member) => member.status === 'active' || member.status === undefined
+    )
   }
 }
 
@@ -1596,14 +1832,14 @@ const handleMemberRowClick = async (row: any) => {
   if (currentResidentId.value === row.id) {
     return
   }
-  
+
   // 重置编辑状态，避免按钮显示状态变化导致闪烁
   isEditable.value = false
   title.value = '居民详细信息'
-  
+
   currentResidentId.value = row.id
   currentHouseholdId.value = row.householdId || row.household_id
-  
+
   // 静默加载数据，不显示loading，避免按钮闪烁
   try {
     await Promise.all([
@@ -1619,20 +1855,28 @@ const handleMemberRowClick = async (row: any) => {
 // 获取成员状态文本
 const getMemberStatusText = (status: string) => {
   switch (status) {
-    case 'active': return '正常'
-    case 'migrated_out': return '迁出'
-    case 'deceased': return '死亡'
-    default: return '未知'
+    case 'active':
+      return '正常'
+    case 'migrated_out':
+      return '迁出'
+    case 'deceased':
+      return '死亡'
+    default:
+      return '未知'
   }
 }
 
 // 获取成员状态类型
 const getMemberStatusType = (status: string) => {
   switch (status) {
-    case 'active': return 'success'
-    case 'migrated_out': return 'warning'
-    case 'deceased': return 'danger'
-    default: return 'info'
+    case 'active':
+      return 'success'
+    case 'migrated_out':
+      return 'warning'
+    case 'deceased':
+      return 'danger'
+    default:
+      return 'info'
   }
 }
 
@@ -1811,7 +2055,7 @@ onMounted(() => {
     // 菜单栏风格的箭头图标
     &.toggle-arrow-icon {
       font-size: 16px;
-      color: #409EFF;
+      color: #409eff;
       cursor: pointer;
       transition: transform 0.3s ease;
       padding: 4px;
@@ -1854,5 +2098,4 @@ onMounted(() => {
   margin-top: 15px;
   text-align: right;
 }
-
 </style>

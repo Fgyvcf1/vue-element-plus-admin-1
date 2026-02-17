@@ -62,11 +62,7 @@
               />
             </el-form-item>
             <el-form-item label="联系电话" class="compact-form-item">
-              <el-input
-                v-model="searchForm.phoneNumber"
-                placeholder="电话"
-                clearable
-              />
+              <el-input v-model="searchForm.phoneNumber" placeholder="电话" clearable />
             </el-form-item>
             <el-form-item label="状态" class="compact-form-item">
               <el-select v-model="searchForm.status" placeholder="状态" clearable>
@@ -89,7 +85,7 @@
               <Icon icon="ep:download" class="mr-1" />
               导出
             </el-button>
-            <el-button type="warning" @click="handleImport" size="small">
+            <el-button v-hasPermi="'resident:add'" type="warning" @click="handleImport" size="small">
               <Icon icon="ep:upload" class="mr-1" />
               导入
             </el-button>
@@ -168,14 +164,18 @@
 
       <!-- 右键菜单 -->
       <div
-        v-if="contextMenuVisible"
+        v-if="contextMenuVisible && canShowContextMenu"
         class="context-menu"
         :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
         @click.stop
       >
         <ul class="menu-list">
-          <li class="menu-item" @click="handleAddDisabled">添加为残疾人</li>
-          <li class="menu-item" @click="handleAddLowIncome">添加为低收入人群</li>
+          <li v-hasPermi="'special:add'" class="menu-item" @click="handleAddDisabled">
+            添加为残疾人
+          </li>
+          <li v-hasPermi="'special:add'" class="menu-item" @click="handleAddLowIncome">
+            添加为低收入人群
+          </li>
         </ul>
       </div>
 
@@ -215,7 +215,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   ElMessage,
@@ -244,8 +244,11 @@ import ImportMapping from './components/ImportMapping.vue'
 import { getResidentList, exportResidents, getSearchSuggestions } from '@/api/resident'
 import { downloadFile } from '@/utils/download'
 import request from '@/axios'
+import { useUserStoreWithOut } from '@/store/modules/user'
 
 const router = useRouter()
+const userStore = useUserStoreWithOut()
+const canShowContextMenu = computed(() => userStore.hasPermission('special:add'))
 
 // 搜索表单
 const searchForm = reactive({
@@ -346,6 +349,9 @@ const selectedRow = ref<any>({})
 
 // 打开右键菜单
 const openContextMenu = (row: any, event: MouseEvent) => {
+  if (!canShowContextMenu.value) {
+    return
+  }
   event.preventDefault()
   event.stopPropagation()
   selectedRow.value = row
@@ -363,7 +369,7 @@ const closeContextMenu = () => {
 const handleAddDisabled = () => {
   closeContextMenu()
   router.push({
-    path: '/special-people/disabled/add',
+    name: 'DisabledAdd',
     query: { residentId: selectedRow.value.id }
   })
 }
@@ -372,7 +378,7 @@ const handleAddDisabled = () => {
 const handleAddLowIncome = () => {
   closeContextMenu()
   router.push({
-    path: '/special-people/low-income/add',
+    name: 'LowIncomeAdd',
     query: { residentId: selectedRow.value.id }
   })
 }

@@ -56,7 +56,12 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="职务" prop="position">
-            <el-select v-model="form.position" :disabled="formReadonly" placeholder="请选择职务" style="width: 100%">
+            <el-select
+              v-model="form.position"
+              :disabled="formReadonly"
+              placeholder="请选择职务"
+              style="width: 100%"
+            >
               <el-option
                 v-for="item in positionOptions"
                 :key="item.value"
@@ -71,12 +76,24 @@
       <el-row :gutter="12">
         <el-col :span="12">
           <el-form-item label="任期开始" prop="termStartDate">
-            <el-date-picker v-model="form.termStartDate" :disabled="formReadonly" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+            <el-date-picker
+              v-model="form.termStartDate"
+              :disabled="formReadonly"
+              type="date"
+              value-format="YYYY-MM-DD"
+              style="width: 100%"
+            />
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="任期结束">
-            <el-date-picker v-model="form.termEndDate" :disabled="formReadonly" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
+            <el-date-picker
+              v-model="form.termEndDate"
+              :disabled="formReadonly"
+              type="date"
+              value-format="YYYY-MM-DD"
+              style="width: 100%"
+            />
           </el-form-item>
         </el-col>
       </el-row>
@@ -103,10 +120,21 @@
 
     <template #footer>
       <el-button size="small" @click="handleClose">关闭</el-button>
-      <el-button v-if="isEdit && !isEditing" type="primary" size="small" @click="enableEdit">编辑</el-button>
+      <el-button v-if="isEdit && !isEditing" type="primary" size="small" @click="enableEdit"
+        >编辑</el-button
+      >
       <el-button v-if="isEdit && isEditing" size="small" @click="cancelEdit">取消编辑</el-button>
-      <el-button v-if="isEdit && isEditing" type="danger" size="small" @click="handleDelete">删除</el-button>
-      <el-button v-if="!isEdit || isEditing" type="primary" size="small" :loading="submitting" @click="handleSubmit">保存</el-button>
+      <el-button v-if="isEdit && isEditing" type="danger" size="small" @click="handleDelete"
+        >删除</el-button
+      >
+      <el-button
+        v-if="!isEdit || isEditing"
+        type="primary"
+        size="small"
+        :loading="submitting"
+        @click="handleSubmit"
+        >保存</el-button
+      >
     </template>
   </el-dialog>
 </template>
@@ -207,7 +235,8 @@ const assignForm = (data: Record<string, any>) => {
   form.idCard = data.idCard || data.id_card || ''
   form.termNumber = String(data.termNumber || data.term_number || '')
   form.position = data.position || ''
-  form.termStartDate = data.termStartDate || data.term_start_date || new Date().toISOString().slice(0, 10)
+  form.termStartDate =
+    data.termStartDate || data.term_start_date || new Date().toISOString().slice(0, 10)
   form.termEndDate = data.termEndDate || data.term_end_date || ''
   form.status = data.status || 'current'
   form.remarks = data.remarks || ''

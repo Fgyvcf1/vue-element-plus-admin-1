@@ -4,9 +4,11 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node kill-port.js 3002 && node app.js",
-    "dev": "node kill-port.js 3002 && nodemon app.js",
+    "start": "node kill-port.js 3001 && node app.js",
+    "dev": "node kill-port.js 3001 && nodemon app.js",
     "kill-port": "node kill-port.js",
+    "test:api:low-income-query": "node test-low-income-query-api.js",
+    "test:api:disabled-query": "node test-disabled-query-api.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

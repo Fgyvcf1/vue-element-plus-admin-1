@@ -17,7 +17,9 @@
         "
       >
         <span>提示：同户新增时，输入户主姓名后系统会自动填充户主信息和家庭ID</span>
-        <el-button type="primary" size="small" @click="handleImport">导入</el-button>
+        <el-button v-hasPermi="'resident:add'" type="primary" size="small" @click="handleImport">
+          导入
+        </el-button>
       </div>
 
       <!-- 导入对话框 -->
@@ -463,8 +465,10 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { addResident, addHousehold, getSearchSuggestions } from '@/api/resident'
 import { getDictApi } from '@/api/common'
 import ImportMapping from './components/ImportMapping.vue'
+import { useUserStoreWithOut } from '@/store/modules/user'
 
 const router = useRouter()
+const userStore = useUserStoreWithOut()
 const residentFormRef = ref<FormInstance>()
 const householdFormRef = ref<FormInstance>()
 const loading = ref(false)
@@ -601,13 +605,13 @@ const handleHouseholdHeadSelect = (item: any) => {
     householdForm.householdType = item.householdType || ''
     householdForm.housingType = item.housingType || ''
     householdForm.ethnicity = item.ethnicity || ''
-    
+
     // 重要：填充居民表单中的 household_id
     residentForm.household_id = item.householdNumber || ''
     residentForm.household_head_id = item.householdHeadId || ''
     residentForm.Home_address = item.address || residentForm.Home_address
     residentForm.village_group = item.villageGroup || residentForm.village_group
-    
+
     ElMessage.success(`已选择户主：${item.householdHeadName || item.value}`)
   }
 }
@@ -637,7 +641,7 @@ const handleRelationshipChange = (value: string) => {
     householdForm.villageGroup = residentForm.village_group
     householdForm.address = residentForm.Home_address
     householdForm.phoneNumber = residentForm.phone_number
-    
+
     ElMessage.info('已自动将居民信息填充到户主信息，请补充户主的户口类型和住房类型')
   }
 }
@@ -651,16 +655,19 @@ const submitForm = async () => {
       loading.value = true
       try {
         let householdId = residentForm.household_id
-        
+
         // 如果是户主（本人），需要先创建户主信息
-        if (residentForm.relationship_to_head === '本人' || residentForm.relationship_to_head === '户主') {
+        if (
+          residentForm.relationship_to_head === '本人' ||
+          residentForm.relationship_to_head === '户主'
+        ) {
           // 验证户主必填信息
           if (!householdForm.householdHeadName || !householdForm.householdHeadIdCard) {
             ElMessage.error('创建户主时，户主姓名和身份证号为必填项')
             loading.value = false
             return
           }
-          
+
           // 创建户主
           const householdData = {
             household_head_name: householdForm.householdHeadName,
@@ -673,10 +680,10 @@ const submitForm = async () => {
             household_type: householdForm.householdType || '农业户口',
             housing_type: householdForm.housingType || '自有住房'
           }
-          
+
           console.log('创建户主:', householdData)
           const householdRes = await addHousehold(householdData)
-          
+
           if (householdRes.code === 20000) {
             householdId = householdRes.data?.householdNumber
             ElMessage.success('创建户主成功')
@@ -693,7 +700,7 @@ const submitForm = async () => {
             return
           }
         }
-        
+
         // 准备居民数据
         const residentData = {
           name: residentForm.name,
@@ -869,6 +876,11 @@ const loadAllDictionaries = async () => {
 
 // 组件挂载时加载字典数据
 onMounted(() => {
+  if (!userStore.hasPermission('resident:add')) {
+    ElMessage.error('当前账号没有新增居民权限')
+    router.replace('/resident/query')
+    return
+  }
   loadAllDictionaries()
 })
 </script>

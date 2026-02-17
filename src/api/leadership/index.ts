@@ -78,4 +78,3 @@ export const getMemberStatistics = (residentId: number): Promise<any> => {
     params: { resident_id: residentId }
   })
 }
-

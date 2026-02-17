@@ -14,6 +14,7 @@ interface UserState {
   roleRouters?: string[] | AppCustomRouteRecordRaw[]
   rememberMe: boolean
   loginInfo?: UserLoginType
+  permissions: string[]
 }
 
 export const useUserStore = defineStore('user', {
@@ -24,7 +25,8 @@ export const useUserStore = defineStore('user', {
       token: '',
       roleRouters: undefined,
       rememberMe: true,
-      loginInfo: undefined
+      loginInfo: undefined,
+      permissions: []
     }
   },
   getters: {
@@ -45,6 +47,9 @@ export const useUserStore = defineStore('user', {
     },
     getLoginInfo(): UserLoginType | undefined {
       return this.loginInfo
+    },
+    getPermissions(): string[] {
+      return this.permissions
     }
   },
   actions: {
@@ -90,6 +95,7 @@ export const useUserStore = defineStore('user', {
       // 3. 清除其他状态
       this.setToken('')
       this.setRoleRouters([])
+      this.setPermissions([])
 
       // 2. 重置权限状态
       permissionStore.setIsAddRouters(false)
@@ -114,9 +120,21 @@ export const useUserStore = defineStore('user', {
     },
     setLoginInfo(loginInfo: UserLoginType | undefined) {
       this.loginInfo = loginInfo
+    },
+    setPermissions(permissions: string[]) {
+      this.permissions = permissions
+    },
+    hasPermission(permission: string): boolean {
+      // 超级管理员拥有所有权限
+      if (this.userInfo?.role === 'superadmin') return true
+      return this.permissions.includes(permission)
     }
   },
-  persist: true
+  persist: {
+    key: 'pinia-state-user',
+    paths: ['userInfo', 'tokenKey', 'token', 'roleRouters', 'rememberMe', 'loginInfo']
+    // 排除 permissions，每次登录重新获取
+  }
 })
 
 export const useUserStoreWithOut = () => {

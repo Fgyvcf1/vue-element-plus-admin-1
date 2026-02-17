@@ -1,12 +1,14 @@
-console.log('启动后端服务...\n');
+console.log('启动后端服务...\n')
 
-const { execSync } = require('child_process');
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const routes = require('./routes');
+const { execSync } = require('child_process')
+const express = require('express')
+const cors = require('cors')
+const bodyParser = require('body-parser')
+const routes = require('./routes')
+const permissionRoutes = require('./routes/permissionRoutes')
+const db = require('./db')
 
-const port = 3001;
+const port = 3001
 
 /**
  * 杀死占用指定端口的进程
@@ -14,103 +16,183 @@ const port = 3001;
 function killPort(port) {
   try {
     // 获取占用端口的PID
-    const output = execSync(`netstat -ano | findstr LISTENING | findstr :${port}`).toString();
+    const output = execSync(`netstat -ano | findstr LISTENING | findstr :${port}`).toString()
 
     // 解析PID
-    const lines = output.trim().split('\n');
-    const pids = [];
+    const lines = output.trim().split('\n')
+    const pids = []
 
-    lines.forEach(line => {
-      const parts = line.trim().split(/\s+/);
+    lines.forEach((line) => {
+      const parts = line.trim().split(/\s+/)
       if (parts.length >= 5) {
-        const pid = parts[4];
+        const pid = parts[4]
         if (pid && !pids.includes(pid)) {
-          pids.push(pid);
+          pids.push(pid)
         }
       }
-    });
+    })
 
     if (pids.length === 0) {
-      console.log(`端口 ${port} 未被占用\n`);
-      return;
+      console.log(`端口 ${port} 未被占用\n`)
+      return
     }
 
     // 终止占用端口的进程
-    pids.forEach(pid => {
+    pids.forEach((pid) => {
       try {
-        execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' });
-        console.log(`已终止占用端口 ${port} 的进程 ${pid}`);
+        execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' })
+        console.log(`已终止占用端口 ${port} 的进程 ${pid}`)
       } catch (error) {
-        console.error(`终止进程 ${pid} 失败:`, error.message);
+        console.error(`终止进程 ${pid} 失败:`, error.message)
       }
-    });
+    })
 
-    console.log(`✓ 端口 ${port} 已释放\n`);
+    console.log(`✓ 端口 ${port} 已释放\n`)
   } catch (error) {
-    console.log(`端口 ${port} 未被占用\n`);
+    console.log(`端口 ${port} 未被占用\n`)
   }
 }
 
 // 启动前先杀死占用端口的进程
-console.log(`检查端口 ${port} 是否被占用...`);
-killPort(port);
+console.log(`检查端口 ${port} 是否被占用...`)
+killPort(port)
 
-const app = express();
+const app = express()
 
 // CORS配置
 const corsOptions = {
-  origin: ['http://localhost:4000', 'http://127.0.0.1:4000', 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: [
+    'http://localhost:4000',
+    'http://127.0.0.1:4000',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id'],
   credentials: true
-};
+}
 
-app.use(cors(corsOptions));
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+app.use(cors(corsOptions))
+app.use(bodyParser.json({ limit: '50mb' }))
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }))
 
 // 静态文件服务
-app.use('/uploads', express.static('uploads'));
-app.use('/archives', express.static('archives'));
+app.use('/uploads', express.static('uploads'))
+app.use('/archives', express.static('archives'))
+
+// 登录路由
+app.post('/api/user/login', async (req, res) => {
+  const { username, password } = req.body
+
+  try {
+    const [users] = await db.pool.execute(
+      'SELECT u.*, r.role_code, r.role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE u.username = ?',
+      [username]
+    )
+
+    if (users.length === 0) {
+      return res.status(401).json({
+        code: 401,
+        message: '用户名或密码错误'
+      })
+    }
+
+    const user = users[0]
+
+    const isPasswordValid = user.password === password || user.password_hash === password
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        code: 401,
+        message: '用户名或密码错误'
+      })
+    }
+
+    let permissions = []
+    if (user.role_code === 'superadmin' || user.role === 'superadmin') {
+      const [permRows] = await db.pool.execute('SELECT permission_code FROM permissions')
+      permissions = permRows.map((row) => row.permission_code)
+    } else if (user.role_id) {
+      const [permRows] = await db.pool.execute(
+        `
+        SELECT p.permission_code
+        FROM role_permissions rp
+        JOIN permissions p ON rp.permission_id = p.id
+        WHERE rp.role_id = ?
+        `,
+        [user.role_id]
+      )
+      permissions = permRows.map((row) => row.permission_code)
+    }
+
+    res.json({
+      code: 20000,
+      data: {
+        id: user.id,
+        username: user.username,
+        realName: user.real_name,
+        token: 'mock-token-' + Date.now(),
+        role: user.role_code || user.role || 'user',
+        roleName: user.role_name,
+        permissions
+      },
+      message: '登录成功'
+    })
+  } catch (err) {
+    console.error('登录失败:', err.message)
+    res.status(500).json({
+      code: 500,
+      message: '登录失败: ' + err.message
+    })
+  }
+})
+
+// 登出路由
+app.get('/api/user/loginOut', (_req, res) => {
+  res.json({
+    code: 20000,
+    message: '登出成功'
+  })
+})
 
 // API路由
-app.use('/api', routes);
+app.use('/api', routes)
+app.use('/api/permission', permissionRoutes)
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
-  console.error('服务器错误:', err.message);
-  console.error('错误堆栈:', err.stack);
+  console.error('服务器错误:', err.message)
+  console.error('错误堆栈:', err.stack)
   res.status(500).json({
     code: 500,
     message: '服务器内部错误',
     error: err.message
-  });
-});
+  })
+})
 
 // 启动服务器
 const server = app.listen(port, () => {
-  console.log(`后端服务运行在 http://localhost:${port}`);
-  console.log(`CORS配置: 允许来自 localhost:4000 和 localhost:5173 的请求`);
-  console.log('居民查询API: http://localhost:3001/api/residents');
-});
+  console.log(`后端服务运行在 http://localhost:${port}`)
+  console.log(`CORS配置: 允许来自 localhost:4000 和 localhost:5173 的请求`)
+  console.log('居民查询API: http://localhost:3001/api/residents')
+})
 
 // 监听服务器错误
 server.on('error', (error) => {
   if (error.code === 'EADDRINUSE') {
-    console.error(`端口 ${port} 已被占用！`);
+    console.error(`端口 ${port} 已被占用！`)
   } else {
-    console.error('服务器启动失败:', error.message);
+    console.error('服务器启动失败:', error.message)
   }
-  process.exit(1);
-});
+  process.exit(1)
+})
 
 // 优雅关闭
 process.on('SIGINT', () => {
-  console.log('\n正在关闭服务器...');
+  console.log('\n正在关闭服务器...')
   server.close(() => {
-    console.log('服务器已关闭');
-    process.exit(0);
-  });
-});
+    console.log('服务器已关闭')
+    process.exit(0)
+  })
+})
 
-module.exports = app;
+module.exports = app

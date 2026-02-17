@@ -12,8 +12,27 @@ export const getResidentList = (params: ResidentListParams) => {
 // 别名 - 兼容旧代码
 export const getResidents = getResidentList
 
+// 搜索居民（用于调解档案的自动完成）
+export const searchResidents = (params: { keyword: string; page?: number; pageSize?: number }) => {
+  return request.get<ResidentListResult>({
+    url: '/residents',
+    params: {
+      keyword: params.keyword,
+      page: params.page || 1,
+      pageSize: params.pageSize || 10
+    }
+  })
+}
+
 // 获取居民详情
 export const getResidentDetail = (id: string) => {
+  return request.get<ResidentDetail>({
+    url: `/residents/${id}`
+  })
+}
+
+// 兼容旧代码，获取单个居民详情
+export const getResident = (id: number | string) => {
   return request.get<ResidentDetail>({
     url: `/residents/${id}`
   })
@@ -45,15 +64,18 @@ export const updateResident = (id: string, data: Partial<ResidentDetail>) => {
 }
 
 // 更新居民状态（迁途改销）
-export const updateResidentStatus = (id: string, data: {
-  status: string
-  death_date?: string
-  death_reason?: string
-  migration_in_date?: string
-  migration_in_reason?: string
-  migration_out_date?: string
-  migration_out_reason?: string
-}) => {
+export const updateResidentStatus = (
+  id: string,
+  data: {
+    status: string
+    death_date?: string
+    death_reason?: string
+    migration_in_date?: string
+    migration_in_reason?: string
+    migration_out_date?: string
+    migration_out_reason?: string
+  }
+) => {
   return request.put({
     url: `/residents/${id}/status`,
     data

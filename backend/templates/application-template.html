@@ -1,169 +1,161 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>人民调解申请书</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: "SimSun", "宋体", serif;
-            font-size: 16px;
-            line-height: 1.5;
-            color: #000;
-            padding: 15px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .archive-id {
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .section {
-            margin-bottom: 15px;
-        }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            padding-bottom: 3px;
-            border-bottom: 2px solid #000;
-        }
-        
-        .info-row {
-            display: flex;
-            margin-bottom: 6px;
-            line-height: 1.5;
-        }
-        
-        .info-label {
-            font-weight: bold;
-            min-width: 100px;
-        }
-        
-        .info-content {
-            flex: 1;
-        }
-        
-        .participants {
-            margin-bottom: 10px;
-        }
-        
-        .participant-item {
-            margin-bottom: 8px;
-            padding: 6px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        
-        .participant-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        
-        .participant-info {
-            line-height: 1.4;
-        }
-        
-        .description {
-            text-indent: 2em;
-            line-height: 1.5;
-            margin-bottom: 8px;
-        }
-        
-        .signature {
-            margin-top: 30px;
-            text-align: right;
-        }
-        
-        .signature-date {
-            margin-top: 15px;
-        }
-        
-        ul {
-            margin-left: 20px;
-        }
-        
-        li {
-            margin-bottom: 4px;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'SimSun', '宋体', serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #000;
+        padding: 15px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .archive-id {
+        font-size: 14px;
+        color: #666;
+      }
+
+      .section {
+        margin-bottom: 15px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        padding-bottom: 3px;
+        border-bottom: 2px solid #000;
+      }
+
+      .info-row {
+        display: flex;
+        margin-bottom: 6px;
+        line-height: 1.5;
+      }
+
+      .info-label {
+        font-weight: bold;
+        min-width: 100px;
+      }
+
+      .info-content {
+        flex: 1;
+      }
+
+      .participants {
+        margin-bottom: 10px;
+      }
+
+      .participant-item {
+        margin-bottom: 8px;
+        padding: 6px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+      }
+
+      .participant-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      .participant-info {
+        line-height: 1.4;
+      }
+
+      .description {
+        text-indent: 2em;
+        line-height: 1.5;
+        margin-bottom: 8px;
+      }
+
+      .signature {
+        margin-top: 30px;
+        text-align: right;
+      }
+
+      .signature-date {
+        margin-top: 15px;
+      }
+
+      ul {
+        margin-left: 20px;
+      }
+
+      li {
+        margin-bottom: 4px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="header">
-        <div class="title">人民调解申请书</div>
-        <div class="archive-id">档案编号：{{archive_id}}</div>
+      <div class="title">人民调解申请书</div>
+      <div class="archive-id">档案编号：{{archive_id}}</div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">一、基本信息</div>
-        <div class="info-row">
-            <span class="info-label">纠纷类型：</span>
-            <span class="info-content">{{dispute_type}}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">申请日期：</span>
-            <span class="info-content">{{apply_date}}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">发生日期：</span>
-            <span class="info-content">{{occurrence_date}}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">发生地点：</span>
-            <span class="info-content">{{occurrence_location}}</span>
-        </div>
+      <div class="section-title">一、基本信息</div>
+      <div class="info-row">
+        <span class="info-label">纠纷类型：</span>
+        <span class="info-content">{{dispute_type}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">申请日期：</span>
+        <span class="info-content">{{apply_date}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">发生日期：</span>
+        <span class="info-content">{{occurrence_date}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">发生地点：</span>
+        <span class="info-content">{{occurrence_location}}</span>
+      </div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">二、申请人信息</div>
-        <div class="participants">
-            {{{applicants_list}}}
-        </div>
+      <div class="section-title">二、申请人信息</div>
+      <div class="participants"> {{{applicants_list}}} </div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">三、被申请人信息</div>
-        <div class="participants">
-            {{{respondents_list}}}
-        </div>
+      <div class="section-title">三、被申请人信息</div>
+      <div class="participants"> {{{respondents_list}}} </div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">四、纠纷描述</div>
-        <div class="description">
-            {{dispute_description}}
-        </div>
+      <div class="section-title">四、纠纷描述</div>
+      <div class="description"> {{dispute_description}} </div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">五、申请调解内容</div>
-        <div class="description">
-            {{request_content}}
-        </div>
+      <div class="section-title">五、申请调解内容</div>
+      <div class="description"> {{request_content}} </div>
     </div>
-    
+
     <div class="signature">
-        <div>申请人（签名）：</div>
-        <div class="signature-date">{{apply_date}}</div>
+      <div>申请人（签名）：</div>
+      <div class="signature-date">{{apply_date}}</div>
     </div>
-</body>
+  </body>
 </html>

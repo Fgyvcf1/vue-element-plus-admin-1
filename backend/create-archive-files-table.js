@@ -1,11 +1,11 @@
-const db = require('./db');
+const db = require('./db')
 
 // 创建archive_files表用于存储PDF文件信息
 db.serialize(() => {
   db.run('BEGIN TRANSACTION', (err) => {
     if (err) {
-      console.error('开始事务失败:', err);
-      return;
+      console.error('开始事务失败:', err)
+      return
     }
 
     // 创建archive_files表
@@ -21,36 +21,36 @@ db.serialize(() => {
         expired_at TIMESTAMP,
         FOREIGN KEY (archive_id) REFERENCES mediation_archives(archive_id) ON DELETE CASCADE
       )
-    `;
+    `
 
     db.run(createTableSQL, (err) => {
       if (err) {
-        console.error('创建archive_files表失败:', err);
-        db.run('ROLLBACK');
-        return;
+        console.error('创建archive_files表失败:', err)
+        db.run('ROLLBACK')
+        return
       }
 
       // 创建索引以提高查询性能
       const createIndexSQL = `
         CREATE INDEX IF NOT EXISTS idx_archive_files_archive_id ON archive_files(archive_id);
         CREATE INDEX IF NOT EXISTS idx_archive_files_type ON archive_files(type);
-      `;
+      `
 
       db.run(createIndexSQL, (err) => {
         if (err) {
-          console.error('创建索引失败:', err);
-          db.run('ROLLBACK');
-          return;
+          console.error('创建索引失败:', err)
+          db.run('ROLLBACK')
+          return
         }
 
         db.run('COMMIT', (err) => {
           if (err) {
-            console.error('提交事务失败:', err);
-            return;
+            console.error('提交事务失败:', err)
+            return
           }
-          console.log('archive_files表创建成功');
-        });
-      });
-    });
-  });
-});
+          console.log('archive_files表创建成功')
+        })
+      })
+    })
+  })
+})

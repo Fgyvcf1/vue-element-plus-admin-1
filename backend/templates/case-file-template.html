@@ -1,367 +1,351 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>调解案卷</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: "SimSun", "宋体", serif;
-            font-size: 14px;
-            line-height: 1.8;
-            color: #000;
-        }
-        
-        /* 封面页 */
-        .cover-page {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            page-break-after: always;
-        }
-        
-        .cover-title {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 60px;
-            letter-spacing: 8px;
-        }
-        
-        .cover-info {
-            font-size: 18px;
-            line-height: 2.5;
-            text-align: left;
-            margin-top: 40px;
-        }
-        
-        .cover-info-row {
-            margin-bottom: 15px;
-        }
-        
-        .cover-info-label {
-            font-weight: bold;
-            display: inline-block;
-            width: 120px;
-        }
-        
-        .cover-archive-id {
-            font-size: 20px;
-            margin-top: 80px;
-            padding: 20px 40px;
-            border: 2px solid #000;
-        }
-        
-        .cover-date {
-            font-size: 16px;
-            margin-top: 60px;
-        }
-        
-        /* 分页控制 */
-        .page-break {
-            page-break-after: always;
-        }
-        
-        /* 各部分标题 */
-        .part-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-top: 20px;
-        }
-        
-        .part-title {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 6px;
-        }
-        
-        .part-number {
-            font-size: 14px;
-            color: #666;
-            margin-top: 10px;
-        }
-        
-        /* 通用样式 */
-        .section {
-            margin-bottom: 25px;
-        }
-        
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #000;
-        }
-        
-        .info-row {
-            display: flex;
-            margin-bottom: 10px;
-            line-height: 1.8;
-        }
-        
-        .info-label {
-            font-weight: bold;
-            min-width: 100px;
-        }
-        
-        .info-content {
-            flex: 1;
-        }
-        
-        .description {
-            text-indent: 2em;
-            line-height: 1.8;
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-        }
-        
-        /* 申请人/被申请人 */
-        .participants {
-            margin-bottom: 15px;
-        }
-        
-        .participant-item {
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        
-        /* 调解记录 */
-        .record-item {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .record-item h4 {
-            font-size: 16px;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        /* 占位页 */
-        .placeholder-page {
-            height: 60vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: #999;
-        }
-        
-        .placeholder-page h3 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        
-        /* 签名区域 */
-        .signatures {
-            margin-top: 60px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 40px;
-            text-align: center;
-        }
-        
-        .signature-item {
-            margin-top: 40px;
-        }
-        
-        .signature-title {
-            font-weight: bold;
-            margin-bottom: 60px;
-        }
-        
-        .signature-line {
-            border-bottom: 1px solid #000;
-            margin-bottom: 10px;
-            min-height: 30px;
-        }
-        
-        /* 协议书内容 */
-        .agreement-content {
-            text-indent: 2em;
-            line-height: 1.8;
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-        }
-        
-        ul {
-            margin-left: 20px;
-        }
-        
-        li {
-            margin-bottom: 8px;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'SimSun', '宋体', serif;
+        font-size: 14px;
+        line-height: 1.8;
+        color: #000;
+      }
+
+      /* 封面页 */
+      .cover-page {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        page-break-after: always;
+      }
+
+      .cover-title {
+        font-size: 36px;
+        font-weight: bold;
+        margin-bottom: 60px;
+        letter-spacing: 8px;
+      }
+
+      .cover-info {
+        font-size: 18px;
+        line-height: 2.5;
+        text-align: left;
+        margin-top: 40px;
+      }
+
+      .cover-info-row {
+        margin-bottom: 15px;
+      }
+
+      .cover-info-label {
+        font-weight: bold;
+        display: inline-block;
+        width: 120px;
+      }
+
+      .cover-archive-id {
+        font-size: 20px;
+        margin-top: 80px;
+        padding: 20px 40px;
+        border: 2px solid #000;
+      }
+
+      .cover-date {
+        font-size: 16px;
+        margin-top: 60px;
+      }
+
+      /* 分页控制 */
+      .page-break {
+        page-break-after: always;
+      }
+
+      /* 各部分标题 */
+      .part-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-top: 20px;
+      }
+
+      .part-title {
+        font-size: 24px;
+        font-weight: bold;
+        letter-spacing: 6px;
+      }
+
+      .part-number {
+        font-size: 14px;
+        color: #666;
+        margin-top: 10px;
+      }
+
+      /* 通用样式 */
+      .section {
+        margin-bottom: 25px;
+      }
+
+      .section-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #000;
+      }
+
+      .info-row {
+        display: flex;
+        margin-bottom: 10px;
+        line-height: 1.8;
+      }
+
+      .info-label {
+        font-weight: bold;
+        min-width: 100px;
+      }
+
+      .info-content {
+        flex: 1;
+      }
+
+      .description {
+        text-indent: 2em;
+        line-height: 1.8;
+        margin-bottom: 15px;
+        white-space: pre-wrap;
+      }
+
+      /* 申请人/被申请人 */
+      .participants {
+        margin-bottom: 15px;
+      }
+
+      .participant-item {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+      }
+
+      /* 调解记录 */
+      .record-item {
+        margin-bottom: 30px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .record-item h4 {
+        font-size: 16px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+
+      /* 占位页 */
+      .placeholder-page {
+        height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: #999;
+      }
+
+      .placeholder-page h3 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      /* 签名区域 */
+      .signatures {
+        margin-top: 60px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 40px;
+        text-align: center;
+      }
+
+      .signature-item {
+        margin-top: 40px;
+      }
+
+      .signature-title {
+        font-weight: bold;
+        margin-bottom: 60px;
+      }
+
+      .signature-line {
+        border-bottom: 1px solid #000;
+        margin-bottom: 10px;
+        min-height: 30px;
+      }
+
+      /* 协议书内容 */
+      .agreement-content {
+        text-indent: 2em;
+        line-height: 1.8;
+        margin-bottom: 15px;
+        white-space: pre-wrap;
+      }
+
+      ul {
+        margin-left: 20px;
+      }
+
+      li {
+        margin-bottom: 8px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- 封面页 -->
     <div class="cover-page">
-        <div class="cover-title">人 民 调 解 案 卷</div>
-        <div class="cover-archive-id">档案编号：{{archive_id}}</div>
-        <div class="cover-info">
-            <div class="cover-info-row">
-                <span class="cover-info-label">申请人：</span>
-                <span>{{applicant_names}}</span>
-            </div>
-            <div class="cover-info-row">
-                <span class="cover-info-label">被申请人：</span>
-                <span>{{respondent_names}}</span>
-            </div>
+      <div class="cover-title">人 民 调 解 案 卷</div>
+      <div class="cover-archive-id">档案编号：{{archive_id}}</div>
+      <div class="cover-info">
+        <div class="cover-info-row">
+          <span class="cover-info-label">申请人：</span>
+          <span>{{applicant_names}}</span>
         </div>
-        <div class="cover-date">生成日期：{{generate_date}}</div>
+        <div class="cover-info-row">
+          <span class="cover-info-label">被申请人：</span>
+          <span>{{respondent_names}}</span>
+        </div>
+      </div>
+      <div class="cover-date">生成日期：{{generate_date}}</div>
     </div>
-    
+
     <!-- 第一部分：申请书 -->
     <div class="part-header">
-        <div class="part-title">人 民 调 解 申 请 书</div>
-        <div class="part-number">第一部分</div>
+      <div class="part-title">人 民 调 解 申 请 书</div>
+      <div class="part-number">第一部分</div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">一、基本信息</div>
-        <div class="info-row">
-            <span class="info-label">纠纷类型：</span>
-            <span class="info-content">{{dispute_type}}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">申请日期：</span>
-            <span class="info-content">{{apply_date}}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">发生日期：</span>
-            <span class="info-content">{{occurrence_date}}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">发生地点：</span>
-            <span class="info-content">{{occurrence_location}}</span>
-        </div>
+      <div class="section-title">一、基本信息</div>
+      <div class="info-row">
+        <span class="info-label">纠纷类型：</span>
+        <span class="info-content">{{dispute_type}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">申请日期：</span>
+        <span class="info-content">{{apply_date}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">发生日期：</span>
+        <span class="info-content">{{occurrence_date}}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">发生地点：</span>
+        <span class="info-content">{{occurrence_location}}</span>
+      </div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">二、申请人信息</div>
-        <div class="participants">
-            {{{applicants_list}}}
-        </div>
+      <div class="section-title">二、申请人信息</div>
+      <div class="participants"> {{{applicants_list}}} </div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">三、被申请人信息</div>
-        <div class="participants">
-            {{{respondents_list}}}
-        </div>
+      <div class="section-title">三、被申请人信息</div>
+      <div class="participants"> {{{respondents_list}}} </div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">四、纠纷描述</div>
-        <div class="description">
-            {{dispute_description}}
-        </div>
+      <div class="section-title">四、纠纷描述</div>
+      <div class="description"> {{dispute_description}} </div>
     </div>
-    
+
     <div class="section">
-        <div class="section-title">五、申请调解内容</div>
-        <div class="description">
-            {{request_content}}
-        </div>
+      <div class="section-title">五、申请调解内容</div>
+      <div class="description"> {{request_content}} </div>
     </div>
-    
+
     <div class="signature">
-        <div>申请人（签名）：</div>
-        <div style="margin-top: 20px;">{{apply_date}}</div>
+      <div>申请人（签名）：</div>
+      <div style="margin-top: 20px">{{apply_date}}</div>
     </div>
-    
+
     <!-- 第二部分：调解记录 -->
     <div class="page-break"></div>
     <div class="part-header">
-        <div class="part-title">人 民 调 解 记 录</div>
-        <div class="part-number">第二部分</div>
+      <div class="part-title">人 民 调 解 记 录</div>
+      <div class="part-number">第二部分</div>
     </div>
-    
-    {{#if has_records}}
-        {{{records_list}}}
-    {{else}}
-        <div class="placeholder-page">
-            <h3>暂无调解记录</h3>
-            <p>本案尚未进行调解</p>
-        </div>
+
+    {{#if has_records}} {{{records_list}}} {{else}}
+    <div class="placeholder-page">
+      <h3>暂无调解记录</h3>
+      <p>本案尚未进行调解</p>
+    </div>
     {{/if}}
-    
+
     <!-- 第三部分：协议书 -->
     <div class="page-break"></div>
     <div class="part-header">
-        <div class="part-title">人 民 调 解 协 议 书</div>
-        <div class="part-number">第三部分</div>
+      <div class="part-title">人 民 调 解 协 议 书</div>
+      <div class="part-number">第三部分</div>
     </div>
-    
+
     {{#if has_agreement}}
-        <div class="section">
-            <div class="section-title">一、协议基本信息</div>
-            <div class="info-row">
-                <span class="info-label">协议日期：</span>
-                <span class="info-content">{{agreement_date}}</span>
-            </div>
-            {{#if performance_period}}
-            <div class="info-row">
-                <span class="info-label">履行期限：</span>
-                <span class="info-content">{{performance_period}}</span>
-            </div>
-            {{/if}}
-        </div>
-        
-        <div class="section">
-            <div class="section-title">二、协议内容</div>
-            <div class="agreement-content">
-                {{agreement_content}}
-            </div>
-        </div>
-        
-        {{#if breach_liability}}
-        <div class="section">
-            <div class="section-title">三、违约责任</div>
-            <div class="agreement-content">
-                {{breach_liability}}
-            </div>
-        </div>
-        {{/if}}
-        
-        <div class="signatures">
-            <div class="signature-item">
-                <div class="signature-title">甲方（当事人）</div>
-                <div class="signature-line"></div>
-            </div>
-            <div class="signature-item">
-                <div class="signature-title">乙方（当事人）</div>
-                <div class="signature-line"></div>
-            </div>
-            <div class="signature-item">
-                <div class="signature-title">人民调解员</div>
-                <div class="signature-line"></div>
-            </div>
-        </div>
-        
-        <div style="text-align: center; margin-top: 60px; font-size: 14px;">
-            {{agreement_date}}
-        </div>
-    {{else}}
-        <div class="placeholder-page">
-            <h3>未达成调解协议</h3>
-            <p>本案尚未达成调解协议</p>
-        </div>
+    <div class="section">
+      <div class="section-title">一、协议基本信息</div>
+      <div class="info-row">
+        <span class="info-label">协议日期：</span>
+        <span class="info-content">{{agreement_date}}</span>
+      </div>
+      {{#if performance_period}}
+      <div class="info-row">
+        <span class="info-label">履行期限：</span>
+        <span class="info-content">{{performance_period}}</span>
+      </div>
+      {{/if}}
+    </div>
+
+    <div class="section">
+      <div class="section-title">二、协议内容</div>
+      <div class="agreement-content"> {{agreement_content}} </div>
+    </div>
+
+    {{#if breach_liability}}
+    <div class="section">
+      <div class="section-title">三、违约责任</div>
+      <div class="agreement-content"> {{breach_liability}} </div>
+    </div>
     {{/if}}
-</body>
+
+    <div class="signatures">
+      <div class="signature-item">
+        <div class="signature-title">甲方（当事人）</div>
+        <div class="signature-line"></div>
+      </div>
+      <div class="signature-item">
+        <div class="signature-title">乙方（当事人）</div>
+        <div class="signature-line"></div>
+      </div>
+      <div class="signature-item">
+        <div class="signature-title">人民调解员</div>
+        <div class="signature-line"></div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 60px; font-size: 14px"> {{agreement_date}} </div>
+    {{else}}
+    <div class="placeholder-page">
+      <h3>未达成调解协议</h3>
+      <p>本案尚未达成调解协议</p>
+    </div>
+    {{/if}}
+  </body>
 </html>

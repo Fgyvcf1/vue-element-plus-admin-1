@@ -7,20 +7,24 @@ import UploadAvatar from './components/UploadAvatar.vue'
 import { Dialog } from '@/components/Dialog'
 import EditInfo from './components/EditInfo.vue'
 import EditPassword from './components/EditPassword.vue'
+import { getProfile } from '@/api/user'
+import { useUserStoreWithOut } from '@/store/modules/user'
 
 const userInfo = ref()
+const userStore = useUserStoreWithOut()
 const fetchDetailUserApi = async () => {
-  // 这里可以调用接口获取用户信息
-  const data = {
-    id: 1,
-    username: 'admin',
-    realName: 'admin',
-    phoneNumber: '18888888888',
-    email: '502431556@qq.com',
-    avatarUrl: '',
-    roleList: ['超级管理员']
+  try {
+    const res = await getProfile()
+    if (res?.data) {
+      userInfo.value = res.data
+      userStore.setUserInfo({
+        ...userStore.getUserInfo,
+        ...res.data
+      })
+    }
+  } catch (error) {
+    console.error('获取个人资料失败:', error)
   }
-  userInfo.value = data
 }
 fetchDetailUserApi()
 
@@ -44,6 +48,14 @@ const saveAvatar = async () => {
   } finally {
     avatarLoading.value = false
   }
+}
+
+const handleProfileUpdated = (data: any) => {
+  userInfo.value = data
+  userStore.setUserInfo({
+    ...userStore.getUserInfo,
+    ...data
+  })
 }
 </script>
 
@@ -99,7 +111,7 @@ const saveAvatar = async () => {
     <ContentWrap title="基本资料" class="flex-[3] ml-20px">
       <ElTabs v-model="activeName">
         <ElTabPane label="基本信息" name="first">
-          <EditInfo :user-info="userInfo" />
+          <EditInfo :user-info="userInfo" @updated="handleProfileUpdated" />
         </ElTabPane>
         <ElTabPane label="修改密码" name="second">
           <EditPassword />

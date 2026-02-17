@@ -3,7 +3,9 @@
     <el-card>
       <div slot="header" class="clearfix">
         <span>政策享受记录管理</span>
-        <el-button type="primary" size="small" icon="el-icon-plus" @click="handleAddRecord">新增政策记录</el-button>
+        <el-button type="primary" size="small" icon="el-icon-plus" @click="handleAddRecord"
+          >新增政策记录</el-button
+        >
       </div>
 
       <!-- 低收入人员基本信息 -->
@@ -29,8 +31,22 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="当前状态">
-              <el-tag :type="personInfo.status === 'active' ? 'success' : personInfo.status === 'suspended' ? 'warning' : 'danger'">
-                {{ personInfo.status === 'active' ? '在享' : personInfo.status === 'suspended' ? '暂停' : '取消' }}
+              <el-tag
+                :type="
+                  personInfo.status === 'active'
+                    ? 'success'
+                    : personInfo.status === 'suspended'
+                      ? 'warning'
+                      : 'danger'
+                "
+              >
+                {{
+                  personInfo.status === 'active'
+                    ? '在享'
+                    : personInfo.status === 'suspended'
+                      ? '暂停'
+                      : '取消'
+                }}
               </el-tag>
             </el-form-item>
           </el-col>
@@ -53,10 +69,20 @@
               <div class="card-header">
                 <h4>{{ record.policyType }}</h4>
                 <div class="card-actions">
-                  <el-button size="mini" type="primary" icon="el-icon-edit" @click="handleEditRecord(record)">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    icon="el-icon-edit"
+                    @click="handleEditRecord(record)"
+                  >
                     编辑
                   </el-button>
-                  <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDeleteRecord(record)">
+                  <el-button
+                    size="mini"
+                    type="danger"
+                    icon="el-icon-delete"
+                    @click="handleDeleteRecord(record)"
+                  >
                     删除
                   </el-button>
                 </div>
@@ -78,7 +104,11 @@
                   <el-col :span="12">
                     <div class="info-item">
                       <span class="label">补助金额：</span>
-                      <span class="value">{{ record.subsidyAmount ? record.subsidyAmount + '元/' + formatCycle(record.subsidyCycle) : '无补助' }}</span>
+                      <span class="value">{{
+                        record.subsidyAmount
+                          ? record.subsidyAmount + '元/' + formatCycle(record.subsidyCycle)
+                          : '无补助'
+                      }}</span>
                     </div>
                   </el-col>
                   <el-col :span="12">
@@ -96,7 +126,10 @@
                   <el-col :span="12">
                     <div class="info-item">
                       <span class="label">状态：</span>
-                      <el-tag :type="record.status === 'active' ? 'success' : 'warning'" size="small">
+                      <el-tag
+                        :type="record.status === 'active' ? 'success' : 'warning'"
+                        size="small"
+                      >
                         {{ record.status === 'active' ? '在享' : '已过期' }}
                       </el-tag>
                     </div>
@@ -115,29 +148,20 @@
 
         <!-- 无记录提示 -->
         <div v-if="policyRecords.length === 0" class="no-records">
-          <div style="text-align: center; color: #909399; padding: 20px;">
-            <i class="el-icon-info" style="font-size: 24px; margin-bottom: 10px; display: block;" />
+          <div style="text-align: center; color: #909399; padding: 20px">
+            <i class="el-icon-info" style="font-size: 24px; margin-bottom: 10px; display: block" />
             <span>暂无政策享受记录</span>
           </div>
         </div>
       </el-card>
 
       <!-- 政策记录表单对话框 -->
-      <el-dialog
-        :title="formTitle"
-        :visible.sync="dialogVisible"
-        width="60%"
-        size="small"
-      >
+      <el-dialog :title="formTitle" :visible.sync="dialogVisible" width="60%" size="small">
         <el-form ref="recordForm" :model="formData" label-width="120px" size="small">
           <el-row :gutter="12">
             <el-col :span="12">
               <el-form-item label="政策类型" prop="policyType">
-                <el-input
-                  v-model="formData.policyType"
-                  placeholder="请输入政策类型"
-                  size="small"
-                />
+                <el-input v-model="formData.policyType" placeholder="请输入政策类型" size="small" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -206,11 +230,7 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="状态" prop="status">
-                <el-select
-                  v-model="formData.status"
-                  placeholder="请选择状态"
-                  size="small"
-                >
+                <el-select v-model="formData.status" placeholder="请选择状态" size="small">
                   <el-option label="在享" value="active" />
                   <el-option label="已过期" value="expired" />
                   <el-option label="已调整" value="adjusted" />
@@ -232,7 +252,9 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button size="small" @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" size="small" :loading="loading" @click="handleSaveRecord">保存</el-button>
+          <el-button type="primary" size="small" :loading="loading" @click="handleSaveRecord"
+            >保存</el-button
+          >
         </div>
       </el-dialog>
     </el-card>
@@ -311,7 +333,7 @@ export default {
         const response = await getPolicyRecords({ low_income_person_id: this.lowIncomePersonId })
         if (response && response.data) {
           // 将API返回的数据转换为组件需要的格式
-          this.policyRecords = response.data.map(item => ({
+          this.policyRecords = response.data.map((item) => ({
             id: item.id,
             lowIncomePersonId: item.low_income_person_id,
             policyType: item.policy_type,
@@ -383,14 +405,16 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        // 这里应该调用实际的API删除记录
-        // 模拟删除
-        this.policyRecords = this.policyRecords.filter(item => item.id !== record.id)
-        this.$message.success('删除成功')
-      }).catch(() => {
-        // 取消删除
       })
+        .then(() => {
+          // 这里应该调用实际的API删除记录
+          // 模拟删除
+          this.policyRecords = this.policyRecords.filter((item) => item.id !== record.id)
+          this.$message.success('删除成功')
+        })
+        .catch(() => {
+          // 取消删除
+        })
     },
 
     // 表单验证

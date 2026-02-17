@@ -9,7 +9,12 @@
         <!-- 筛选区域 -->
         <el-form :inline="true" :model="queryParams" class="demo-form-inline">
           <el-form-item label="配置组">
-            <el-select v-model="queryParams.group" placeholder="全部" clearable @change="handleQuery">
+            <el-select
+              v-model="queryParams.group"
+              placeholder="全部"
+              clearable
+              @change="handleQuery"
+            >
               <el-option
                 v-for="item in groupOptions"
                 :key="item.value"
@@ -36,7 +41,12 @@
         <el-row style="margin-bottom: 20px">
           <el-col :span="12">
             <el-button type="primary" icon="el-icon-plus" @click="handleAdd">新增配置</el-button>
-            <el-button type="success" icon="el-icon-check" :disabled="selectedConfigs.length === 0" @click="handleBatchSave">
+            <el-button
+              type="success"
+              icon="el-icon-check"
+              :disabled="selectedConfigs.length === 0"
+              @click="handleBatchSave"
+            >
               批量保存
             </el-button>
           </el-col>
@@ -63,13 +73,24 @@
           <el-table-column prop="config_group" label="配置组" width="120">
             <template slot-scope="scope">
               <el-tag
-                :type="scope.row.config_group === 'notification' ? 'warning' :
-                       scope.row.config_group === 'system' ? 'primary' : 'info'"
+                :type="
+                  scope.row.config_group === 'notification'
+                    ? 'warning'
+                    : scope.row.config_group === 'system'
+                      ? 'primary'
+                      : 'info'
+                "
                 size="small"
               >
-                {{ scope.row.config_group === 'notification' ? '通知配置' :
-                    scope.row.config_group === 'system' ? '系统配置' :
-                    scope.row.config_group === 'dictionary' ? '字典配置' : scope.row.config_group }}
+                {{
+                  scope.row.config_group === 'notification'
+                    ? '通知配置'
+                    : scope.row.config_group === 'system'
+                      ? '系统配置'
+                      : scope.row.config_group === 'dictionary'
+                        ? '字典配置'
+                        : scope.row.config_group
+                }}
               </el-tag>
             </template>
           </el-table-column>
@@ -125,7 +146,8 @@
                 size="small"
                 style="color: #f56c6c"
                 @click="handleDelete(scope.row)"
-              >删除</el-button>
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -153,14 +175,22 @@
             <el-input v-model="configForm.config_key" placeholder="请输入配置键（英文）" />
           </el-form-item>
           <el-form-item label="配置组" prop="config_group">
-            <el-select v-model="configForm.config_group" placeholder="请选择配置组" style="width: 100%">
+            <el-select
+              v-model="configForm.config_group"
+              placeholder="请选择配置组"
+              style="width: 100%"
+            >
               <el-option label="通知配置" value="notification" />
               <el-option label="系统配置" value="system" />
               <el-option label="字典配置" value="dictionary" />
             </el-select>
           </el-form-item>
           <el-form-item label="值类型" prop="value_type">
-            <el-select v-model="configForm.value_type" placeholder="请选择值类型" style="width: 100%">
+            <el-select
+              v-model="configForm.value_type"
+              placeholder="请选择值类型"
+              style="width: 100%"
+            >
               <el-option label="字符串" value="string" />
               <el-option label="数字" value="number" />
               <el-option label="布尔值" value="boolean" />
@@ -189,7 +219,13 @@
 </template>
 
 <script>
-import { getConfigList, createConfig, updateConfig, deleteConfig, getConfigGroups } from '../../api/config'
+import {
+  getConfigList,
+  createConfig,
+  updateConfig,
+  deleteConfig,
+  getConfigGroups
+} from '../../api/config'
 
 export default {
   name: 'SystemConfig',
@@ -226,22 +262,18 @@ export default {
       },
       // 表单验证规则
       configRules: {
-        config_name: [
-          { required: true, message: '请输入配置名称', trigger: 'blur' }
-        ],
+        config_name: [{ required: true, message: '请输入配置名称', trigger: 'blur' }],
         config_key: [
           { required: true, message: '请输入配置键', trigger: 'blur' },
-          { pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/, message: '配置键只能包含字母、数字和下划线，且不能以数字开头', trigger: 'blur' }
+          {
+            pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+            message: '配置键只能包含字母、数字和下划线，且不能以数字开头',
+            trigger: 'blur'
+          }
         ],
-        config_group: [
-          { required: true, message: '请选择配置组', trigger: 'change' }
-        ],
-        value_type: [
-          { required: true, message: '请选择值类型', trigger: 'change' }
-        ],
-        config_value: [
-          { required: true, message: '请输入配置值', trigger: 'blur' }
-        ]
+        config_group: [{ required: true, message: '请选择配置组', trigger: 'change' }],
+        value_type: [{ required: true, message: '请选择值类型', trigger: 'change' }],
+        config_value: [{ required: true, message: '请输入配置值', trigger: 'blur' }]
       }
     }
   },
@@ -325,14 +357,14 @@ export default {
     },
     // 批量保存
     async handleBatchSave() {
-      const changedConfigs = this.selectedConfigs.filter(item => item.changed)
+      const changedConfigs = this.selectedConfigs.filter((item) => item.changed)
       if (changedConfigs.length === 0) {
         this.$message.warning('没有需要保存的配置')
         return
       }
 
       try {
-        const configs = changedConfigs.map(item => ({
+        const configs = changedConfigs.map((item) => ({
           key: item.config_key,
           value: item.config_value
         }))
@@ -356,7 +388,7 @@ export default {
     },
     // 提交表单
     handleSubmit() {
-      this.$refs.configForm.validate(async valid => {
+      this.$refs.configForm.validate(async (valid) => {
         if (valid) {
           try {
             const res = await createConfig({
@@ -383,18 +415,20 @@ export default {
     handleDelete(row) {
       this.$confirm('确认删除该配置吗？', '提示', {
         type: 'warning'
-      }).then(async() => {
-        try {
-          const res = await deleteConfig(row.config_key)
-          if (res.success) {
-            this.$message.success('删除成功')
-            this.fetchConfigList()
+      })
+        .then(async () => {
+          try {
+            const res = await deleteConfig(row.config_key)
+            if (res.success) {
+              this.$message.success('删除成功')
+              this.fetchConfigList()
+            }
+          } catch (error) {
+            console.error('删除配置失败:', error)
+            this.$message.error('删除配置失败')
           }
-        } catch (error) {
-          console.error('删除配置失败:', error)
-          this.$message.error('删除配置失败')
-        }
-      }).catch(() => {})
+        })
+        .catch(() => {})
     }
   }
 }
@@ -408,7 +442,7 @@ export default {
 .clearfix:before,
 .clearfix:after {
   display: table;
-  content: "";
+  content: '';
 }
 
 .clearfix:after {

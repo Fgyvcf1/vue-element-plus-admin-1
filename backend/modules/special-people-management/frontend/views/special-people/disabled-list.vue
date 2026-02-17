@@ -55,14 +55,26 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="small" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+          <el-button type="primary" size="small" icon="el-icon-search" @click="handleQuery"
+            >搜索</el-button
+          >
           <el-button size="small" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
-          <el-button type="success" size="small" icon="el-icon-plus" @click="handleAdd">新增残疾人</el-button>
-          <span style="margin-left: 20px; color: #409EFF; cursor: pointer;" @click="handleExport">导出</span>
+          <el-button type="success" size="small" icon="el-icon-plus" @click="handleAdd"
+            >新增残疾人</el-button
+          >
+          <span style="margin-left: 20px; color: #409eff; cursor: pointer" @click="handleExport"
+            >导出</span
+          >
         </el-form-item>
       </el-form>
 
-      <el-table v-loading="loading" :data="disabledList" size="small" style="width: 100%" @row-click="handleRowClick">
+      <el-table
+        v-loading="loading"
+        :data="disabledList"
+        size="small"
+        style="width: 100%"
+        @row-click="handleRowClick"
+      >
         <el-table-column type="index" width="50" align="center" />
         <el-table-column prop="name" label="居民姓名" align="center" width="100" />
         <el-table-column prop="gender" label="性别" align="center" width="60" />
@@ -84,12 +96,17 @@
         </el-table-column>
         <el-table-column prop="guardianName" label="监护人姓名" align="center" width="100" />
         <el-table-column prop="guardianPhone" label="监护人电话" align="center" width="120" />
-        <el-table-column prop="guardianRelationship" label="与残疾人关系" align="center" width="120" />
+        <el-table-column
+          prop="guardianRelationship"
+          label="与残疾人关系"
+          align="center"
+          width="120"
+        />
         <el-table-column prop="address" label="家庭住址" align="center" min-width="200" />
       </el-table>
 
       <pagination
-        v-show="total>0"
+        v-show="total > 0"
         :total="total"
         :page.sync="queryParams.pageNum"
         :limit.sync="queryParams.pageSize"
@@ -157,39 +174,46 @@ export default {
 
     getList() {
       this.loading = true
-      getDisabledPersons(this.queryParams).then(response => {
-        if (response && response.data && Array.isArray(response.data)) {
-          // 将API返回的数据转换为组件需要的格式
-          this.disabledList = response.data.map(item => ({
-            id: item.id,
-            name: item.name || '',
-            idCard: item.idCard || '',
-            gender: item.gender || '',
-            age: item.age || '',
-            disabilityType: item.disability_type,
-            disabilityLevel: item.disability_level,
-            certificateNumber: item.certificate_number,
-            issueDate: item.issue_date,
-            certificateStatus: item.certificate_status || '在持',
-            guardianName: item.guardian_name || '',
-            guardianPhone: item.guardian_phone || '',
-            guardianRelationship: item.guardian_relationship || '',
-            address: item.household_address || item.resident_address || item.address || item.residence_address || ''
-          }))
-          this.total = response.data.length
-        } else {
-          // 没有数据时显示空数组
+      getDisabledPersons(this.queryParams)
+        .then((response) => {
+          if (response && response.data && Array.isArray(response.data)) {
+            // 将API返回的数据转换为组件需要的格式
+            this.disabledList = response.data.map((item) => ({
+              id: item.id,
+              name: item.name || '',
+              idCard: item.idCard || '',
+              gender: item.gender || '',
+              age: item.age || '',
+              disabilityType: item.disability_type,
+              disabilityLevel: item.disability_level,
+              certificateNumber: item.certificate_number,
+              issueDate: item.issue_date,
+              certificateStatus: item.certificate_status || '在持',
+              guardianName: item.guardian_name || '',
+              guardianPhone: item.guardian_phone || '',
+              guardianRelationship: item.guardian_relationship || '',
+              address:
+                item.household_address ||
+                item.resident_address ||
+                item.address ||
+                item.residence_address ||
+                ''
+            }))
+            this.total = response.data.length
+          } else {
+            // 没有数据时显示空数组
+            this.disabledList = []
+            this.total = 0
+          }
+          this.loading = false
+        })
+        .catch((error) => {
+          console.error('获取残疾人数据失败:', error)
           this.disabledList = []
           this.total = 0
-        }
-        this.loading = false
-      }).catch(error => {
-        console.error('获取残疾人数据失败:', error)
-        this.disabledList = []
-        this.total = 0
-        this.loading = false
-        this.$message.error('获取残疾人数据失败')
-      })
+          this.loading = false
+          this.$message.error('获取残疾人数据失败')
+        })
     },
     handleQuery() {
       this.queryParams.pageNum = 1
@@ -244,7 +268,21 @@ export default {
       }
 
       // 定义Excel表头
-      const headers = ['序号', '居民姓名', '性别', '年龄', '残疾类型', '残疾等级', '残疾证号', '初次发证日期', '持证状态', '监护人姓名', '监护人电话', '与残疾人关系', '家庭住址']
+      const headers = [
+        '序号',
+        '居民姓名',
+        '性别',
+        '年龄',
+        '残疾类型',
+        '残疾等级',
+        '残疾证号',
+        '初次发证日期',
+        '持证状态',
+        '监护人姓名',
+        '监护人电话',
+        '与残疾人关系',
+        '家庭住址'
+      ]
       const textColumns = [2, 6, 10] // 身份证号(索引2)、残疾证号(索引6)、监护人电话(索引10)设置为文本格式
 
       // 转换数据

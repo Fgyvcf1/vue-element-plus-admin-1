@@ -1,21 +1,21 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const dbPath = path.join(__dirname, 'app.db');
-const db = new sqlite3.Database(dbPath);
+const sqlite3 = require('sqlite3').verbose()
+const path = require('path')
+const dbPath = path.join(__dirname, 'app.db')
+const db = new sqlite3.Database(dbPath)
 
-console.log('检查数据库中的所有表...');
+console.log('检查数据库中的所有表...')
 db.all("SELECT name FROM sqlite_master WHERE type='table';", (err, tables) => {
   if (err) {
-    console.error('查询表列表失败:', err.message);
-    db.close();
-    return;
+    console.error('查询表列表失败:', err.message)
+    db.close()
+    return
   }
-  
-  console.log('数据库中存在的表:');
+
+  console.log('数据库中存在的表:')
   tables.forEach((table, index) => {
-    console.log(`${index + 1}. ${table.name}`);
-  });
-  
+    console.log(`${index + 1}. ${table.name}`)
+  })
+
   // 检查并创建必要的表
   const tablesToCheck = [
     {
@@ -65,44 +65,46 @@ db.all("SELECT name FROM sqlite_master WHERE type='table';", (err, tables) => {
         );
       `
     }
-  ];
-  
+  ]
+
   // 检查并创建表
-  let tablesCreated = 0;
-  const totalTables = tablesToCheck.length;
-  
-  tablesToCheck.forEach(tableInfo => {
-    if (!tables.some(table => table.name === tableInfo.name)) {
-      console.log(`\n创建${tableInfo.name}表...`);
-      
+  let tablesCreated = 0
+  const totalTables = tablesToCheck.length
+
+  tablesToCheck.forEach((tableInfo) => {
+    if (!tables.some((table) => table.name === tableInfo.name)) {
+      console.log(`\n创建${tableInfo.name}表...`)
+
       db.run(tableInfo.createSql, (err) => {
         if (err) {
-          console.error(`创建${tableInfo.name}表失败:`, err.message);
+          console.error(`创建${tableInfo.name}表失败:`, err.message)
         } else {
-          console.log(`${tableInfo.name}表创建成功！`);
+          console.log(`${tableInfo.name}表创建成功！`)
           // 再次检查表结构
           db.all(`PRAGMA table_info(${tableInfo.name});`, (err, rows) => {
             if (err) {
-              console.error('查询新创建的表结构失败:', err.message);
+              console.error('查询新创建的表结构失败:', err.message)
             } else {
-              console.log(`\n新创建的${tableInfo.name}表结构:`);
+              console.log(`\n新创建的${tableInfo.name}表结构:`)
               rows.forEach((row, index) => {
-                console.log(`${index + 1}. ${row.name} (${row.type}) - ${row.notnull ? 'NOT NULL' : 'NULL'} ${row.pk ? 'PRIMARY KEY' : ''}`);
-              });
+                console.log(
+                  `${index + 1}. ${row.name} (${row.type}) - ${row.notnull ? 'NOT NULL' : 'NULL'} ${row.pk ? 'PRIMARY KEY' : ''}`
+                )
+              })
             }
-            
-            tablesCreated++;
+
+            tablesCreated++
             if (tablesCreated === totalTables) {
-              db.close();
+              db.close()
             }
-          });
+          })
         }
-      });
+      })
     } else {
-      tablesCreated++;
+      tablesCreated++
       if (tablesCreated === totalTables) {
-        db.close();
+        db.close()
       }
     }
-  });
-});
+  })
+})

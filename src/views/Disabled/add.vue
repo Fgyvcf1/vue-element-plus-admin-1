@@ -1,7 +1,14 @@
 <template>
   <div class="app-container">
     <el-card>
-      <el-form ref="disabledFormRef" :model="formData" :rules="formRules" label-width="100px" size="small" class="demo-form">
+      <el-form
+        ref="disabledFormRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="100px"
+        size="small"
+        class="demo-form"
+      >
         <!-- 居民基本信息（只读，自动填充） -->
         <el-card class="section-card" style="margin-bottom: 10px; padding: 5px">
           <template #header>
@@ -127,7 +134,9 @@
         </el-card>
 
         <div class="form-actions">
-          <el-button type="primary" size="small" :loading="loading" @click="handleSave">保存</el-button>
+          <el-button type="primary" size="small" :loading="loading" @click="handleSave"
+            >保存</el-button
+          >
           <el-button size="small" @click="handleCancel">取消</el-button>
         </div>
       </el-form>
@@ -153,11 +162,7 @@ import {
 } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { getResidents, getResident } from '@/api/resident'
-import {
-  addDisabledPerson,
-  updateDisabledPerson,
-  getDisabledPerson
-} from '@/api/disabled'
+import { addDisabledPerson, updateDisabledPerson, getDisabledPerson } from '@/api/disabled'
 import { getDictionaryByCategory } from '@/api/dictionary'
 
 const router = useRouter()
@@ -199,11 +204,11 @@ const formRules = reactive<FormRules>({
 const loadDictionaries = async () => {
   try {
     console.log('开始加载字典数据...')
-    
+
     // 加载残疾类型字典（注意：字典表中分类是"残疾类型"，不是"残疾类别"）
     const typeRes = await getDictionaryByCategory('残疾类型')
     console.log('残疾类型字典响应:', typeRes)
-    
+
     // 响应拦截器已经返回了 response.data，所以直接使用 typeRes.data
     if (typeRes.data) {
       disabilityTypeOptions.value = typeRes.data.map((item: any) => ({
@@ -216,7 +221,7 @@ const loadDictionaries = async () => {
     // 加载残疾等级字典
     const levelRes = await getDictionaryByCategory('残疾等级')
     console.log('残疾等级字典响应:', levelRes)
-    
+
     if (levelRes.data) {
       disabilityLevelOptions.value = levelRes.data.map((item: any) => ({
         label: item.label || item.value,
@@ -228,7 +233,7 @@ const loadDictionaries = async () => {
     console.error('加载字典数据失败:', error)
     ElMessage.warning('加载字典数据失败，使用默认选项')
   }
-  
+
   // 如果没有获取到数据，使用默认值
   if (disabilityTypeOptions.value.length === 0) {
     console.log('使用默认残疾类别选项')
@@ -343,7 +348,7 @@ const loadEditData = async (id: number) => {
       formData.dateOfBirth = (data as any).dateOfBirth || ''
       formData.age = String((data as any).age || '')
       formData.phoneNumber = (data as any).phoneNumber || ''
-      
+
       formData.disabilityType = data.disability_type
       formData.disabilityLevel = data.disability_level
       formData.disabilityCardNumber = data.disability_card_number || ''
@@ -360,20 +365,20 @@ const loadEditData = async (id: number) => {
 
 // 保存数据
 const handleSave = async () => {
-  console.log('开始保存残疾人信息...');
+  console.log('开始保存残疾人信息...')
   if (!disabledFormRef.value) {
-    console.error('表单引用无效');
-    return;
+    console.error('表单引用无效')
+    return
   }
 
   try {
-    console.log('触发表单验证...');
-    const valid = await disabledFormRef.value.validate();
-    console.log('表单验证结果:', valid);
+    console.log('触发表单验证...')
+    const valid = await disabledFormRef.value.validate()
+    console.log('表单验证结果:', valid)
 
     if (valid) {
-      loading.value = true;
-      console.log('表单验证通过，准备保存数据');
+      loading.value = true
+      console.log('表单验证通过，准备保存数据')
 
       const saveData = {
         resident_id: formData.residentId,
@@ -382,42 +387,42 @@ const handleSave = async () => {
         certificate_number: formData.disabilityCardNumber || null,
         guardian_name: formData.guardianName || null,
         guardian_phone: formData.guardianPhoneNumber || null
-      };
-      
-      console.log('待保存的数据 (saveData):', JSON.stringify(saveData, null, 2));
+      }
+
+      console.log('待保存的数据 (saveData):', JSON.stringify(saveData, null, 2))
 
       if (!saveData.resident_id) {
-          ElMessage.error('居民ID丢失，无法保存');
-          loading.value = false;
-          return;
+        ElMessage.error('居民ID丢失，无法保存')
+        loading.value = false
+        return
       }
 
       if (isEdit.value && formData.id) {
-        console.log('执行更新操作, ID:', formData.id);
-        await updateDisabledPerson(formData.id, saveData);
-        ElMessage.success('更新残疾人信息成功');
+        console.log('执行更新操作, ID:', formData.id)
+        await updateDisabledPerson(formData.id, saveData)
+        ElMessage.success('更新残疾人信息成功')
       } else {
-        console.log('执行新增操作');
-        await addDisabledPerson(saveData);
-        ElMessage.success('新增残疾人信息成功');
+        console.log('执行新增操作')
+        await addDisabledPerson(saveData)
+        ElMessage.success('新增残疾人信息成功')
       }
 
       // 跳转回列表页
-      router.push({ name: 'DisabledList' });
+      router.push({ name: 'DisabledList' })
     } else {
-        console.warn('表单验证失败');
-        ElMessage.warning('请检查表单必填项');
+      console.warn('表单验证失败')
+      ElMessage.warning('请检查表单必填项')
     }
   } catch (error: any) {
-    console.error('保存残疾人信息时发生严重错误:', error);
+    console.error('保存残疾人信息时发生严重错误:', error)
     // 检查是否是校验未通过的错误（promise reject）
     if (error && typeof error === 'object' && !error.response) {
       // 很可能是校验错误，上面已经提示，这里不再重复
     } else {
-      ElMessage.error(error.response?.data?.message || error.message || '保存残疾人信息失败');
+      ElMessage.error(error.response?.data?.message || error.message || '保存残疾人信息失败')
     }
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 

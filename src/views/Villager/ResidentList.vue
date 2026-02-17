@@ -1,5 +1,15 @@
 <script setup lang="tsx">
-import { ref, reactive, computed, onMounted, onActivated, onBeforeUnmount, nextTick, h, unref } from 'vue'
+import {
+  ref,
+  reactive,
+  computed,
+  onMounted,
+  onActivated,
+  onBeforeUnmount,
+  nextTick,
+  h,
+  unref
+} from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
@@ -403,7 +413,7 @@ const handleAddDisabled = () => {
   closeContextMenu()
   if (selectedRow.value) {
     router.push({
-      path: '/special-people/disabled/add',
+      name: 'DisabledAdd',
       query: { residentId: selectedRow.value.id }
     })
   }
@@ -414,7 +424,7 @@ const handleAddLowIncome = () => {
   closeContextMenu()
   if (selectedRow.value) {
     router.push({
-      path: '/special-people/low-income/add',
+      name: 'LowIncomeAdd',
       query: { residentId: selectedRow.value.id }
     })
   }
