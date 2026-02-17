@@ -44,8 +44,8 @@ router.beforeEach(async (to, from, next) => {
 
     // 非超级管理员禁止访问权限管理/系统设置
     if (!isSuperAdmin && (to.path.startsWith('/permission') || to.path.startsWith('/system'))) {
-      ElMessage.warning('仅超级管理员可访问该页面')
-      next({ path: '/403', replace: true })
+      ElMessage.warning('当前账号没有权限')
+      next(false)
       return
     }
 
@@ -68,8 +68,8 @@ router.beforeEach(async (to, from, next) => {
       const requiredPermission = to.meta?.permission as string
       if (requiredPermission && !userStore.hasPermission(requiredPermission)) {
         console.log('无权限访问:', requiredPermission)
-        ElMessage.warning('您没有该页面的访问权限')
-        next({ path: '/index', replace: true })
+        ElMessage.warning('当前账号没有权限')
+        next(false)
         return
       }
 
@@ -127,8 +127,8 @@ router.beforeEach(async (to, from, next) => {
     // 动态路由模式下也做权限校验（防止手动输入URL）
     const requiredPermission = to.meta?.permission as string
     if (requiredPermission && !userStore.hasPermission(requiredPermission)) {
-      ElMessage.warning('您没有该页面的访问权限')
-      next({ path: '/403', replace: true })
+      ElMessage.warning('当前账号没有权限')
+      next(false)
       return
     }
 

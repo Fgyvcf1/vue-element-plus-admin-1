@@ -98,7 +98,7 @@
         :close-on-click-modal="true"
         @close="handleDialogClose"
       >
-        <div style="margin-bottom: 16px; text-align: right">
+        <div v-if="canEdit" style="margin-bottom: 16px; text-align: right">
           <el-button v-if="!isEditing" type="primary" size="small" @click="handleEditDetail"
             >编辑</el-button
           >
@@ -305,7 +305,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   ElMessage,
@@ -331,9 +331,12 @@ import type { FormInstance } from 'element-plus'
 import { getDisabledPersons, getDisabledPerson, updateDisabledPerson } from '@/api/disabled'
 import { getDictionaryByCategory } from '@/api/dictionary'
 import ExcelJS from 'exceljs'
+import { useUserStore } from '@/store/modules/user'
 
 const router = useRouter()
+const userStore = useUserStore()
 const queryFormRef = ref<FormInstance>()
+const canEdit = computed(() => userStore.hasPermission('special:edit'))
 
 const loading = ref(false)
 const disabledList = ref<any[]>([])

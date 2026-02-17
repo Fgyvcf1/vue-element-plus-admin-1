@@ -143,7 +143,7 @@
 
     <el-dialog v-model="detailVisible" title="待办详情" width="760px" destroy-on-close>
       <div class="dialog-top-actions">
-        <el-button v-if="detailReadonly" type="primary" size="small" @click="detailReadonly = false"
+        <el-button v-if="detailReadonly" type="primary" size="small" @click="enableDetailEdit"
           >编辑</el-button
         >
         <template v-else>
@@ -247,7 +247,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   ElCard,
@@ -280,6 +280,7 @@ import {
   markAllTodoRemindersRead,
   updateTodoReminder
 } from '@/api/todoReminder'
+import { useUserStore } from '@/store/modules/user'
 
 const loading = ref(false)
 const createLoading = ref(false)
@@ -291,6 +292,9 @@ const selectedIds = ref<number[]>([])
 const detailVisible = ref(false)
 const createVisible = ref(false)
 const detailReadonly = ref(true)
+const userStore = useUserStore()
+const canAdd = computed(() => userStore.hasPermission('todo:add'))
+const canEdit = computed(() => userStore.hasPermission('todo:edit'))
 
 const quickTab = ref<'all' | 'unread' | 'task' | 'birth' | 'event'>('all')
 
@@ -438,7 +442,23 @@ const cancelEditDetail = () => {
   detailReadonly.value = true
 }
 
+const warnNoPermission = () => {
+  ElMessage.warning('当前账号没有权限')
+}
+
+const enableDetailEdit = () => {
+  if (!canEdit.value) {
+    warnNoPermission()
+    return
+  }
+  detailReadonly.value = false
+}
+
 const handleSaveDetail = async () => {
+  if (!canEdit.value) {
+    warnNoPermission()
+    return
+  }
   if (!editForm.id) return
   if (!editForm.title?.trim() || !editForm.content?.trim()) {
     ElMessage.warning('标题和内容不能为空')
@@ -465,6 +485,10 @@ const handleSaveDetail = async () => {
 }
 
 const openCreateDialog = () => {
+  if (!canAdd.value) {
+    warnNoPermission()
+    return
+  }
   createForm.title = ''
   createForm.content = ''
   createForm.type = 'task'
@@ -473,6 +497,10 @@ const openCreateDialog = () => {
 }
 
 const handleCreate = async () => {
+  if (!canAdd.value) {
+    warnNoPermission()
+    return
+  }
   if (!createForm.title.trim() || !createForm.content.trim()) {
     ElMessage.warning('请填写标题和内容')
     return

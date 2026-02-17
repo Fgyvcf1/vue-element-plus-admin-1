@@ -115,7 +115,7 @@ export const usePermissionStore = defineStore('permission', {
         this.addRouters = routerMap.concat([
           {
             path: '/:path(.*)*',
-            redirect: '/404',
+            redirect: '/error/404-demo',
             name: '404Page',
             meta: {
               hidden: true,

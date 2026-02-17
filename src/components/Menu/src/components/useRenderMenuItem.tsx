@@ -25,6 +25,10 @@ export const useRenderMenuItem = (menuMode) =>
 
       const canShow = (route: AppRouteRecordRaw): boolean => {
         const meta = route.meta ?? {}
+        const roleCode = userStore.getUserInfo?.role
+        if (roleCode === 'readonly' && (route.path === '/permission' || route.path === '/system')) {
+          return false
+        }
         if (meta.hidden) return false
         const allowed = hasPerm(meta.permission as string | string[] | undefined)
         if (allowed) return true

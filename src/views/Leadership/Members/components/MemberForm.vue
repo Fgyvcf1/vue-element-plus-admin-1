@@ -164,6 +164,7 @@ import { addCommitteeMember, updateCommitteeMember } from '@/api/leadership'
 import { getResidentList } from '@/api/resident'
 import { getDictionaryByCategory } from '@/api/dictionary'
 import HistoryTimeline from './HistoryTimeline.vue'
+import { useUserStore } from '@/store/modules/user'
 
 const props = defineProps<{
   visible: boolean
@@ -181,6 +182,10 @@ const dialogVisible = computed({
   get: () => props.visible,
   set: (val: boolean) => emit('update:visible', val)
 })
+
+const userStore = useUserStore()
+const canAdd = computed(() => userStore.hasPermission('organization:add'))
+const canEdit = computed(() => userStore.hasPermission('organization:edit'))
 
 const isEdit = computed(() => !!form.id)
 const isEditing = ref(false)
@@ -291,6 +296,10 @@ watch(
 )
 
 const enableEdit = () => {
+  if (!canEdit.value) {
+    ElMessage.warning('当前账号没有权限')
+    return
+  }
   isEditing.value = true
 }
 
@@ -330,6 +339,14 @@ const handleResidentSelect = (selectedResident: any) => {
 }
 
 const handleSubmit = async () => {
+  if (isEdit.value && !canEdit.value) {
+    ElMessage.warning('当前账号没有权限')
+    return
+  }
+  if (!isEdit.value && !canAdd.value) {
+    ElMessage.warning('当前账号没有权限')
+    return
+  }
   if (formReadonly.value) {
     return
   }

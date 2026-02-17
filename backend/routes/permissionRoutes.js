@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const db = require('../db')
-const { checkPermission } = require('../middleware/auth')
+const { checkPermission, requireAuth } = require('../middleware/auth')
 
 const toInt = (value, fallback = 0) => {
   const parsed = Number.parseInt(value, 10)
@@ -11,6 +11,68 @@ const toInt = (value, fallback = 0) => {
 const normalizePermissionIds = (value) => {
   if (!Array.isArray(value)) return []
   return value.map((id) => toInt(id, 0)).filter((id) => id > 0)
+}
+
+const toBool = (value) => Number(value) === 1
+
+const buildMenuTree = (rows) => {
+  const nodes = new Map()
+  const order = []
+
+  rows.forEach((row) => {
+    const node = {
+      path: row.path,
+      name: row.name,
+      redirect: row.redirect || undefined,
+      component: row.component || undefined,
+      meta: {
+        title: row.title,
+        icon: row.icon || undefined,
+        hidden: toBool(row.hidden),
+        alwaysShow: toBool(row.always_show),
+        noCache: toBool(row.no_cache),
+        affix: toBool(row.affix),
+        activeMenu: row.active_menu || undefined,
+        permission: row.permission_code || undefined
+      },
+      children: []
+    }
+    nodes.set(row.id, node)
+    order.push(row)
+  })
+
+  const roots = []
+  order.forEach((row) => {
+    const node = nodes.get(row.id)
+    if (!node) return
+    if (row.parent_id && nodes.has(row.parent_id)) {
+      nodes.get(row.parent_id).children.push(node)
+    } else {
+      roots.push(node)
+    }
+  })
+
+  const prune = (list) => {
+    list.forEach((item) => {
+      if (item.children && item.children.length === 0) {
+        delete item.children
+      } else if (item.children) {
+        prune(item.children)
+      }
+      if (!item.meta?.permission) {
+        delete item.meta.permission
+      }
+      if (!item.meta?.icon) {
+        delete item.meta.icon
+      }
+      if (!item.meta?.activeMenu) {
+        delete item.meta.activeMenu
+      }
+    })
+  }
+  prune(roots)
+
+  return roots
 }
 
 // ============================================
@@ -200,6 +262,99 @@ router.delete('/roles/:id', checkPermission('system:role'), async (req, res) => 
 // ============================================
 // 权限管理接口
 // ============================================
+
+// 获取当前用户权限 + 菜单树
+router.get('/me', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.id
+    const [users] = await db.pool.execute(
+      `
+      SELECT u.role_id, u.role AS user_role, r.role_code
+      FROM users u
+      LEFT JOIN roles r ON u.role_id = r.id
+      WHERE u.id = ?
+      `,
+      [userId]
+    )
+
+    if (!users.length) {
+      return res.status(404).json({ code: 404, message: '用户不存在' })
+    }
+
+    const user = users[0]
+    const isSuperAdmin = user.role_code === 'superadmin' || user.user_role === 'superadmin'
+
+    let permissions = []
+    if (isSuperAdmin) {
+      const [permRows] = await db.pool.execute('SELECT permission_code FROM permissions')
+      permissions = permRows.map((row) => row.permission_code)
+    } else if (user.role_id) {
+      const [permRows] = await db.pool.execute(
+        `
+        SELECT p.permission_code
+        FROM role_permissions rp
+        JOIN permissions p ON rp.permission_id = p.id
+        WHERE rp.role_id = ?
+        `,
+        [user.role_id]
+      )
+      permissions = permRows.map((row) => row.permission_code)
+    }
+
+    let menus = []
+    if (isSuperAdmin) {
+      const [menuRows] = await db.pool.execute(
+        `
+        SELECT *
+        FROM sys_menu
+        WHERE status = 1 AND menu_type != 3
+        ORDER BY sort_order ASC, id ASC
+        `
+      )
+      menus = buildMenuTree(menuRows)
+    } else if (user.role_id) {
+      const [roleMenuRows] = await db.pool.execute(
+        'SELECT menu_id FROM role_menu WHERE role_id = ?',
+        [user.role_id]
+      )
+      const allowedIds = new Set(roleMenuRows.map((row) => row.menu_id))
+      if (allowedIds.size > 0) {
+        const [allMenus] = await db.pool.execute(
+          `
+          SELECT *
+          FROM sys_menu
+          WHERE status = 1 AND menu_type != 3
+          ORDER BY sort_order ASC, id ASC
+          `
+        )
+        const menuMap = new Map(allMenus.map((row) => [row.id, row]))
+        const addAncestors = (menuId) => {
+          let current = menuMap.get(menuId)
+          while (current && current.parent_id && current.parent_id !== 0) {
+            if (!allowedIds.has(current.parent_id)) {
+              allowedIds.add(current.parent_id)
+            }
+            current = menuMap.get(current.parent_id)
+          }
+        }
+        Array.from(allowedIds).forEach((id) => addAncestors(id))
+        const filteredMenus = allMenus.filter((row) => allowedIds.has(row.id))
+        menus = buildMenuTree(filteredMenus)
+      }
+    }
+
+    res.json({
+      code: 20000,
+      data: {
+        permissions,
+        menus
+      }
+    })
+  } catch (error) {
+    console.error('获取用户权限失败:', error)
+    res.status(500).json({ code: 500, message: '获取用户权限失败' })
+  }
+})
 
 // 获取所有权限（树形结构）
 router.get('/permissions', checkPermission('system:role'), async (req, res) => {

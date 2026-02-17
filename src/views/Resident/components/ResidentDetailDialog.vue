@@ -1118,7 +1118,7 @@ const loadAllDictionaries = async () => {
 // 点击修改按钮
 const handleEdit = () => {
   if (!canEditResident.value) {
-    ElMessage.warning('当前账号没有编辑居民权限')
+    ElMessage.warning('当前账号没有权限')
     return
   }
   isEditable.value = true
@@ -1249,7 +1249,7 @@ const loadHouseholdMembers = async (householdId: string | number) => {
 // 同户新增
 const handleSameHouseholdAdd = () => {
   if (!canAddResident.value) {
-    ElMessage.warning('当前账号没有新增居民权限')
+    ElMessage.warning('当前账号没有权限')
     return
   }
   isAddingNew.value = true
@@ -1324,11 +1324,11 @@ const handleHouseholdIdCardChange = () => {
 // 保存数据
 const handleSave = async () => {
   if (isAddingNew.value && !canAddResident.value) {
-    ElMessage.warning('当前账号没有新增居民权限')
+    ElMessage.warning('当前账号没有权限')
     return
   }
   if (!isAddingNew.value && !canEditResident.value) {
-    ElMessage.warning('当前账号没有编辑居民权限')
+    ElMessage.warning('当前账号没有权限')
     return
   }
   if (!validateForm()) {
@@ -1725,7 +1725,7 @@ const confirmChangeHead = async () => {
 // 处理户主信息下拉菜单命令
 const handleHouseholdCommand = (command: string) => {
   if (!canEditResident.value) {
-    ElMessage.warning('当前账号没有编辑居民权限')
+    ElMessage.warning('当前账号没有权限')
     return
   }
   console.log('handleHouseholdCommand 被调用:', command)
@@ -1796,7 +1796,7 @@ const toggleMigration = () => {
 // 切换迁途改销编辑模式
 const toggleMigrationEdit = () => {
   if (!canEditResident.value) {
-    ElMessage.warning('当前账号没有编辑居民权限')
+    ElMessage.warning('当前账号没有权限')
     return
   }
   isMigrationEditable.value = true

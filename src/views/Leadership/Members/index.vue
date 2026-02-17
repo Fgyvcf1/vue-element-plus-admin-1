@@ -146,9 +146,11 @@ import {
 } from 'element-plus'
 import { deleteCommitteeMember } from '@/api/leadership'
 import { useLeadershipStore } from '@/store/modules/leadership'
+import { useUserStore } from '@/store/modules/user'
 import MemberForm from './components/MemberForm.vue'
 
 const leadershipStore = useLeadershipStore()
+const userStore = useUserStore()
 const members = computed(() => leadershipStore.getMembers)
 const total = computed(() => leadershipStore.getTotal)
 const loading = computed(() => leadershipStore.getLoading)
@@ -255,6 +257,10 @@ const handleQuery = () => {
 }
 
 const handleAdd = () => {
+  if (!userStore.hasPermission('organization:add')) {
+    ElMessage.warning('当前账号没有权限')
+    return
+  }
   formData.value = {
     id: undefined,
     residentId: undefined,
@@ -273,6 +279,10 @@ const handleAdd = () => {
 }
 
 const handleEdit = (row: any) => {
+  if (!userStore.hasPermission('organization:edit')) {
+    ElMessage.warning('当前账号没有权限')
+    return
+  }
   formData.value = {
     id: row.id,
     residentId: row.resident_id,

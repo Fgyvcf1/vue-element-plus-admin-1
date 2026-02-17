@@ -105,7 +105,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
   {
     path: '/error',
     component: Layout,
-    redirect: '/error/404',
+    redirect: '/error/404-demo',
     name: 'Error',
     meta: {
       title: t('router.errorPage'),
