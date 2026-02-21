@@ -24,6 +24,12 @@ const normalizeValue = (value, toNull = false) => {
   return value
 }
 
+const formatLowIncomeStatus = (status) => {
+  if (status === 'active') return '在享'
+  if (status === 'cancelled') return '已停止/取消'
+  return status || '未知'
+}
+
 const pickLowIncomeType = (body) => {
   return (
     body.low_income_type ||
@@ -297,11 +303,27 @@ const createLowIncome = async (req, res) => {
     }
 
     const [existing] = await db.pool.execute(
-      'SELECT id FROM low_income_persons WHERE resident_id = ? AND status = "active"',
+      `SELECT id, status
+       FROM low_income_persons
+       WHERE resident_id = ?
+       ORDER BY updated_at DESC, created_at DESC, id DESC
+       LIMIT 1`,
       [residentId]
     )
     if (existing.length) {
-      return res.status(400).json({ code: 400, message: '该居民已经是低收入人员' })
+      const status = existing[0]?.status
+      if (status && status !== 'active') {
+        return res.status(400).json({
+          code: 400,
+          message: `该居民已有低收入记录，当前状态：${formatLowIncomeStatus(
+            status
+          )}。请在原记录中恢复后使用`
+        })
+      }
+      return res.status(400).json({
+        code: 400,
+        message: '该居民已有低收入记录，请在原记录中修改，不要重复新增'
+      })
     }
 
     const applyDate = normalizeValue(
@@ -372,6 +394,30 @@ router.post('/low-income-persons-with-policy', checkPermission('special:add'), a
     const [residents] = await db.pool.execute('SELECT id FROM residents WHERE id = ?', [residentId])
     if (!residents.length) {
       return res.status(404).json({ code: 404, message: '居民不存在' })
+    }
+
+    const [existing] = await db.pool.execute(
+      `SELECT id, status
+       FROM low_income_persons
+       WHERE resident_id = ?
+       ORDER BY updated_at DESC, created_at DESC, id DESC
+       LIMIT 1`,
+      [residentId]
+    )
+    if (existing.length) {
+      const status = existing[0]?.status
+      if (status && status !== 'active') {
+        return res.status(400).json({
+          code: 400,
+          message: `该居民已有低收入记录，当前状态：${formatLowIncomeStatus(
+            status
+          )}。请在原记录中恢复后使用`
+        })
+      }
+      return res.status(400).json({
+        code: 400,
+        message: '该居民已有低收入记录，请在原记录中修改，不要重复新增'
+      })
     }
 
     connection = await db.beginTransaction()

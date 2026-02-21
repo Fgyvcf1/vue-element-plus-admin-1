@@ -1,0 +1,16 @@
+* text=auto eol=crlf
+
+# Unix shells
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+*.ksh text eol=lf
+*.command text eol=lf
+
+# Docker
+Dockerfile text eol=lf
+Dockerfile.* text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf

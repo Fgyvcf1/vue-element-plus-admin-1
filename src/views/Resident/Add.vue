@@ -572,7 +572,7 @@ const handleHouseholdIdCardInput = (value: string) => {
 }
 
 // 获取户主姓名搜索建议
-const fetchHouseholdHeadSuggestions = async (
+const fetchHouseholdHeadSuggestions = (
   queryString: string,
   callback: (data: any[]) => void
 ) => {
@@ -580,14 +580,15 @@ const fetchHouseholdHeadSuggestions = async (
     callback([])
     return
   }
-  try {
-    const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
-    // 后端返回的数据在 householdHeadNames 字段中（直接返回，不在 data 中）
-    const suggestions = res.householdHeadNames || []
-    callback(suggestions)
-  } catch (error) {
-    callback([])
-  }
+  getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
+    .then((res) => {
+      // 后端返回的数据在 householdHeadNames 字段中（直接返回，不在 data 中）
+      const suggestions = res.householdHeadNames || []
+      callback(suggestions)
+    })
+    .catch(() => {
+      callback([])
+    })
 }
 
 // 户主姓名选择处理

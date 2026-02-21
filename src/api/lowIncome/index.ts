@@ -1,18 +1,17 @@
 import request from '@/axios'
-import type { AxiosResponse } from 'axios'
 
 // 低收入人员类型定义（支持 snake_case 和 camelCase）
 export interface LowIncomePerson {
   id?: number
-  resident_id?: number
-  residentId?: number
-  low_income_type?: string
-  lowIncomeType?: string
-  approval_date?: string
-  approvalDate?: string
-  status?: 'active' | 'suspended' | 'cancelled'
-  created_at?: string
-  updated_at?: string
+  resident_id?: number | string | null
+  residentId?: number | string | null
+  low_income_type?: string | null
+  lowIncomeType?: string | null
+  approval_date?: string | null
+  approvalDate?: string | null
+  status?: string | null
+  created_at?: string | null
+  updated_at?: string | null
   // 关联居民信息
   name?: string
   idCard?: string
@@ -26,31 +25,37 @@ export interface LowIncomePerson {
   household_head_name?: string
   relationshipToHead?: string
   relationship_to_head?: string
+  dateOfBirth?: string
+  date_of_birth?: string
+  householdId?: string | number | null
+  household_id?: string | number | null
   // 政策记录相关
   enjoyPolicyType?: string
-  policyType?: string
-  policy_type?: string
-  enjoyLevel?: string
-  enjoy_level?: string
-  has_subsidy?: boolean
-  hasSubsidy?: boolean
-  startDate?: string
-  start_date?: string
-  endDate?: string
-  end_date?: string
-  subsidyAmount?: number | string
-  subsidy_amount?: number
-  subsidyCycle?: string
-  subsidy_cycle?: string
-  accountName?: string
-  account_name?: string
-  accountRelationship?: string
-  account_relationship?: string
-  bankName?: string
-  bank_name?: string
-  bankAccount?: string
-  bank_account?: string
-  remark?: string
+  policyType?: string | null
+  policy_type?: string | null
+  enjoyLevel?: string | null
+  enjoy_level?: string | null
+  has_subsidy?: boolean | null
+  hasSubsidy?: boolean | null
+  startDate?: string | null
+  start_date?: string | null
+  endDate?: string | null
+  end_date?: string | null
+  subsidyAmount?: number | string | null
+  subsidy_amount?: number | string | null
+  subsidyCycle?: string | null
+  subsidy_cycle?: string | null
+  subsidyAccount?: string | null
+  accountName?: string | null
+  account_name?: string | null
+  accountRelationship?: string | null
+  account_relationship?: string | null
+  accountHolderRelationship?: string | null
+  bankName?: string | null
+  bank_name?: string | null
+  bankAccount?: string | null
+  bank_account?: string | null
+  remark?: string | null
   // 统计字段
   totalHouseholdMembers?: number
   lowIncomeHouseholdMembers?: number
@@ -60,36 +65,38 @@ export interface LowIncomePerson {
 // 政策记录类型定义（支持 snake_case 和 camelCase）
 export interface PolicyRecord {
   id?: number
-  low_income_person_id?: number
-  lowIncomePersonId?: number
-  policy_type?: string
-  policyType?: string
-  enjoy_level?: string
-  enjoyLevel?: string
-  has_subsidy?: boolean
-  hasSubsidy?: boolean
-  start_date?: string
-  startDate?: string
-  end_date?: string
-  endDate?: string
-  subsidy_amount?: number
-  subsidyAmount?: number
-  subsidy_cycle?: string
-  subsidyCycle?: string
-  account_name?: string
-  accountName?: string
-  account_relationship?: string
-  accountRelationship?: string
-  bank_name?: string
-  bankName?: string
-  bank_account?: string
-  bankAccount?: string
-  status?: 'active' | 'expired' | 'adjusted' | 'suspended' | 'cancelled'
-  remark?: string
-  created_at?: string
-  createdAt?: string
-  updated_at?: string
-  updatedAt?: string
+  low_income_person_id?: number | string | null
+  lowIncomePersonId?: number | string | null
+  policy_type?: string | null
+  policyType?: string | null
+  enjoy_level?: string | null
+  enjoyLevel?: string | null
+  has_subsidy?: boolean | null
+  hasSubsidy?: boolean | null
+  start_date?: string | null
+  startDate?: string | null
+  end_date?: string | null
+  endDate?: string | null
+  subsidy_amount?: number | string | null
+  subsidyAmount?: number | string | null
+  subsidy_cycle?: string | null
+  subsidyCycle?: string | null
+  subsidyAccount?: string | null
+  account_name?: string | null
+  accountName?: string | null
+  account_relationship?: string | null
+  accountRelationship?: string | null
+  accountHolderRelationship?: string | null
+  bank_name?: string | null
+  bankName?: string | null
+  bank_account?: string | null
+  bankAccount?: string | null
+  status?: string | null
+  remark?: string | null
+  created_at?: string | null
+  createdAt?: string | null
+  updated_at?: string | null
+  updatedAt?: string | null
 }
 
 // 查询参数类型
@@ -108,17 +115,17 @@ export interface PolicyRecordQueryParams {
   pageSize?: number
 }
 
-// API响应类型
-export interface ApiResponse<T = any> {
-  code: number
-  data: T
-  message?: string
+// 列表响应类型
+export interface PagedResponse<T = any> extends IResponse<T> {
+  total?: number
+  page?: number
+  pageSize?: number
 }
 
 // 获取低收入人员列表
 export const getLowIncomePersons = (
   params: LowIncomeQueryParams
-): Promise<AxiosResponse<ApiResponse<LowIncomePerson[]>>> => {
+): Promise<PagedResponse<LowIncomePerson[]>> => {
   return request.get({
     url: '/low-income-persons',
     params
@@ -128,7 +135,7 @@ export const getLowIncomePersons = (
 // 获取单个低收入人员
 export const getLowIncomePerson = (
   id: number
-): Promise<AxiosResponse<ApiResponse<LowIncomePerson>>> => {
+): Promise<IResponse<LowIncomePerson>> => {
   return request.get({
     url: `/low-income-persons/${id}`
   })
@@ -137,7 +144,7 @@ export const getLowIncomePerson = (
 // 添加低收入人员
 export const addLowIncomePerson = (
   data: Partial<LowIncomePerson>
-): Promise<AxiosResponse<ApiResponse<LowIncomePerson>>> => {
+): Promise<IResponse<{ id: number }>> => {
   return request.post({
     url: '/low-income-persons',
     data
@@ -147,7 +154,7 @@ export const addLowIncomePerson = (
 // 添加低收入人员及政策记录（事务）
 export const addLowIncomePersonWithPolicy = (
   data: Partial<LowIncomePerson>
-): Promise<AxiosResponse<ApiResponse<LowIncomePerson>>> => {
+): Promise<IResponse<{ id: number }>> => {
   return request.post({
     url: '/low-income-persons-with-policy',
     data
@@ -158,7 +165,7 @@ export const addLowIncomePersonWithPolicy = (
 export const updateLowIncomePerson = (
   id: number,
   data: Partial<LowIncomePerson>
-): Promise<AxiosResponse<ApiResponse<LowIncomePerson>>> => {
+): Promise<IResponse<null>> => {
   return request.put({
     url: `/low-income-persons/${id}`,
     data
@@ -166,7 +173,7 @@ export const updateLowIncomePerson = (
 }
 
 // 删除低收入人员
-export const deleteLowIncomePerson = (id: number): Promise<AxiosResponse<ApiResponse<null>>> => {
+export const deleteLowIncomePerson = (id: number): Promise<IResponse<null>> => {
   return request.delete({
     url: `/low-income-persons/${id}`
   })
@@ -175,7 +182,7 @@ export const deleteLowIncomePerson = (id: number): Promise<AxiosResponse<ApiResp
 // 获取政策记录列表
 export const getPolicyRecords = (
   params: PolicyRecordQueryParams
-): Promise<AxiosResponse<ApiResponse<PolicyRecord[]>>> => {
+): Promise<PagedResponse<PolicyRecord[]>> => {
   return request.get({
     url: '/low-income-policy-records',
     params
@@ -185,7 +192,7 @@ export const getPolicyRecords = (
 // 添加政策记录
 export const addPolicyRecord = (
   data: Partial<PolicyRecord>
-): Promise<AxiosResponse<ApiResponse<PolicyRecord>>> => {
+): Promise<IResponse<{ id: number }>> => {
   return request.post({
     url: '/low-income-policy-records',
     data
@@ -196,7 +203,7 @@ export const addPolicyRecord = (
 export const updatePolicyRecord = (
   id: number,
   data: Partial<PolicyRecord>
-): Promise<AxiosResponse<ApiResponse<PolicyRecord>>> => {
+): Promise<IResponse<null>> => {
   return request.put({
     url: `/low-income-policy-records/${id}`,
     data
@@ -204,7 +211,7 @@ export const updatePolicyRecord = (
 }
 
 // 删除政策记录
-export const deletePolicyRecord = (id: number): Promise<AxiosResponse<ApiResponse<null>>> => {
+export const deletePolicyRecord = (id: number): Promise<IResponse<null>> => {
   return request.delete({
     url: `/low-income-policy-records/${id}`
   })
@@ -213,7 +220,7 @@ export const deletePolicyRecord = (id: number): Promise<AxiosResponse<ApiRespons
 // 获取单个成员的历史享受政策月数
 export const getTotalMonths = (
   id: number
-): Promise<AxiosResponse<ApiResponse<{ totalMonths: number }>>> => {
+): Promise<IResponse<{ totalMonths: number }>> => {
   return request.get({
     url: `/low-income-persons/${id}/total-months`
   })
@@ -222,7 +229,7 @@ export const getTotalMonths = (
 // 获取该户所有成员享受总金额
 export const getHouseholdTotalSubsidy = (
   id: number
-): Promise<AxiosResponse<ApiResponse<{ totalSubsidy: number; totalMonths: number }>>> => {
+): Promise<IResponse<{ totalSubsidy: number; totalMonths: number }>> => {
   return request.get({
     url: `/low-income-persons/${id}/household-total-subsidy`
   })

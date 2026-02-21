@@ -1,12 +1,17 @@
 import request from '@/axios'
-import type { ResidentListParams, ResidentListResult, ResidentDetail } from './types'
+import type {
+  ResidentListParams,
+  ResidentListResponse,
+  ResidentDetail,
+  SearchSuggestionsResponse
+} from './types'
 
 // 获取居民列表
 export const getResidentList = (params: ResidentListParams) => {
-  return request.get<ResidentListResult>({
+  return request.get({
     url: '/residents',
     params
-  })
+  }) as Promise<ResidentListResponse>
 }
 
 // 别名 - 兼容旧代码
@@ -14,14 +19,14 @@ export const getResidents = getResidentList
 
 // 搜索居民（用于调解档案的自动完成）
 export const searchResidents = (params: { keyword: string; page?: number; pageSize?: number }) => {
-  return request.get<ResidentListResult>({
+  return request.get({
     url: '/residents',
     params: {
       keyword: params.keyword,
-      page: params.page || 1,
+      pageNum: params.page || 1,
       pageSize: params.pageSize || 10
     }
-  })
+  }) as Promise<ResidentListResponse>
 }
 
 // 获取居民详情
@@ -107,10 +112,10 @@ export const getVillageGroups = () => {
 
 // 获取搜索建议
 export const getSearchSuggestions = (params: { keyword: string; type: string }) => {
-  return request.get<{ value: string }[]>({
+  return request.get({
     url: '/search-suggestions',
     params
-  })
+  }) as Promise<SearchSuggestionsResponse>
 }
 
 // 导入居民数据

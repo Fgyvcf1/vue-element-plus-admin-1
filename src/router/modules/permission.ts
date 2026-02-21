@@ -8,7 +8,7 @@ const permissionRouter: AppRouteRecordRaw[] = [
     name: 'Permission',
     meta: {
       title: '权限管理',
-      icon: 'vi-ep:setting',
+      icon: 'vi-ep:lock',
       orderNo: 105,
       permission: 'system:view'
     },

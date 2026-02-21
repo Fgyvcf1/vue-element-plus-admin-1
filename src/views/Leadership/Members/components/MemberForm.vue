@@ -311,23 +311,24 @@ const cancelEdit = () => {
   isEditing.value = false
 }
 
-const queryResidents = async (query: string, cb: (data: any[]) => void) => {
+const queryResidents = (query: string, cb: (data: any[]) => void) => {
   if (!query) {
     cb([])
     return
   }
-  try {
-    const response = await getResidentList({ pageNum: 1, pageSize: 10, name: query })
-    const list = response.data || []
-    cb(
-      list.map((item: any) => ({
-        ...item,
-        value: item.name
-      }))
-    )
-  } catch {
-    cb([])
-  }
+  getResidentList({ pageNum: 1, pageSize: 10, name: query })
+    .then((response) => {
+      const list = Array.isArray(response.data) ? response.data : []
+      cb(
+        list.map((item: any) => ({
+          ...item,
+          value: item.name
+        }))
+      )
+    })
+    .catch(() => {
+      cb([])
+    })
 }
 
 const handleResidentSelect = (selectedResident: any) => {
@@ -375,7 +376,7 @@ const handleSubmit = async () => {
       termEndDate: form.termEndDate || null,
       position: form.position,
       status: form.status,
-      remarks: form.remarks || null
+      remarks: form.remarks || undefined
     }
 
     if (isEdit.value && form.id) {

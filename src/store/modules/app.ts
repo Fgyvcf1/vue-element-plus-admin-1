@@ -33,6 +33,35 @@ interface AppState {
   footer: boolean
   theme: ThemeTypes
   fixedMenu: boolean
+  logoUrl: string
+  logoText: string
+  logoMode: 'image' | 'text' | 'both'
+  faviconUrl: string
+  brandingLoaded: boolean
+}
+
+const setFavicon = (href?: string) => {
+  if (!href || typeof document === 'undefined') return
+  let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null
+  if (!link) {
+    link = document.createElement('link')
+    link.rel = 'icon'
+    document.head.appendChild(link)
+  }
+  link.href = href
+}
+
+const setLoadingLogo = (src?: string) => {
+  if (!src || typeof document === 'undefined') return
+  const logo = document.querySelector('.app-loading-logo') as HTMLImageElement | null
+  if (logo) {
+    logo.src = src
+  }
+}
+
+const normalizeLogoMode = (value?: string) => {
+  if (value === 'image' || value === 'text' || value === 'both') return value
+  return 'image'
 }
 
 export const useAppStore = defineStore('app', {
@@ -59,6 +88,11 @@ export const useAppStore = defineStore('app', {
       dynamicRouter: false, // 是否动态路由
       serverDynamicRouter: false, // 是否服务端渲染动态路由
       fixedMenu: false, // 是否固定菜单
+      logoUrl: '/logo.png',
+      logoText: '',
+      logoMode: 'image',
+      faviconUrl: '/favicon.ico',
+      brandingLoaded: false,
 
       layout: 'classic', // layout布局
       isDark: false, // 是否是暗黑模式
@@ -170,6 +204,21 @@ export const useAppStore = defineStore('app', {
     },
     getFooter(): boolean {
       return this.footer
+    },
+    getLogoUrl(): string {
+      return this.logoUrl
+    },
+    getLogoText(): string {
+      return this.logoText
+    },
+    getLogoMode(): 'image' | 'text' | 'both' {
+      return this.logoMode
+    },
+    getFaviconUrl(): string {
+      return this.faviconUrl
+    },
+    getBrandingLoaded(): boolean {
+      return this.brandingLoaded
     }
   },
   actions: {
@@ -263,6 +312,26 @@ export const useAppStore = defineStore('app', {
     setFooter(footer: boolean) {
       this.footer = footer
     },
+    setBranding(payload: {
+      title?: string
+      logoMode?: 'image' | 'text' | 'both'
+      logoText?: string
+      logoUrl?: string
+      faviconUrl?: string
+    }) {
+      const nextTitle = payload.title?.trim() || this.title
+      this.title = nextTitle
+      this.logoMode = normalizeLogoMode(payload.logoMode || this.logoMode)
+      this.logoText = payload.logoText ?? this.logoText
+      this.logoUrl = payload.logoUrl || this.logoUrl
+      this.faviconUrl = payload.faviconUrl || this.faviconUrl
+      this.brandingLoaded = true
+      if (typeof document !== 'undefined') {
+        document.title = nextTitle
+        setFavicon(this.faviconUrl)
+        setLoadingLogo(this.logoUrl)
+      }
+    },
     setPrimaryLight() {
       if (this.theme.elColorPrimary) {
         const elColorPrimary = this.theme.elColorPrimary
@@ -328,8 +397,10 @@ export const useAppStore = defineStore('app', {
         valueLight: 'light'
       })
       isDark.value = this.getIsDark
-      const newTitle = import.meta.env.VITE_APP_TITLE
-      newTitle !== this.getTitle && this.setTitle(newTitle)
+      if (!this.brandingLoaded) {
+        const newTitle = import.meta.env.VITE_APP_TITLE
+        newTitle !== this.getTitle && this.setTitle(newTitle)
+      }
     }
   },
   persist: true

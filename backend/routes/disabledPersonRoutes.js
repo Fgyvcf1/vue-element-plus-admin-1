@@ -204,11 +204,16 @@ router.post('/disabled-persons', checkPermission('special:add'), async (req, res
     }
 
     const [existing] = await db.pool.execute(
-      'SELECT id FROM disabled_persons WHERE resident_id = ? LIMIT 1',
+      'SELECT id, certificate_status FROM disabled_persons WHERE resident_id = ? LIMIT 1',
       [residentId]
     )
     if (existing.length) {
-      return res.status(400).json({ code: 400, message: '该居民已经是残疾人' })
+      const status = existing[0]?.certificate_status
+      const statusText = status ? `当前证件状态：${status}。` : ''
+      return res.status(400).json({
+        code: 400,
+        message: `该居民已有残疾人记录，${statusText}请在原记录中修改，不要重复新增`
+      })
     }
 
     const insertSql = `

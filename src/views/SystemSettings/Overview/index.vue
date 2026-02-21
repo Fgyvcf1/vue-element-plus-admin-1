@@ -26,6 +26,15 @@
             </div>
           </el-card>
         </el-col>
+        <el-col :xs="24" :sm="12">
+          <el-card class="entry-card" shadow="hover" @click="goTo('branding')">
+            <div class="entry-title">界面设置</div>
+            <div class="entry-desc">设置系统标题、Logo 与浏览器图标</div>
+            <div class="entry-action">
+              <el-button type="primary" link>进入</el-button>
+            </div>
+          </el-card>
+        </el-col>
       </el-row>
     </el-card>
   </div>
@@ -36,7 +45,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const goTo = (target: 'notification' | 'dictionary') => {
+const goTo = (target: 'notification' | 'dictionary' | 'branding') => {
   router.push(`/system/${target}`)
 }
 </script>

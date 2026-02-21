@@ -48,6 +48,12 @@ declare global {
   declare interface IResponse<T = any> {
     code: number
     data: T extends any ? T : T & any
+    message?: string
+    total?: number
+    totalPersons?: number
+    totalHouseholds?: number
+    page?: number
+    pageSize?: number
   }
 
   declare interface ThemeTypes {

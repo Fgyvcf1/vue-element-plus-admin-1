@@ -11,7 +11,11 @@ const appStore = useAppStore()
 
 const show = ref(true)
 
-const title = computed(() => appStore.getTitle)
+const logoText = computed(() => appStore.getLogoText || appStore.getTitle)
+const logoUrl = computed(() => appStore.getLogoUrl || '/logo.png')
+const logoMode = computed(() => appStore.getLogoMode)
+const showLogoImage = computed(() => logoMode.value !== 'text')
+const showLogoText = computed(() => logoMode.value !== 'image')
 
 const layout = computed(() => appStore.getLayout)
 
@@ -59,21 +63,24 @@ watch(
       to="/"
     >
       <img
-        src="@/assets/imgs/logo.png"
+        v-if="showLogoImage"
+        :src="logoUrl"
+        alt="Logo"
         class="w-[calc(var(--logo-height)-10px)] h-[calc(var(--logo-height)-10px)]"
       />
       <div
-        v-if="show"
+        v-if="show && showLogoText"
         :class="[
-          'ml-10px text-16px font-700',
+          'text-16px font-700',
           {
+            'ml-10px': showLogoImage,
             'text-[var(--logo-title-text-color)]': layout === 'classic',
             'text-[var(--top-header-text-color)]':
               layout === 'topLeft' || layout === 'top' || layout === 'cutMenu'
           }
         ]"
       >
-        {{ title }}
+        {{ logoText }}
       </div>
     </router-link>
   </div>

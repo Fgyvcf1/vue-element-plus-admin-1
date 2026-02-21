@@ -234,7 +234,7 @@
             <el-option label="事件提醒" value="event" />
           </el-select>
         </el-form-item>
-        <el-form-item label="进度">
+        <el-form-item v-if="createForm.type === 'task'" label="进度">
           <el-input-number v-model="createForm.progress" :min="0" :max="100" />
         </el-form-item>
       </el-form>
@@ -247,7 +247,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   ElCard,
@@ -339,12 +339,14 @@ const typeLabelMap: Record<string, string> = {
   system: '系统'
 }
 
-const getTypeTagType = (type: string) => {
+const getTypeTagType = (
+  type: string
+): 'success' | 'warning' | 'info' | 'primary' | 'danger' => {
   if (type === 'task') return 'warning'
   if (type === 'birth') return 'success'
   if (type === 'event') return 'primary'
   if (type === 'system') return 'info'
-  return ''
+  return 'info'
 }
 
 const getRowClassName = ({ row }: { row: any }) => {
@@ -361,6 +363,15 @@ const refreshStats = async () => {
   stats.read = res.data?.read || 0
   stats.byType = res.data?.byType || {}
 }
+
+watch(
+  () => createForm.type,
+  (type) => {
+    if (type !== 'task') {
+      createForm.progress = 0
+    }
+  }
+)
 
 const buildQueryByQuickTab = () => {
   const payload: any = {

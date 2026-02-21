@@ -35,7 +35,7 @@ const lockScreen = () => {
 }
 
 const toDocument = () => {
-  window.open('https://element-plus-admin-doc.cn/')
+  push('/operation-guide')
 }
 
 const toPage = (path: string) => {

@@ -449,7 +449,7 @@
               <el-timeline-item
                 v-for="(record, index) in policyHistory"
                 :key="record.id || index"
-                :timestamp="record.startDate"
+                :timestamp="record.startDate || ''"
                 :type="record.status === 'active' ? 'success' : 'warning'"
                 placement="top"
               >
@@ -494,7 +494,7 @@
                         <div class="info-item">
                           <span class="label">享受档次：</span>
                           <span class="value">{{
-                            getEnjoyLevelDisplay(record.policyType, record.enjoyLevel)
+                            getEnjoyLevelDisplay(record.policyType, record.enjoyLevel as string | undefined)
                           }}</span>
                         </div>
                       </el-col>
@@ -628,7 +628,7 @@ const queryParams = reactive({
 // 模态框相关
 const dialogVisible = ref(false)
 const activeTab = ref('info')
-const memberDetail = reactive<Partial<LowIncomePerson>>({})
+const memberDetail = reactive<Record<string, any>>({})
 const originalMemberDetail = reactive<Partial<LowIncomePerson>>({})
 const policyHistory = ref<Partial<PolicyRecord>[]>([])
 const isEditing = ref(false)
@@ -705,7 +705,7 @@ const loadDictionaries = async () => {
 }
 
 // 获取享受档次的显示值
-const getEnjoyLevelDisplay = (policyType?: string, enjoyLevel?: string) => {
+const getEnjoyLevelDisplay = (policyType?: string | null, enjoyLevel?: string | null) => {
   return enjoyLevel || '-'
 }
 
@@ -889,12 +889,12 @@ const getStatsData = async (id: number) => {
 
     // 注意：经过响应拦截器处理后，response 直接是后端返回的数据结构
     if (monthsResponse.data) {
-      stats.memberTotalMonths = parseInt(monthsResponse.data.totalMonths) || 0
+      stats.memberTotalMonths = Number(monthsResponse.data.totalMonths) || 0
     }
 
     if (subsidyResponse.data) {
-      stats.totalSubsidy = parseFloat(subsidyResponse.data.totalSubsidy) || 0
-      stats.totalMonths = parseInt(subsidyResponse.data.totalMonths) || 0
+      stats.totalSubsidy = Number(subsidyResponse.data.totalSubsidy) || 0
+      stats.totalMonths = Number(subsidyResponse.data.totalMonths) || 0
     }
   } catch (error) {
     console.error('获取统计数据失败:', error)

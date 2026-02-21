@@ -150,7 +150,7 @@ const userForm = reactive({
   username: '',
   password: '',
   real_name: '',
-  role_id: null as number | null,
+  role_id: undefined as number | undefined,
   status: 'active'
 })
 
@@ -158,7 +158,7 @@ const roleForm = reactive({
   userId: null as number | null,
   username: '',
   realName: '',
-  roleId: null as number | null
+  roleId: undefined as number | undefined
 })
 
 const passwordForm = reactive({
@@ -202,7 +202,7 @@ const handleAdd = () => {
   userForm.username = ''
   userForm.password = ''
   userForm.real_name = ''
-  userForm.role_id = null
+  userForm.role_id = undefined
   userForm.status = 'active'
   userDialogVisible.value = true
 }
@@ -214,7 +214,7 @@ const handleEdit = (row: any) => {
   userForm.username = row.username
   userForm.password = ''
   userForm.real_name = row.real_name
-  userForm.role_id = row.role_id
+  userForm.role_id = row.role_id ?? undefined
   userForm.status = row.status || 'active'
   userDialogVisible.value = true
 }
@@ -274,7 +274,7 @@ const handleAssignRole = (row: any) => {
   roleForm.userId = row.id
   roleForm.username = row.username
   roleForm.realName = row.real_name
-  roleForm.roleId = row.role_id
+  roleForm.roleId = row.role_id ?? undefined
   roleDialogVisible.value = true
 }
 

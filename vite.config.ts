@@ -25,6 +25,10 @@ function pathResolve(dir: string) {
 }
 
 export default ({ command, mode }: ConfigEnv): UserConfig => {
+  const iconifyCollectionRe =
+    /(?:material-symbols|material-symbols-light|ic|mdi|ph|solar|tabler|mingcute|ri|bi|carbon|iconamoon|iconoir|ion|lucide|uil|tdesign|teenyicons|clarity|bx|bxs|majesticons|ant-design|gg|octicon|memory|cil|mynaui|basil|pixelarticons|akar-icons|ci|system-uicons|typcn|radix-icons|zondicons|ep|circum|mdi-light|fe|eos-icons|charm|prime|humbleicons|uiw|uim|uit|uis|maki|gridicons|mi|quill|gala|lets-icons|fluent|icon-park-outline|icon-park-solid|icon-park-twotone|icon-park|vscode-icons|jam|heroicons|codicon|pajamas|pepicons-pop|pepicons-print|pepicons-pencil|bytesize|ei|streamline|guidance|fa6-solid|fa6-regular|ooui|nimbus|formkit|line-md|meteocons|svg-spinners|openmoji|twemoji|noto|fluent-emoji|fluent-emoji-flat|fluent-emoji-high-contrast|noto-v1|emojione|emojione-monotone|emojione-v1|fxemoji|streamline-emojis|bxl|logos|simple-icons|cib|fa6-brands|nonicons|arcticons|file-icons|devicon|devicon-plain|skill-icons|brandico|entypo-social|cryptocurrency|cryptocurrency-color|flag|circle-flags|flagpack|cif|gis|map|geo|game-icons|fad|academicons|wi|healthicons|medical-icon|covid|la|eva|dashicons|flat-color-icons|entypo|foundation|raphael|icons8|iwwa|heroicons-outline|heroicons-solid|fa-solid|fa-regular|fa-brands|fa|fluent-mdl2|fontisto|icomoon-free|subway|oi|wpf|simple-line-icons|et|el|vaadin|grommet-icons|whh|si-glyph|zmdi|ls|bpmn|flat-ui|vs|topcoat|il|websymbol|fontelico|ps|feather|mono-icons|pepicons):[\w\d-]+/g
+  const iconifyCollectionCheckRe =
+    /(?:material-symbols|material-symbols-light|ic|mdi|ph|solar|tabler|mingcute|ri|bi|carbon|iconamoon|iconoir|ion|lucide|uil|tdesign|teenyicons|clarity|bx|bxs|majesticons|ant-design|gg|octicon|memory|cil|mynaui|basil|pixelarticons|akar-icons|ci|system-uicons|typcn|radix-icons|zondicons|ep|circum|mdi-light|fe|eos-icons|charm|prime|humbleicons|uiw|uim|uit|uis|maki|gridicons|mi|quill|gala|lets-icons|fluent|icon-park-outline|icon-park-solid|icon-park-twotone|icon-park|vscode-icons|jam|heroicons|codicon|pajamas|pepicons-pop|pepicons-print|pepicons-pencil|bytesize|ei|streamline|guidance|fa6-solid|fa6-regular|ooui|nimbus|formkit|line-md|meteocons|svg-spinners|openmoji|twemoji|noto|fluent-emoji|fluent-emoji-flat|fluent-emoji-high-contrast|noto-v1|emojione|emojione-monotone|emojione-v1|fxemoji|streamline-emojis|bxl|logos|simple-icons|cib|fa6-brands|nonicons|arcticons|file-icons|devicon|devicon-plain|skill-icons|brandico|entypo-social|cryptocurrency|cryptocurrency-color|flag|circle-flags|flagpack|cif|gis|map|geo|game-icons|fad|academicons|wi|healthicons|medical-icon|covid|la|eva|dashicons|flat-color-icons|entypo|foundation|raphael|icons8|iwwa|heroicons-outline|heroicons-solid|fa-solid|fa-regular|fa-brands|fa|fluent-mdl2|fontisto|icomoon-free|subway|oi|wpf|simple-line-icons|et|el|vaadin|grommet-icons|whh|si-glyph|zmdi|ls|bpmn|flat-ui|vs|topcoat|il|websymbol|fontelico|ps|feather|mono-icons|pepicons):[\w\d-]+/
   let env = {} as any
   const isBuild = command === 'build'
   if (!isBuild) {
@@ -50,12 +54,14 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       Components({
         resolvers: [ElementPlusResolver()]
       }),
-      EslintPlugin({
-        cache: false,
-        failOnWarning: false,
-        failOnError: false,
-        include: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.tsx'] // 检查的文件
-      }),
+      !isBuild
+        ? EslintPlugin({
+            cache: false,
+            failOnWarning: false,
+            failOnError: false,
+            include: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.tsx'] // 检查的文件
+          })
+        : undefined,
       VueI18nPlugin({
         runtimeOnly: true,
         compositionOnly: true,
@@ -66,7 +72,27 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         symbolId: 'icon-[dir]-[name]',
         svgoOptions: true
       }),
-      PurgeIcons(),
+      PurgeIcons({
+        content: ['src/**/*.{vue,ts,tsx,js,jsx}'],
+        iconifyImportName: '@/plugins/iconify-offline',
+        iconSource: 'local',
+        extractors: [
+          {
+            extensions: ['*'],
+            extractor: (code) => {
+              const results = new Set(code.match(iconifyCollectionRe) || [])
+              const viMatches = code.match(/vi-[\w-]+:[\w-]+/g) || []
+              viMatches.forEach((icon) => {
+                const normalized = icon.replace(/^vi-/, '')
+                if (iconifyCollectionCheckRe.test(normalized)) {
+                  results.add(normalized)
+                }
+              })
+              return Array.from(results)
+            }
+          }
+        ]
+      }),
       env.VITE_USE_MOCK === 'true'
         ? viteMockServe({
             ignore: /^\_/,
@@ -134,6 +160,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     server: {
       port: 4000,
       strictPort: true, // 严格模式，端口被占用时报错而不是自动切换
+      watch: {
+        // 避免监听打包产物目录，防止 Windows 上被占用导致 Vite 崩溃
+        ignored: ['**/release/**', '**/dist/**', '**/dist-pro/**']
+      },
       proxy: {
         // 选项写法 - 排除mock路径
         '/api': {
@@ -145,6 +175,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
               return req.url
             }
           }
+        },
+        '/uploads': {
+          target: 'http://localhost:3001',
+          changeOrigin: true
         }
       },
       hmr: {

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { LoginForm } from './components'
+import { computed } from 'vue'
 import { ThemeSwitch } from '@/components/ThemeSwitch'
 import { LocaleDropdown } from '@/components/LocaleDropdown'
 import { useI18n } from '@/hooks/web/useI18n'
-import { underlineToHump } from '@/utils'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 import { ElScrollbar } from 'element-plus'
@@ -15,6 +15,12 @@ const prefixCls = getPrefixCls('login')
 const appStore = useAppStore()
 
 const { t } = useI18n()
+
+const logoText = computed(() => appStore.getLogoText || appStore.getTitle)
+const logoUrl = computed(() => appStore.getLogoUrl || '/logo.png')
+const logoMode = computed(() => appStore.getLogoMode)
+const showLogoImage = computed(() => logoMode.value !== 'text')
+const showLogoText = computed(() => logoMode.value !== 'image')
 </script>
 
 <template>
@@ -28,8 +34,8 @@ const { t } = useI18n()
           :class="`${prefixCls}__left flex-1 bg-gray-500 bg-opacity-20 relative p-30px lt-xl:hidden`"
         >
           <div class="flex items-center relative text-white">
-            <img src="@/assets/imgs/logo.png" alt="" class="w-48px h-48px mr-10px" />
-            <span class="text-20px font-bold">{{ underlineToHump(appStore.getTitle) }}</span>
+            <img v-if="showLogoImage" :src="logoUrl" alt="Logo" class="w-48px h-48px mr-10px" />
+            <span v-if="showLogoText" class="text-20px font-bold">{{ logoText }}</span>
           </div>
           <div class="flex justify-center items-center h-[calc(100%-60px)]">
             <TransitionGroup
@@ -50,8 +56,13 @@ const { t } = useI18n()
             class="flex justify-between items-center text-white at-2xl:justify-end at-xl:justify-end"
           >
             <div class="flex items-center at-2xl:hidden at-xl:hidden">
-              <img src="@/assets/imgs/logo.png" alt="" class="w-48px h-48px mr-10px" />
-              <span class="text-20px font-bold">{{ underlineToHump(appStore.getTitle) }}</span>
+              <img
+                v-if="showLogoImage"
+                :src="logoUrl"
+                alt="Logo"
+                class="w-48px h-48px mr-10px"
+              />
+              <span v-if="showLogoText" class="text-20px font-bold">{{ logoText }}</span>
             </div>
 
             <div class="flex justify-end items-center space-x-10px">

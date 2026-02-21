@@ -10,7 +10,19 @@
         </div>
         <div class="archive-actions">
           <el-button @click="goBack">返回列表</el-button>
-          <el-button v-if="!isViewMode" type="primary" :loading="saving" @click="handleSave"
+          <el-button
+            v-if="isViewMode && canEdit"
+            type="primary"
+            :icon="Edit"
+            @click="enterEdit"
+            >编辑</el-button
+          >
+          <el-button
+            v-if="!isViewMode"
+            type="primary"
+            :loading="saving"
+            :disabled="activeTab === 'record' && isRecordLocked"
+            @click="handleSave"
             >保存</el-button
           >
         </div>
@@ -333,99 +345,108 @@
 
           <!-- 新增调解记录表单 -->
           <div class="new-record-section">
-            <div class="section-header" @click="toggleRecordForm">
-              <h4 class="section-title" style="margin: 0; cursor: pointer">
-                {{ isRecordFormCollapsed ? '展开' : '收起' }}新增调解记录
-              </h4>
-              <el-icon :size="18" style="cursor: pointer">
-                <ArrowDown v-if="isRecordFormCollapsed" />
-                <ArrowUp v-else />
-              </el-icon>
-            </div>
-
-            <el-collapse-transition>
-              <div v-show="!isRecordFormCollapsed">
-                <el-form :model="recordForm" label-width="100px" :disabled="isViewMode">
-                  <el-row :gutter="20">
-                    <el-col :span="12">
-                      <el-form-item label="调解日期" required>
-                        <el-date-picker
-                          v-model="recordForm.mediation_date"
-                          type="date"
-                          placeholder="选择调解日期"
-                          value-format="YYYY-MM-DD"
-                          style="width: 100%"
-                        />
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-form-item label="调解地点">
-                        <el-input
-                          v-model="recordForm.mediation_location"
-                          placeholder="请输入调解地点"
-                        />
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-
-                  <el-form-item label="调解员">
-                    <el-input
-                      v-model="recordForm.mediators"
-                      placeholder="请输入调解员姓名，多个用逗号分隔"
-                      type="textarea"
-                      :rows="2"
-                    />
-                  </el-form-item>
-
-                  <el-form-item label="调解过程" required>
-                    <el-input
-                      v-model="recordForm.process_record"
-                      type="textarea"
-                      :rows="6"
-                      placeholder="请详细记录调解过程"
-                      maxlength="1000"
-                      show-word-limit
-                    />
-                  </el-form-item>
-
-                  <el-form-item label="调解结果">
-                    <el-input
-                      v-model="recordForm.mediation_result"
-                      type="textarea"
-                      :rows="4"
-                      placeholder="请输入调解结果"
-                      maxlength="500"
-                      show-word-limit
-                    />
-                  </el-form-item>
-
-                  <el-form-item label="是否达成协议">
-                    <el-radio-group v-model="recordForm.agreement">
-                      <el-radio label="yes">是</el-radio>
-                      <el-radio label="no">否</el-radio>
-                    </el-radio-group>
-                  </el-form-item>
-
-                  <!-- 图片上传 -->
-                  <el-form-item label="现场图片">
-                    <el-upload
-                      action="#"
-                      list-type="picture-card"
-                      :auto-upload="false"
-                      :file-list="recordImageList"
-                      :on-change="handleImageChange"
-                      :on-remove="handleImageRemove"
-                      accept="image/*"
-                    >
-                      <el-icon><Plus /></el-icon>
-                      <template #tip>
-                        <div class="el-upload__tip">只能上传图片文件，单个文件不超过5MB</div>
-                      </template>
-                    </el-upload>
-                  </el-form-item>
-                </el-form>
+            <el-alert
+              v-if="isRecordLocked"
+              title="已达成协议，不能再新增调解记录"
+              type="warning"
+              :closable="false"
+              show-icon
+            />
+            <template v-else>
+              <div class="section-header" @click="toggleRecordForm">
+                <h4 class="section-title" style="margin: 0; cursor: pointer">
+                  {{ isRecordFormCollapsed ? '展开' : '收起' }}新增调解记录
+                </h4>
+                <el-icon :size="18" style="cursor: pointer">
+                  <ArrowDown v-if="isRecordFormCollapsed" />
+                  <ArrowUp v-else />
+                </el-icon>
               </div>
-            </el-collapse-transition>
+
+              <el-collapse-transition>
+                <div v-show="!isRecordFormCollapsed">
+                  <el-form :model="recordForm" label-width="100px" :disabled="isViewMode">
+                    <el-row :gutter="20">
+                      <el-col :span="12">
+                        <el-form-item label="调解日期" required>
+                          <el-date-picker
+                            v-model="recordForm.mediation_date"
+                            type="date"
+                            placeholder="选择调解日期"
+                            value-format="YYYY-MM-DD"
+                            style="width: 100%"
+                          />
+                        </el-form-item>
+                      </el-col>
+                      <el-col :span="12">
+                        <el-form-item label="调解地点">
+                          <el-input
+                            v-model="recordForm.mediation_location"
+                            placeholder="请输入调解地点"
+                          />
+                        </el-form-item>
+                      </el-col>
+                    </el-row>
+
+                    <el-form-item label="调解员">
+                      <el-input
+                        v-model="recordForm.mediators"
+                        placeholder="请输入调解员姓名，多个用逗号分隔"
+                        type="textarea"
+                        :rows="2"
+                      />
+                    </el-form-item>
+
+                    <el-form-item label="调解过程" required>
+                      <el-input
+                        v-model="recordForm.process_record"
+                        type="textarea"
+                        :rows="6"
+                        placeholder="请详细记录调解过程"
+                        maxlength="1000"
+                        show-word-limit
+                      />
+                    </el-form-item>
+
+                    <el-form-item label="调解结果">
+                      <el-input
+                        v-model="recordForm.mediation_result"
+                        type="textarea"
+                        :rows="4"
+                        placeholder="请输入调解结果"
+                        maxlength="500"
+                        show-word-limit
+                      />
+                    </el-form-item>
+
+                    <el-form-item label="是否达成协议">
+                      <el-radio-group v-model="recordForm.agreement">
+                        <el-radio label="yes">是</el-radio>
+                        <el-radio label="no">否</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+
+                    <!-- 图片上传 -->
+                    <el-form-item label="现场图片">
+                      <el-upload
+                        action="#"
+                        list-type="picture-card"
+                        :auto-upload="false"
+                        :file-list="recordImageList"
+                        :on-change="handleImageChange"
+                        :on-remove="handleImageRemove"
+                        accept="image/*"
+                      >
+                        <el-icon><Plus /></el-icon>
+                        <template #tip>
+                          <div class="el-upload__tip">只能上传图片文件，单个文件不超过5MB</div>
+                        </template>
+                      </el-upload>
+                    </el-form-item>
+                  </el-form>
+                </div>
+              </el-collapse-transition>
+            </template>
           </div>
         </el-tab-pane>
 
@@ -741,6 +762,7 @@ import {
   Printer,
   Upload,
   View,
+  Edit,
   Download,
   Delete
 } from '@element-plus/icons-vue'
@@ -754,12 +776,15 @@ import {
   uploadRecordImages
 } from '@/api/archive'
 import { searchResidents } from '@/api/resident'
+import { useUserStore } from '@/store/modules/user'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
 const archiveId = computed(() => String(route.params.id || ''))
 const isViewMode = computed(() => route.query.mode !== 'edit')
+const canEdit = computed(() => userStore.hasPermission('mediation:edit'))
 
 // 档案基本信息
 const archiveData = reactive({
@@ -842,6 +867,10 @@ const canEditAgreement = computed(() => {
   return recordForm.agreement === 'yes'
 })
 
+const isRecordLocked = computed(() => {
+  return recordsList.value.length > 0 && recordsList.value[0].agreement === 'yes'
+})
+
 const disputeDescriptionLines = computed(() => {
   if (!applicationForm.dispute_description) return []
   return applicationForm.dispute_description
@@ -904,6 +933,17 @@ const formatFileSize = (size?: number) => {
   return (size / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
+const enterEdit = () => {
+  if (!canEdit.value) {
+    ElMessage.warning('当前账号没有编辑权限')
+    return
+  }
+  router.replace({
+    path: route.path,
+    query: { ...route.query, mode: 'edit' }
+  })
+}
+
 // 申请人/被申请人操作
 const addApplicant = () => {
   applicationForm.applicants.push({
@@ -944,22 +984,23 @@ const removeRespondent = (index: number) => {
 }
 
 // 居民搜索
-const queryResidents = async (query: string, callback: Function) => {
+const queryResidents = (query: string, callback: Function) => {
   if (!query || query.length < 1) {
     callback([])
     return
   }
-  try {
-    const res = await searchResidents({ keyword: query, page: 1, pageSize: 10 })
-    const items = res.data?.items || res.data || []
-    const suggestions = items.map((item: any) => ({
-      value: item.name,
-      ...item
-    }))
-    callback(suggestions)
-  } catch (error) {
-    callback([])
-  }
+  searchResidents({ keyword: query, page: 1, pageSize: 10 })
+    .then((res) => {
+      const items = Array.isArray(res.data) ? res.data : (res as any).data?.items || []
+      const suggestions = items.map((item: any) => ({
+        value: item.name,
+        ...item
+      }))
+      callback(suggestions)
+    })
+    .catch(() => {
+      callback([])
+    })
 }
 
 const handleResidentSelect = (item: any, type: 'applicant' | 'respondent', index: number) => {
@@ -974,6 +1015,44 @@ const handleResidentSelect = (item: any, type: 'applicant' | 'respondent', index
   person.occupation = item.occupation || ''
   if (person.id_card && person.id_card.length === 18) {
     person.age = String(calculateAge(person.id_card))
+  }
+}
+
+const normalizePersonFromApi = (person: any) => {
+  const idCard = person.id_card || person.idCard || person.resident_id_card || ''
+  const nation = person.nation || person.ethnicity || person.resident_ethnicity || '汉族'
+  const phone = person.phone || person.resident_phone || person.phoneNumber || ''
+  const address =
+    person.address || person.resident_address || person.homeAddress || person.Home_address || ''
+  const gender = person.gender || person.resident_gender || ''
+  const occupation = person.occupation || person.resident_occupation || ''
+  let age = person.age || ''
+  if (!age && idCard && idCard.length === 18) {
+    age = String(calculateAge(idCard))
+  }
+  return {
+    ...person,
+    id_card: idCard,
+    nation,
+    phone,
+    address,
+    gender,
+    occupation,
+    age,
+    residentId: person.residentId ?? person.resident_id ?? null,
+    isResident:
+      person.isResident ?? (person.residentId || person.resident_id ? true : false)
+  }
+}
+
+const normalizePersonForSave = (person: any) => {
+  return {
+    ...person,
+    idCard: person.idCard || person.id_card || '',
+    ethnicity: person.ethnicity || person.nation || '汉族',
+    residentId: person.residentId ?? person.resident_id ?? null,
+    isResident:
+      person.isResident ?? (person.residentId || person.resident_id ? true : false)
   }
 }
 
@@ -1022,11 +1101,11 @@ const toggleRecordForm = () => {
   isRecordFormCollapsed.value = !isRecordFormCollapsed.value
 }
 
-const handleImageChange = (file: any, fileList: any[]) => {
+const handleImageChange = (_file: any, fileList: any[]) => {
   recordImageList.value = fileList
 }
 
-const handleImageRemove = (file: any, fileList: any[]) => {
+const handleImageRemove = (_file: any, fileList: any[]) => {
   recordImageList.value = fileList
 }
 
@@ -1118,10 +1197,10 @@ const loadArchiveDetail = async () => {
       Object.assign(applicationForm, data.application)
     }
     if (data.applicants && data.applicants.length > 0) {
-      applicationForm.applicants = data.applicants
+      applicationForm.applicants = data.applicants.map((item: any) => normalizePersonFromApi(item))
     }
     if (data.respondents && data.respondents.length > 0) {
-      applicationForm.respondents = data.respondents
+      applicationForm.respondents = data.respondents.map((item: any) => normalizePersonFromApi(item))
     }
 
     // 调解记录
@@ -1155,9 +1234,18 @@ const handleSave = async () => {
   saving.value = true
   try {
     if (activeTab.value === 'application') {
-      await saveApplication(archiveId.value, applicationForm)
+      const payload = {
+        ...applicationForm,
+        applicants: applicationForm.applicants.map((item) => normalizePersonForSave(item)),
+        respondents: applicationForm.respondents.map((item) => normalizePersonForSave(item))
+      }
+      await saveApplication(archiveId.value, payload)
       ElMessage.success('申请书保存成功')
     } else if (activeTab.value === 'record') {
+      if (isRecordLocked.value) {
+        ElMessage.warning('已达成协议，不能再新增调解记录')
+        return
+      }
       // 保存调解记录
       await saveRecord(archiveId.value, recordForm)
       ElMessage.success('调解记录保存成功')

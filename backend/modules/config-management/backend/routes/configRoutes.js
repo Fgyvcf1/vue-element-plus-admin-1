@@ -2,6 +2,65 @@ const express = require('express')
 const router = express.Router()
 const db = require('../../../../db') // 使用MariaDB连接
 
+const DEFAULT_NOTIFICATION_CONFIGS = [
+  {
+    key: 'birth_remind_days',
+    value: '7',
+    name: '生日提醒提前天数',
+    group: 'notification',
+    type: 'number',
+    description: '生日提醒功能启动前多少天发送通知'
+  },
+  {
+    key: 'birth_remind_enabled',
+    value: '1',
+    name: '生日提醒启用状态',
+    group: 'notification',
+    type: 'boolean',
+    description: '是否启用生日提醒功能，1-启用，0-禁用'
+  },
+  {
+    key: 'birth_remind_time',
+    value: '09:00:00',
+    name: '生日提醒发送时间',
+    group: 'notification',
+    type: 'time',
+    description: '每天发送生日提醒的时间点'
+  }
+]
+
+const ensureNotificationDefaults = async () => {
+  try {
+    const [rows] = await db.pool.execute(
+      'SELECT COUNT(1) AS total FROM system_config WHERE config_group = ?',
+      ['notification']
+    )
+    if ((rows?.[0]?.total || 0) > 0) return
+
+    const placeholders = DEFAULT_NOTIFICATION_CONFIGS.map(() => '(?, ?, ?, ?, ?, ?, 1)').join(',')
+    const params = []
+    DEFAULT_NOTIFICATION_CONFIGS.forEach((config) => {
+      params.push(
+        config.key,
+        config.value,
+        config.name,
+        config.group,
+        config.type,
+        config.description
+      )
+    })
+
+    await db.pool.execute(
+      `INSERT IGNORE INTO system_config
+        (config_key, config_value, config_name, config_group, value_type, description, is_system)
+        VALUES ${placeholders}`,
+      params
+    )
+  } catch (error) {
+    console.warn('通知默认配置初始化失败:', error?.message || error)
+  }
+}
+
 // 管理员权限验证中间件
 const requireAdmin = (req, res, next) => {
   // TODO: 根据实际的用户认证系统实现权限验证
@@ -15,9 +74,13 @@ const requireAdmin = (req, res, next) => {
 }
 
 // 获取配置列表（支持分页和分组过滤）
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   const { page = 1, pageSize = 20, group, keyword } = req.query
   const offset = (page - 1) * pageSize
+
+  if (!group || group === 'notification') {
+    await ensureNotificationDefaults()
+  }
 
   let whereClause = 'WHERE 1=1'
   const params = []
@@ -73,7 +136,8 @@ router.get('/', (req, res) => {
 })
 
 // 获取所有配置组（必须在 :key 之前定义）
-router.get('/groups', (req, res) => {
+router.get('/groups', async (req, res) => {
+  await ensureNotificationDefaults()
   db.all(
     'SELECT DISTINCT config_group FROM system_config ORDER BY config_group',
     [],

@@ -1,0 +1,7 @@
+{
+  "host": "localhost",
+  "user": "app_user",
+  "password": "strongpass791002",
+  "database": "village",
+  "port": 3306
+}

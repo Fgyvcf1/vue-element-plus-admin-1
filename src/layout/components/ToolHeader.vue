@@ -133,7 +133,9 @@ export default defineComponent({
           <ElDropdown
             trigger="click"
             onCommand={handleBellCommand}
-            onVisibleChange={(visible: boolean) => visible && refreshNotificationData()}
+            {...{
+              'onVisible-change': (visible: boolean) => visible && refreshNotificationData()
+            }}
           >
             {{
               default: () => (

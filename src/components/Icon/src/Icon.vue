@@ -3,7 +3,8 @@ import { computed, unref } from 'vue'
 import { ElIcon } from 'element-plus'
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'
-import { Icon } from '@iconify/vue'
+import { Icon as IconifyOnline } from '@iconify/vue'
+import { Icon as IconifyOffline } from '@iconify/vue/offline'
 import { ICON_PREFIX } from '@/constants'
 
 const { getPrefixCls } = useDesign()
@@ -27,9 +28,8 @@ const symbolId = computed(() => {
 })
 
 // 是否使用在线图标
-const isUseOnline = computed(() => {
-  return import.meta.env.VITE_USE_ONLINE_ICON === 'true'
-})
+const useOnlineIcon = import.meta.env.VITE_USE_ONLINE_ICON === 'true'
+const IconifyComponent = useOnlineIcon ? IconifyOnline : IconifyOffline
 
 const getIconifyStyle = computed(() => {
   const { color, size } = props
@@ -50,10 +50,7 @@ const getIconName = computed(() => {
       <use :xlink:href="symbolId" />
     </svg>
 
-    <template v-else>
-      <Icon v-if="isUseOnline" :icon="getIconName" :style="getIconifyStyle" />
-      <div v-else :class="`${icon} iconify`" :style="getIconifyStyle"></div>
-    </template>
+    <component v-else :is="IconifyComponent" :icon="getIconName" :style="getIconifyStyle" />
   </ElIcon>
 </template>
 

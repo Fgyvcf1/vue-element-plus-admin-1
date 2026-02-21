@@ -237,21 +237,21 @@ const initPopulationChart = () => {
   drawPieChart(ctx, populationData.value, 140, 140, 100)
 }
 
-// 获取调解档案状态统计
+// 获取任务进度统计（仅任务类型）
 const getMatterStats = async () => {
   try {
-    const res = await request.get({ url: '/archives/status-stats' })
+    const res = await request.get({ url: '/todo-reminders/task-progress-stats' })
     if (res.code === 20000 && res.data) {
       matterData.value = res.data
       await nextTick()
       initMatterChart()
     }
   } catch (error) {
-    console.error('获取调解状态统计失败:', error)
+    console.error('获取任务进度统计失败:', error)
     matterData.value = [
-      { name: '已完成', value: 0, color: '#67C23A' },
+      { name: '未开始', value: 0, color: '#F56C6C' },
       { name: '处理中', value: 0, color: '#E6A23C' },
-      { name: '待处理', value: 0, color: '#F56C6C' }
+      { name: '已完成', value: 0, color: '#67C23A' }
     ]
     await nextTick()
     initMatterChart()

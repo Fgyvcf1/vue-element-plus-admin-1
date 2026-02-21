@@ -43,6 +43,16 @@ const systemSettingsRouter: AppRouteRecordRaw[] = [
           icon: 'vi-ep:collection-tag',
           permission: 'system:view'
         }
+      },
+      {
+        path: 'branding',
+        component: () => import('@/views/SystemSettings/Branding/index.vue'),
+        name: 'BrandingSettings',
+        meta: {
+          title: '界面设置',
+          icon: 'vi-ep:picture',
+          permission: 'system:view'
+        }
       }
     ]
   }

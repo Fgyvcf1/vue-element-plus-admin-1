@@ -294,7 +294,7 @@
                 value-format="YYYY-MM-DD"
                 size="small"
                 @change="handleDateOfBirthChange"
-                :popper-options="{ zIndex: 30000 }"
+                popper-class="resident-popper"
               />
             </el-form-item>
           </el-col>
@@ -587,7 +587,7 @@
                   value-format="YYYY-MM-DD"
                   format="YYYY-MM-DD"
                   size="small"
-                  :popper-options="{ zIndex: 30000 }"
+                  popper-class="resident-popper"
                 />
               </el-form-item>
             </el-col>
@@ -617,7 +617,7 @@
                   value-format="YYYY-MM-DD"
                   format="YYYY-MM-DD"
                   size="small"
-                  :popper-options="{ zIndex: 30000 }"
+                  popper-class="resident-popper"
                 />
               </el-form-item>
             </el-col>
@@ -651,7 +651,7 @@
                   value-format="YYYY-MM-DD"
                   format="YYYY-MM-DD"
                   size="small"
-                  :popper-options="{ zIndex: 30000 }"
+                  popper-class="resident-popper"
                 />
               </el-form-item>
             </el-col>
@@ -830,12 +830,12 @@ const residentForm = ref({
   militaryService: '未服兵役',
   educationLevel: '小学',
   status: 'active',
-  registeredPermanentResidence: 1,
+  registeredPermanentResidence: 1 as string | number,
   registeredDate: '',
   statusUpdatedAt: '',
   statusChangeReason: '',
   deathDate: '',
-  equityShares: 0
+  equityShares: 0 as string | number
 })
 
 // 迁途改销表单
@@ -856,7 +856,7 @@ const originalMigrationForm = ref({})
 // 更换户主对话框
 const changeHeadDialogVisible = ref(false)
 const changeHeadType = ref<'same' | 'other'>('same') // 更换类型：same-同户更换，other-跨户迁移
-const newHeadId = ref<number | string | null>(null)
+const newHeadId = ref<number | string | undefined>(undefined)
 const oldHeadNewRelationship = ref('')
 
 // 跨户迁移相关
@@ -1613,47 +1613,48 @@ const updateResidentData = async () => {
 const openChangeHeadDialog = () => {
   // 重置对话框状态
   changeHeadType.value = 'same'
-  newHeadId.value = null
+  newHeadId.value = undefined
   oldHeadNewRelationship.value = ''
   targetHouseholdHeadName.value = ''
   selectedTargetHousehold.value = null
 
   // 如果当前用户不是户主，自动将自己设为新户主（同户更换时）
   if (!isCurrentUserHead.value) {
-    newHeadId.value = currentResidentId.value
+    newHeadId.value = currentResidentId.value ?? undefined
   }
 
   changeHeadDialogVisible.value = true
 }
 
 // 搜索目标户主建议
-const fetchHouseholdHeadSuggestions = async (queryString: string, cb: any) => {
+const fetchHouseholdHeadSuggestions = (queryString: string, cb: any) => {
   if (!queryString || queryString.length < 1) {
     cb([])
     return
   }
 
-  try {
-    const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
-    if (res.code === 20000 && res.householdHeadNames) {
-      // 过滤掉当前家庭
-      const results = res.householdHeadNames
-        .filter((item: any) => item.householdNumber !== currentHouseholdId.value)
-        .map((item: any) => ({
-          householdNumber: item.householdNumber,
-          householdHeadName: item.householdHeadName,
-          address: item.address,
-          householdHeadId: item.householdHeadId,
-          value: item.householdHeadName
-        }))
-      cb(results)
-    } else {
+  getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
+    .then((res) => {
+      if (res.code === 20000 && res.householdHeadNames) {
+        // 过滤掉当前家庭
+        const results = res.householdHeadNames
+          .filter((item: any) => item.householdNumber !== currentHouseholdId.value)
+          .map((item: any) => ({
+            householdNumber: item.householdNumber,
+            householdHeadName: item.householdHeadName,
+            address: item.address,
+            householdHeadId: item.householdHeadId,
+            value: item.householdHeadName
+          }))
+        cb(results)
+      } else {
+        cb([])
+      }
+    })
+    .catch((error) => {
+      console.error('搜索户主失败:', error)
       cb([])
-    }
-  } catch (error) {
-    console.error('搜索户主失败:', error)
-    cb([])
-  }
+    })
 }
 
 // 选择目标家庭
@@ -2097,5 +2098,9 @@ onMounted(() => {
 .migration-buttons {
   margin-top: 15px;
   text-align: right;
+}
+
+:global(.resident-popper) {
+  z-index: 30000 !important;
 }
 </style>

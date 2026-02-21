@@ -7,7 +7,7 @@ export default {
     login: '登录',
     required: '该项为必填项',
     loginOut: '退出系统',
-    document: '项目文档',
+    document: '操作指南',
     reminder: '温馨提示',
     loginOutMessage: '是否退出本系统？',
     back: '返回',
@@ -106,7 +106,7 @@ export default {
   },
   login: {
     welcome: '欢迎使用本系统',
-    message: '开箱即用的中后台管理系统',
+    message: '快捷 高效的村务管理平台',
     username: '用户名',
     password: '密码',
     register: '注册',

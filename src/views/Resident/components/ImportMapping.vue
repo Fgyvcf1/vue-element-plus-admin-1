@@ -223,7 +223,12 @@ const parseExcel = () => {
       const worksheet = workbook.Sheets[firstSheetName]
 
       // 获取表头
-      const range = XLSX.utils.decode_range(worksheet['!ref'])
+      const ref = worksheet['!ref']
+      if (!ref) {
+        ElMessage.error('Excel 无有效数据')
+        return
+      }
+      const range = XLSX.utils.decode_range(ref)
       const rawHeaders: string[] = []
 
       for (let C = range.s.c; C <= range.e.c; ++C) {
@@ -322,6 +327,7 @@ const getRecommendedMapping = (excelField: string) => {
     户籍详细地址: 'Home_address',
     出生日期: 'date_of_birth',
     身份证号码: 'id_card',
+    身份证号: 'id_card',
     联系方式: 'phone_number',
     文化程度: 'education_level',
     婚姻状况: 'marital_status',
@@ -415,6 +421,14 @@ const importData = async () => {
   importError.value = ''
 
   try {
+    const hasName = mappingList.value.some((item) => item.dbField === 'name')
+    const hasIdCard = mappingList.value.some((item) => item.dbField === 'id_card')
+    if (!hasName || !hasIdCard) {
+      importError.value = '请先映射必填字段：姓名、身份证号码'
+      activeStep.value = 3
+      return
+    }
+
     const importData = {
       headers: headerRow.value,
       data: excelData.value,
@@ -435,7 +449,13 @@ const importData = async () => {
     }
   } catch (error: any) {
     console.error('导入失败:', error)
-    importError.value = error.response?.data?.message || error.message || '导入失败'
+    const backendMessage = error.response?.data?.message
+    const backendErrors = error.response?.data?.data?.errors
+    if (Array.isArray(backendErrors) && backendErrors.length > 0) {
+      importError.value = [backendMessage, ...backendErrors].filter(Boolean).join('\n')
+    } else {
+      importError.value = backendMessage || error.message || '导入失败'
+    }
     activeStep.value = 3
   } finally {
     importLoading.value = false

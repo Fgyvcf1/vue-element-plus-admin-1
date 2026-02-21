@@ -100,8 +100,10 @@ const handleEdit = () => {
 }
 
 // 获取状态标签类型
-const getStatusType = (status: string) => {
-  const typeMap: Record<string, string> = {
+const getStatusType = (
+  status: string
+): 'success' | 'warning' | 'info' | 'primary' | 'danger' => {
+  const typeMap: Record<string, 'success' | 'warning' | 'info' | 'primary' | 'danger'> = {
     正常: 'success',
     迁出: 'warning',
     死亡: 'info'

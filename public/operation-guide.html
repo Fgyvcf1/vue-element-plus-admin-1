@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>操作指南</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --text: #1f2328;
+        --muted: #5f6b7a;
+        --border: #e5e7eb;
+        --bg: #ffffff;
+        --card: #f9fafb;
+        --primary: #2563eb;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, Segoe UI, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      header {
+        padding: 28px 24px;
+        border-bottom: 1px solid var(--border);
+        background: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-size: 22px;
+      }
+      .subtitle {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      .toc {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .toc a {
+        display: block;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--text);
+        background: var(--card);
+      }
+      .toc a:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      section {
+        padding: 16px 0;
+        border-bottom: 1px dashed var(--border);
+      }
+      section:last-child {
+        border-bottom: 0;
+      }
+      h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+      h3 {
+        margin: 12px 0 6px;
+        font-size: 15px;
+      }
+      ul {
+        padding-left: 18px;
+        margin: 6px 0 0;
+      }
+      li {
+        margin: 4px 0;
+      }
+      .tip {
+        background: #eef2ff;
+        color: #1e3a8a;
+        border-left: 3px solid #6366f1;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-top: 8px;
+        font-size: 13px;
+      }
+      .section-block {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--card);
+      }
+      .flow {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        color: #374151;
+        background: #f3f4f6;
+        padding: 8px 10px;
+        border-radius: 6px;
+        display: inline-block;
+      }
+      .shot {
+        margin-top: 8px;
+        border: 1px dashed var(--border);
+        border-radius: 8px;
+        padding: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        background: #fff;
+      }
+      .field-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        background: #fff;
+      }
+      .field-table th,
+      .field-table td {
+        border: 1px solid var(--border);
+        padding: 6px 8px;
+        vertical-align: top;
+      }
+      .field-table th {
+        background: #f3f4f6;
+        text-align: left;
+        width: 30%;
+      }
+      .note {
+        background: #fef3c7;
+        color: #92400e;
+        border-left: 3px solid #f59e0b;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-top: 8px;
+        font-size: 13px;
+      }
+      code {
+        background: #f3f4f6;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+      footer {
+        color: var(--muted);
+        font-size: 12px;
+        padding: 16px 0 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>操作指南</h1>
+      <div class="subtitle">各模块使用方法与关键流程说明</div>
+    </header>
+    <main>
+      <div class="toc">
+        <a href="#login">登录与权限</a>
+        <a href="#dashboard">首页概览</a>
+        <a href="#resident">居民管理</a>
+        <a href="#mediation">人民调解</a>
+        <a href="#todo">待办提醒</a>
+        <a href="#special">特殊人群</a>
+        <a href="#leadership">机构管理</a>
+        <a href="#system">系统设置</a>
+        <a href="#faq">常见问题</a>
+      </div>
+
+      <section id="login">
+        <h2>登录与权限</h2>
+        <ul>
+          <li>使用分配的账号密码登录系统。</li>
+          <li>不同角色拥有不同的菜单与按钮权限。</li>
+          <li>如无法访问某模块，请联系管理员分配权限。</li>
+        </ul>
+      </section>
+
+      <section id="dashboard">
+        <h2>首页概览</h2>
+        <ul>
+          <li>展示居民、低收入、残疾人、通知等统计数据。</li>
+          <li>事项进度：统计“任务”型待办的进度分布。</li>
+          <li>纠纷处理趋势：近 6 个月调解档案数量趋势。</li>
+        </ul>
+      </section>
+
+      <section id="resident">
+        <h2>居民管理</h2>
+        <h3>居民查询</h3>
+        <ul>
+          <li>支持按姓名、身份证号、组别等条件筛选。</li>
+          <li>可导出当前筛选结果为 Excel。</li>
+        </ul>
+        <div class="section-block">
+          <h3>字段说明（常用）</h3>
+          <table class="field-table">
+            <tr>
+              <th>字段</th>
+              <th>说明</th>
+            </tr>
+            <tr>
+              <td>姓名</td>
+              <td>居民姓名，必填。</td>
+            </tr>
+            <tr>
+              <td>身份证号码</td>
+              <td>18 位身份证号，必填，用于年龄/性别自动解析。</td>
+            </tr>
+            <tr>
+              <td>与户主关系</td>
+              <td>“本人”代表户主，其它成员应填写与户主关系。</td>
+            </tr>
+            <tr>
+              <td>民族</td>
+              <td>来自字典管理中的民族选项。</td>
+            </tr>
+            <tr>
+              <td>组别</td>
+              <td>村组信息，用于生成户编号与统计。</td>
+            </tr>
+            <tr>
+              <td>户籍详细地址</td>
+              <td>用于户主匹配与家庭成员归户。</td>
+            </tr>
+          </table>
+        </div>
+        <h3>新增/编辑居民</h3>
+        <ul>
+          <li>身份证号、民族等信息用于自动计算年龄与校验。</li>
+          <li>与户主关系为“本人”的记录视为户主。</li>
+        </ul>
+        <div class="section-block">
+          <h3>业务流程</h3>
+          <div class="flow">居民列表 → 新增/编辑 → 保存 → 查询/导出</div>
+          <div class="shot">截图示例：居民列表、居民新增表单（请替换为实际截图）</div>
+        </div>
+        <h3>批量导入</h3>
+        <ul>
+          <li>流程：上传文件 → 字段映射 → 数据预览 → 导入完成。</li>
+          <li>必填字段：<strong>姓名</strong>、<strong>身份证号码</strong>。</li>
+          <li>户主识别依据：与户主关系 = “本人”。</li>
+        </ul>
+        <div class="section-block">
+          <h3>导入字段建议</h3>
+          <table class="field-table">
+            <tr>
+              <th>Excel 表头</th>
+              <th>建议映射字段</th>
+            </tr>
+            <tr>
+              <td>姓名</td>
+              <td>name</td>
+            </tr>
+            <tr>
+              <td>身份证号码 / 身份证号</td>
+              <td>id_card</td>
+            </tr>
+            <tr>
+              <td>与户主关系</td>
+              <td>relationship_to_head</td>
+            </tr>
+            <tr>
+              <td>组别</td>
+              <td>village_group</td>
+            </tr>
+            <tr>
+              <td>户籍详细地址 / 地址</td>
+              <td>Home_address</td>
+            </tr>
+          </table>
+          <div class="shot">截图示例：导入向导 - 字段映射与预览（请替换为实际截图）</div>
+        </div>
+        <div class="note">建议把身份证号设置为“文本格式”，避免科学计数或丢失位数。</div>
+      </section>
+
+      <section id="mediation">
+        <h2>人民调解</h2>
+        <h3>调解申请书</h3>
+        <ul>
+          <li>录入纠纷类型、发生日期、申请人/被申请人信息。</li>
+          <li>可从居民库快速选择人员并自动填充身份证、民族等。</li>
+        </ul>
+        <div class="section-block">
+          <h3>字段说明（申请书）</h3>
+          <table class="field-table">
+            <tr>
+              <th>字段</th>
+              <th>说明</th>
+            </tr>
+            <tr>
+              <td>纠纷类型</td>
+              <td>纠纷分类，用于统计与筛选。</td>
+            </tr>
+            <tr>
+              <td>发生日期</td>
+              <td>纠纷实际发生日期。</td>
+            </tr>
+            <tr>
+              <td>申请人/被申请人</td>
+              <td>支持多人，身份证/民族等会自动回填。</td>
+            </tr>
+          </table>
+        </div>
+        <h3>调解记录</h3>
+        <ul>
+          <li>记录调解过程与结果，并可上传现场图片。</li>
+          <li>若“是否达成协议”选择“是”，则不再允许新增调解记录。</li>
+        </ul>
+        <div class="section-block">
+          <h3>业务流程</h3>
+          <div class="flow">创建档案 → 填写申请书 → 新增调解记录 → 达成协议 → 生成协议书</div>
+          <div class="shot">截图示例：调解记录时间轴、调解记录表单（请替换为实际截图）</div>
+        </div>
+        <h3>调解协议书</h3>
+        <ul>
+          <li>只有在调解记录中选择“达成协议”后才可填写。</li>
+          <li>支持生成并打印协议书 PDF。</li>
+        </ul>
+      </section>
+
+      <section id="todo">
+        <h2>待办提醒</h2>
+        <ul>
+          <li>支持“任务 / 事件提醒 / 系统”等类型。</li>
+          <li>仅“任务”类型显示进度条。</li>
+          <li>支持标记已读、批量操作与关键字搜索。</li>
+        </ul>
+        <div class="section-block">
+          <h3>字段说明</h3>
+          <table class="field-table">
+            <tr>
+              <th>字段</th>
+              <th>说明</th>
+            </tr>
+            <tr>
+              <td>类型</td>
+              <td>任务/事件提醒/系统；仅任务显示进度。</td>
+            </tr>
+            <tr>
+              <td>进度</td>
+              <td>0-100，用于任务进度。</td>
+            </tr>
+            <tr>
+              <td>状态</td>
+              <td>pending/read 等状态。</td>
+            </tr>
+          </table>
+          <div class="shot">截图示例：待办提醒列表与编辑弹窗（请替换为实际截图）</div>
+        </div>
+      </section>
+
+      <section id="special">
+        <h2>特殊人群</h2>
+        <h3>低收入管理</h3>
+        <ul>
+          <li>登记低收入人员信息，支持查看与编辑。</li>
+          <li>可导出列表或按条件筛选。</li>
+        </ul>
+        <div class="section-block">
+          <h3>业务流程</h3>
+          <div class="flow">查询居民 → 建立低收入档案 → 编辑/维护 → 导出</div>
+        </div>
+        <h3>残疾人管理</h3>
+        <ul>
+          <li>登记残疾人员信息及证件信息。</li>
+          <li>支持导出与状态维护。</li>
+        </ul>
+      </section>
+
+      <section id="leadership">
+        <h2>机构管理</h2>
+        <ul>
+          <li>维护现任及历届两委班子、团妇、村民小组长信息与职务数据。</li>
+          <li>支持新增、编辑与导出。</li>
+        </ul>
+        <div class="section-block">
+          <h3>字段说明（常用）</h3>
+          <table class="field-table">
+            <tr>
+              <th>字段</th>
+              <th>说明</th>
+            </tr>
+            <tr>
+              <td>姓名 / 职务</td>
+              <td>用于展示与排序。</td>
+            </tr>
+            <tr>
+              <td>联系方式</td>
+              <td>用于通知或联系。</td>
+            </tr>
+          </table>
+          <div class="shot">截图示例：机构管理列表（请替换为实际截图）</div>
+        </div>
+      </section>
+
+      <section id="system">
+        <h2>系统设置</h2>
+        <h3>通知配置</h3>
+        <ul>
+          <li>配置生日提醒等通知参数。</li>
+        </ul>
+        <h3>字典管理</h3>
+        <ul>
+          <li>维护“民族、政治面貌、文化程度”等字典值。</li>
+        </ul>
+        <h3>界面设置</h3>
+        <ul>
+          <li>设置系统标题、Logo 与浏览器图标。</li>
+          <li>保存后建议刷新浏览器缓存（Ctrl+F5）。</li>
+        </ul>
+        <div class="section-block">
+          <h3>界面设置字段说明</h3>
+          <table class="field-table">
+            <tr>
+              <th>字段</th>
+              <th>说明</th>
+            </tr>
+            <tr>
+              <td>系统标题</td>
+              <td>浏览器标题与系统展示标题。</td>
+            </tr>
+            <tr>
+              <td>Logo 显示方式</td>
+              <td>图片 / 文字 / 图片+文字。</td>
+            </tr>
+            <tr>
+              <td>浏览器图标</td>
+              <td>浏览器标签页图标（favicon）。</td>
+            </tr>
+          </table>
+          <div class="shot">截图示例：界面设置页（请替换为实际截图）</div>
+        </div>
+      </section>
+
+      <section id="faq">
+        <h2>常见问题</h2>
+        <h3>导入提示“格式错误”</h3>
+        <ul>
+          <li>请确认已映射 “姓名” 与 “身份证号码”。</li>
+          <li>Excel 某行缺少姓名/身份证号会被判为错误。</li>
+        </ul>
+        <h3>接口 404/400</h3>
+        <ul>
+          <li>确认后端已启动且接口路径为 <code>/api</code> 前缀。</li>
+          <li>遇到 400 错误可查看弹窗的“错误详情”。</li>
+        </ul>
+        <div class="tip">如需更多帮助，请联系系统管理员或开发人员（微信号：moli6030）。</div>
+      </section>
+
+      <footer>本指南会随功能更新持续完善。</footer>
+    </main>
+  </body>
+</html>

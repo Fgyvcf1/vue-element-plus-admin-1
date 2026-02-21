@@ -356,8 +356,14 @@ router.get('/archives/:id', async (req, res) => {
 
     // 获取申请人信息（包含新添加的字段）
     const [applicantRows] = await db.pool.execute(
-      `SELECT a.id, a.archive_id, a.is_resident, a.resident_id, a.name, a.id_card, a.phone, a.address,
-              a.gender, a.ethnicity, a.age, a.occupation,
+      `SELECT a.id, a.archive_id, a.is_resident, a.resident_id, a.name,
+              COALESCE(a.id_card, r.id_card) as id_card,
+              COALESCE(a.phone, r.phone_number) as phone,
+              COALESCE(a.address, r.Home_address) as address,
+              COALESCE(a.gender, r.gender) as gender,
+              COALESCE(a.ethnicity, r.ethnicity) as ethnicity,
+              a.age,
+              COALESCE(a.occupation, r.occupation) as occupation,
               r.name as resident_name, r.id_card as resident_id_card, r.phone_number as resident_phone, r.Home_address as resident_address,
               r.gender as resident_gender, r.ethnicity as resident_ethnicity, r.date_of_birth as resident_birth_date, r.occupation as resident_occupation
        FROM mediation_applicants a LEFT JOIN residents r ON a.resident_id = r.id WHERE a.archive_id = ? ORDER BY a.id`,
@@ -366,8 +372,14 @@ router.get('/archives/:id', async (req, res) => {
 
     // 获取被申请人信息（包含新添加的字段）
     const [respondentRows] = await db.pool.execute(
-      `SELECT a.id, a.archive_id, a.is_resident, a.resident_id, a.name, a.id_card, a.phone, a.address,
-              a.gender, a.ethnicity, a.age, a.occupation,
+      `SELECT a.id, a.archive_id, a.is_resident, a.resident_id, a.name,
+              COALESCE(a.id_card, r.id_card) as id_card,
+              COALESCE(a.phone, r.phone_number) as phone,
+              COALESCE(a.address, r.Home_address) as address,
+              COALESCE(a.gender, r.gender) as gender,
+              COALESCE(a.ethnicity, r.ethnicity) as ethnicity,
+              a.age,
+              COALESCE(a.occupation, r.occupation) as occupation,
               r.name as resident_name, r.id_card as resident_id_card, r.phone_number as resident_phone, r.Home_address as resident_address,
               r.gender as resident_gender, r.ethnicity as resident_ethnicity, r.date_of_birth as resident_birth_date, r.occupation as resident_occupation
        FROM mediation_respondents a LEFT JOIN residents r ON a.resident_id = r.id WHERE a.archive_id = ? ORDER BY a.id`,
@@ -479,6 +491,25 @@ router.post('/archives/:id/application', async (req, res) => {
       ]
     )
 
+    const normalizePersonPayload = (item = {}) => {
+      const residentId = item.residentId ?? item.resident_id ?? null
+      const isResident =
+        item.isResident ?? (item.residentId || item.resident_id ? true : false)
+      return {
+        isResident,
+        residentId,
+        name: item.name || '',
+        idCard: item.idCard || item.id_card || null,
+        phone: item.phone || item.phoneNumber || item.resident_phone || null,
+        address:
+          item.address || item.homeAddress || item.Home_address || item.resident_address || null,
+        gender: item.gender || item.resident_gender || null,
+        ethnicity: item.ethnicity || item.nation || item.resident_ethnicity || '汉族',
+        age: item.age || null,
+        occupation: item.occupation || item.resident_occupation || null
+      }
+    }
+
     // 插入申请人（包含新字段）
     if (applicants && applicants.length > 0) {
       // 获取最大ID
@@ -487,10 +518,9 @@ router.post('/archives/:id/application', async (req, res) => {
       )
       let maxId = maxIdResult[0].maxId || 0
 
-      for (const item of applicants) {
+      for (const rawItem of applicants) {
+        const item = normalizePersonPayload(rawItem)
         maxId++
-        const isResident = item.isResident || (item.residentId ? true : false)
-        const residentId = item.residentId || null
         await connection.execute(
           `INSERT INTO mediation_applicants (id, archive_id, is_resident, resident_id, name, id_card, phone, address, 
             gender, ethnicity, age, occupation, created_at) 
@@ -498,8 +528,8 @@ router.post('/archives/:id/application', async (req, res) => {
           [
             maxId,
             id,
-            isResident ? 1 : 0,
-            residentId,
+            item.isResident ? 1 : 0,
+            item.residentId,
             item.name || '',
             item.idCard || null,
             item.phone || null,
@@ -521,10 +551,9 @@ router.post('/archives/:id/application', async (req, res) => {
       )
       let maxId = maxIdResult[0].maxId || 0
 
-      for (const item of respondents) {
+      for (const rawItem of respondents) {
+        const item = normalizePersonPayload(rawItem)
         maxId++
-        const isResident = item.isResident || (item.residentId ? true : false)
-        const residentId = item.residentId || null
         await connection.execute(
           `INSERT INTO mediation_respondents (id, archive_id, is_resident, resident_id, name, id_card, phone, address, 
             gender, ethnicity, age, occupation, created_at) 
@@ -532,8 +561,8 @@ router.post('/archives/:id/application', async (req, res) => {
           [
             maxId,
             id,
-            isResident ? 1 : 0,
-            residentId,
+            item.isResident ? 1 : 0,
+            item.residentId,
             item.name || '',
             item.idCard || null,
             item.phone || null,
@@ -591,6 +620,22 @@ router.post('/archives/:id/records', async (req, res) => {
   try {
     connection = await db.pool.getConnection()
     await connection.beginTransaction()
+
+    // 若已存在达成协议的记录，则禁止继续新增调解记录
+    const [agreementRows] = await connection.execute(
+      `
+      SELECT agreement
+      FROM mediation_records
+      WHERE archive_id = ? AND agreement = 'yes'
+      ORDER BY mediation_date DESC, id DESC
+      LIMIT 1
+      `,
+      [id]
+    )
+    if (agreementRows.length > 0) {
+      await connection.rollback()
+      return res.status(400).json({ code: 400, message: '已达成协议，不能再新增调解记录' })
+    }
 
     // 获取最大ID并生成新ID
     const [maxIdResult] = await connection.execute('SELECT MAX(id) as maxId FROM mediation_records')
@@ -942,34 +987,37 @@ router.get('/mediation-archives', (req, res) => {
 
     let sql = `
       SELECT ma.*, 
-      GROUP_CONCAT(DISTINCT mr.name) as mediators_name,
-      GROUP_CONCAT(DISTINCT ra.name) as applicants_name,
-      GROUP_CONCAT(DISTINCT rb.name) as respondents_name
+      GROUP_CONCAT(DISTINCT mr.mediators) as mediators_name,
+      GROUP_CONCAT(DISTINCT app.name) as applicants_name,
+      GROUP_CONCAT(DISTINCT resp.name) as respondents_name
       FROM mediation_archives ma
-      LEFT JOIN mediation_records mr ON ma.id = mr.archive_id
-      LEFT JOIN archive_participants ap_a ON ma.id = ap_a.archive_id AND ap_a.type = 'applicant'
-      LEFT JOIN residents ra ON ap_a.resident_id = ra.id
-      LEFT JOIN archive_participants ap_b ON ma.id = ap_b.archive_id AND ap_b.type = 'respondent'
-      LEFT JOIN residents rb ON ap_b.resident_id = rb.id
+      LEFT JOIN mediation_records mr ON ma.archive_id = mr.archive_id
+      LEFT JOIN mediation_applicants app ON ma.archive_id = app.archive_id
+      LEFT JOIN mediation_respondents resp ON ma.archive_id = resp.archive_id
+      LEFT JOIN mediation_applications ma_app ON ma.archive_id = ma_app.archive_id
       WHERE ma.status != 'deleted'
     `
     const params = []
 
     // 添加关键词搜索条件
     if (keyword) {
-      sql += ` AND (ma.case_title LIKE ? OR ma.case_description LIKE ? OR ma.archive_id LIKE ?`
-      params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`)
-      
-      // 添加当事人姓名搜索
-      sql += ` OR ra.name LIKE ? OR rb.name LIKE ?`
+      sql += ` AND (ma.archive_id LIKE ?`
+      params.push(`%${keyword}%`)
+
+      // 添加案件描述/请求内容搜索
+      sql += ` OR ma_app.dispute_description LIKE ? OR ma_app.request_content LIKE ?`
       params.push(`%${keyword}%`, `%${keyword}%`)
-      
+
+      // 添加当事人姓名搜索
+      sql += ` OR app.name LIKE ? OR resp.name LIKE ?`
+      params.push(`%${keyword}%`, `%${keyword}%`)
+
       sql += ')'
     }
 
     // 添加纠纷类型筛选
     if (disputeType) {
-      sql += ' AND ma.dispute_type = ?'
+      sql += ' AND ma_app.dispute_type = ?'
       params.push(disputeType)
     }
 
@@ -999,17 +1047,17 @@ router.get('/mediation-archives', (req, res) => {
       }
 
       // 查询总数
-      let countSql = 'SELECT COUNT(DISTINCT ma.id) as total FROM mediation_archives ma WHERE ma.status != "deleted"'
+      let countSql = 'SELECT COUNT(DISTINCT ma.id) as total FROM mediation_archives ma LEFT JOIN mediation_applications ma_app ON ma.archive_id = ma_app.archive_id WHERE ma.status != "deleted"'
       const countParams = []
 
       // 添加同样的筛选条件
       if (keyword) {
-        countSql += ` AND (ma.case_title LIKE ? OR ma.case_description LIKE ? OR ma.archive_id LIKE ? OR EXISTS(SELECT 1 FROM archive_participants ap INNER JOIN residents r ON ap.resident_id = r.id WHERE ap.archive_id = ma.id AND r.name LIKE ?))`
-        countParams.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`)
+        countSql += ` AND (ma.archive_id LIKE ? OR ma_app.dispute_description LIKE ? OR ma_app.request_content LIKE ? OR EXISTS(SELECT 1 FROM mediation_applicants app WHERE app.archive_id = ma.archive_id AND app.name LIKE ?) OR EXISTS(SELECT 1 FROM mediation_respondents resp WHERE resp.archive_id = ma.archive_id AND resp.name LIKE ?))`
+        countParams.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`)
       }
 
       if (disputeType) {
-        countSql += ' AND ma.dispute_type = ?'
+        countSql += ' AND ma_app.dispute_type = ?'
         countParams.push(disputeType)
       }
 
@@ -1226,15 +1274,13 @@ router.get('/mediation-archives/:id', (req, res) => {
 
     const sql = `
       SELECT ma.*, 
-      GROUP_CONCAT(DISTINCT mr.name) as mediators_name,
-      GROUP_CONCAT(DISTINCT ra.name) as applicants_name,
-      GROUP_CONCAT(DISTINCT rb.name) as respondents_name
+      GROUP_CONCAT(DISTINCT mr.mediators) as mediators_name,
+      GROUP_CONCAT(DISTINCT app.name) as applicants_name,
+      GROUP_CONCAT(DISTINCT resp.name) as respondents_name
       FROM mediation_archives ma
-      LEFT JOIN mediation_records mr ON ma.id = mr.archive_id
-      LEFT JOIN archive_participants ap_a ON ma.id = ap_a.archive_id AND ap_a.type = 'applicant'
-      LEFT JOIN residents ra ON ap_a.resident_id = ra.id
-      LEFT JOIN archive_participants ap_b ON ma.id = ap_b.archive_id AND ap_b.type = 'respondent'
-      LEFT JOIN residents rb ON ap_b.resident_id = rb.id
+      LEFT JOIN mediation_records mr ON ma.archive_id = mr.archive_id
+      LEFT JOIN mediation_applicants app ON ma.archive_id = app.archive_id
+      LEFT JOIN mediation_respondents resp ON ma.archive_id = resp.archive_id
       WHERE ma.id = ?
       GROUP BY ma.id
     `

@@ -27,6 +27,25 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
     }
   },
   {
+    path: '/operation-guide',
+    component: Layout,
+    name: 'OperationGuideRoot',
+    meta: {
+      hidden: true
+    },
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/OperationGuide/index.vue'),
+        name: 'OperationGuide',
+        meta: {
+          title: t('common.document'),
+          noCache: true
+        }
+      }
+    ]
+  },
+  {
     path: '/redirect',
     component: Layout,
     name: 'RedirectWrap',

@@ -4,11 +4,12 @@ const { execSync } = require('child_process')
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const path = require('path')
 const routes = require('./routes')
 const permissionRoutes = require('./routes/permissionRoutes')
 const db = require('./db')
 
-const port = 3001
+const port = Number(process.env.PORT || 3001)
 
 /**
  * 杀死占用指定端口的进程
@@ -65,7 +66,9 @@ const corsOptions = {
     'http://localhost:4000',
     'http://127.0.0.1:4000',
     'http://localhost:5173',
-    'http://127.0.0.1:5173'
+    'http://127.0.0.1:5173',
+    `http://localhost:${port}`,
+    `http://127.0.0.1:${port}`
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id'],
@@ -77,8 +80,8 @@ app.use(bodyParser.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }))
 
 // 静态文件服务
-app.use('/uploads', express.static('uploads'))
-app.use('/archives', express.static('archives'))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+app.use('/archives', express.static(path.join(__dirname, 'archives')))
 
 // 登录路由
 app.post('/api/user/login', async (req, res) => {

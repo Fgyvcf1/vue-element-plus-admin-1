@@ -126,13 +126,16 @@ export const useUserStore = defineStore('user', {
     },
     hasPermission(permission: string): boolean {
       // 超级管理员拥有所有权限
-      if (this.userInfo?.role === 'superadmin') return true
+      const role = this.userInfo?.role
+      if (role === 'superadmin') return true
+      // 人民调解：除只读用户外均可增删改查
+      if (role && role !== 'readonly' && permission.startsWith('mediation:')) return true
       return this.permissions.includes(permission)
     }
   },
   persist: {
     key: 'pinia-state-user',
-    paths: ['userInfo', 'tokenKey', 'token', 'roleRouters', 'rememberMe', 'loginInfo']
+    pick: ['userInfo', 'tokenKey', 'token', 'roleRouters', 'rememberMe', 'loginInfo']
     // 排除 permissions，每次登录重新获取
   }
 })

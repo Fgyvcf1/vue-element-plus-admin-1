@@ -348,8 +348,8 @@ const loadPersonInfo = async () => {
   try {
     loading.value = true
     const response = await getLowIncomePerson(lowIncomePersonId.value)
-    if (response.data.data) {
-      const data = response.data.data
+    const data = response.data
+    if (data) {
       personInfo.name = data.name || ''
       personInfo.idCard = data.idCard || ''
       personInfo.lowIncomeType = data.low_income_type || ''
@@ -370,8 +370,9 @@ const loadPolicyRecords = async () => {
   try {
     loading.value = true
     const response = await getPolicyRecords({ low_income_person_id: lowIncomePersonId.value })
-    if (response.data.data) {
-      policyRecords.value = response.data.data.map((item: any) => ({
+    const records = Array.isArray(response.data) ? response.data : []
+    if (records.length) {
+      policyRecords.value = records.map((item: any) => ({
         id: item.id,
         lowIncomePersonId: item.low_income_person_id,
         policyType: item.policy_type,
@@ -394,12 +395,12 @@ const loadPolicyRecords = async () => {
 }
 
 // 格式化日期
-const formatDate = (date?: string) => {
+const formatDate = (date?: string | null) => {
   return date || ''
 }
 
 // 格式化补助周期
-const formatCycle = (cycle?: string) => {
+const formatCycle = (cycle?: string | null) => {
   const cycleMap: Record<string, string> = {
     monthly: '月',
     quarterly: '季度',
@@ -429,11 +430,16 @@ const handleAddRecord = () => {
 const handleEditRecord = (record: Partial<PolicyRecord>) => {
   formTitle.value = '编辑政策记录'
   formData.id = record.id || null
-  formData.lowIncomePersonId = record.low_income_person_id || lowIncomePersonId.value
+  const resolvedId = record.low_income_person_id ?? lowIncomePersonId.value
+  formData.lowIncomePersonId =
+    resolvedId === null || resolvedId === undefined ? null : Number(resolvedId)
   formData.policyType = record.policyType || ''
   formData.startDate = record.startDate || ''
   formData.endDate = record.endDate || ''
-  formData.subsidyAmount = record.subsidyAmount || null
+  formData.subsidyAmount =
+    record.subsidyAmount === null || record.subsidyAmount === undefined || record.subsidyAmount === ''
+      ? null
+      : Number(record.subsidyAmount)
   formData.subsidyCycle = record.subsidyCycle || 'monthly'
   formData.subsidyAccount = record.subsidyAccount || ''
   formData.accountHolderRelationship = record.accountHolderRelationship || ''

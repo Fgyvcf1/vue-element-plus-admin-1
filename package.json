@@ -1,33 +1,18 @@
 {
   "name": "vue-element-plus-admin",
-  "version": "2.9.0",
-  "description": "一套基于vue3、element-plus、typesScript、vite4的后台集成方案。",
-  "author": "Archer <502431556@qq.com>",
-  "private": false,
-  "type": "module",
+  "version": "3.0.0",
+  "description": "Vue Element Plus Admin Dashboard",
   "scripts": {
-    "i": "pnpm install",
-    "dev": "npx --yes kill-port 4000 && vite --mode base",
-    "dev:win": "node scripts/kill-port-4000.cjs && node_modules\\\\.bin\\\\vite.cmd --mode base",
+    "dev": "vite",
+    "dev:win": "powershell -Command \"$ErrorActionPreference='SilentlyContinue'; Get-NetTCPConnection -LocalPort 4000 | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue } | Out-Null; exit 0\" && vite --mode base",
     "dev:all": "node scripts/dev-all.cjs",
-    "ts:check": "vue-tsc --noEmit --skipLibCheck",
-    "build:pro": "vite build --mode pro",
-    "build:gitee": "vite build --mode gitee",
+    "build": "vite build",
     "build:dev": "vite build --mode dev",
     "build:test": "vite build --mode test",
-    "serve:pro": "vite preview --mode pro",
-    "serve:dev": "vite preview --mode dev",
-    "serve:test": "vite preview --mode test",
-    "npm:check": "npx npm-check-updates -u",
-    "clean": "npx rimraf node_modules",
-    "clean:cache": "npx rimraf node_modules/.cache",
-    "lint:eslint": "eslint . --fix \"src/**/*.{js,ts,tsx,vue,html}\"",
-    "lint:format": "prettier --write --loglevel warn \"src/**/*.{js,ts,json,tsx,css,less,vue,html,md}\"",
-    "lint:style": "stylelint --fix \"**/*.{vue,less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
-    "lint:lint-staged": "lint-staged -c ./.husky/lintstagedrc.cjs",
-    "prepare": "husky install",
-    "p": "plop",
-    "icon": "esno ./scripts/icon.ts"
+    "build:pro": "vite build --mode pro",
+    "build:gitee": "vite build --mode gitee",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js,.ts,.vue --fix"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
@@ -67,7 +52,20 @@
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
+    "@eslint/js": "^9.17.0",
     "@iconify/json": "^2.2.293",
+    "@iconify-json/ant-design": "^1.1.21",
+    "@iconify-json/bi": "^1.1.25",
+    "@iconify-json/ci": "^1.1.17",
+    "@iconify-json/emojione-monotone": "^1.1.17",
+    "@iconify-json/ep": "^1.1.20",
+    "@iconify-json/ion": "^1.1.24",
+    "@iconify-json/material-symbols": "^1.1.29",
+    "@iconify-json/mdi": "^1.1.50",
+    "@iconify-json/radix-icons": "^1.1.18",
+    "@iconify-json/tdesign": "^1.1.24",
+    "@iconify-json/vaadin": "^1.1.16",
+    "@iconify-json/zmdi": "^1.1.17",
     "@intlify/unplugin-vue-i18n": "^6.0.3",
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.7",
@@ -128,20 +126,16 @@
     "vite-plugin-style-import": "2.0.0",
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-url-copy": "^1.1.4",
+    "vue-eslint-parser": "^10.4.0",
     "vue-tsc": "^2.2.0"
   },
-  "packageManager": "pnpm@9.15.3",
-  "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.1.0"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kailong321200875/vue-element-plus-admin.git"
-  },
-  "bugs": {
-    "url": "https://github.com/kailong321200875/vue-element-plus-admin/issues"
-  },
-  "homepage": "https://github.com/kailong321200875/vue-element-plus-admin"
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "core-js",
+      "es5-ext",
+      "esbuild",
+      "vue-demi"
+    ]
+  }
 }

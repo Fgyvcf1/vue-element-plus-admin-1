@@ -3,18 +3,25 @@ import request from '@/axios'
 // 残疾人类型定义
 export interface DisabledPerson {
   id?: number
-  resident_id: number
-  disability_type: string
-  disability_level: string | number
-  certificate_number?: string
+  resident_id?: number | string | null
+  disability_type?: string
+  disability_level?: string | number
+  certificate_number?: string | null
+  certificate_status?: string | null
+  issue_date?: string | null
+  guardian_name?: string | null
+  guardian_phone?: string | null
+  guardian_relationship?: string | null
   created_at?: string
   updated_at?: string
   // 关联居民信息
   name?: string
   idCard?: string
+  id_card?: string
   gender?: string
-  age?: number
+  age?: number | string
   phoneNumber?: string
+  phone_number?: string
 }
 
 // 查询参数类型

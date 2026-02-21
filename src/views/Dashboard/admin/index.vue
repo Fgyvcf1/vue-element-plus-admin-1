@@ -143,9 +143,9 @@ const populationTooltip = ref({
 })
 
 // Canvas 引用
-const populationChart = ref(null)
-const matterChart = ref(null)
-const disputeChart = ref(null)
+const populationChart = ref<HTMLCanvasElement | null>(null)
+const matterChart = ref<HTMLCanvasElement | null>(null)
+const disputeChart = ref<HTMLCanvasElement | null>(null)
 
 // 获取统计数据
 const getStats = async () => {
@@ -237,13 +237,14 @@ const getPopulationStructure = async () => {
 const initPopulationChart = () => {
   if (!populationChart.value) return
   const ctx = populationChart.value.getContext('2d')
+  if (!ctx) return
   drawPieChart(ctx, populationData.value, 140, 140, 100)
 }
 
-// 获取调解档案状态统计
+// 获取任务进度统计（仅任务类型）
 const getMatterStats = async () => {
   try {
-    const response = await request.get({ url: '/archives/status-stats' })
+    const response = await request.get({ url: '/todo-reminders/task-progress-stats' })
     if (response.code === 20000 && response.data) {
       matterData.value = response.data
       nextTick(() => {
@@ -251,8 +252,12 @@ const getMatterStats = async () => {
       })
     }
   } catch (error) {
-    console.error('获取调解状态统计失败:', error)
-    matterData.value = []
+    console.error('获取任务进度统计失败:', error)
+    matterData.value = [
+      { name: '未开始', value: 0, color: '#F56C6C' },
+      { name: '处理中', value: 0, color: '#E6A23C' },
+      { name: '已完成', value: 0, color: '#67C23A' }
+    ]
   }
 }
 
@@ -260,6 +265,7 @@ const getMatterStats = async () => {
 const initMatterChart = () => {
   if (!matterChart.value) return
   const ctx = matterChart.value.getContext('2d')
+  if (!ctx) return
   drawBarChart(ctx, matterData.value, 280, 280)
 }
 
@@ -283,6 +289,7 @@ const getMediationStats = async () => {
 const initDisputeChart = () => {
   if (!disputeChart.value) return
   const ctx = disputeChart.value.getContext('2d')
+  if (!ctx) return
   drawLineChart(ctx, mediationData.value, 280, 280)
 }
 
@@ -352,7 +359,7 @@ const drawPieChart = (ctx, data, centerX, centerY, radius) => {
           visible: true,
           ageGroup: hoveredItem.name,
           count: hoveredItem.value,
-          percentage: percentage,
+          percentage: Number(percentage),
           x: tooltipX,
           y: mouseY - 20
         }

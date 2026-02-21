@@ -241,8 +241,8 @@ import {
 import { Icon } from '@/components/Icon'
 import ResidentDetailDialog from './components/ResidentDetailDialog.vue'
 import ImportMapping from './components/ImportMapping.vue'
-import { getResidentList, exportResidents, getSearchSuggestions } from '@/api/resident'
-import { downloadFile } from '@/utils/download'
+import { getResidentList, getSearchSuggestions } from '@/api/resident'
+import type { ResidentItem } from '@/api/resident/types'
 import request from '@/axios'
 import { useUserStoreWithOut } from '@/store/modules/user'
 
@@ -271,7 +271,9 @@ watch(
   () => {
     if (hasSearched.value) {
       // 防抖处理，避免频繁请求
-      clearTimeout(searchTimer)
+      if (searchTimer) {
+        clearTimeout(searchTimer)
+      }
       searchTimer = setTimeout(() => {
         // 电话查询条件：至少输入4位数才触发查询
         if (searchForm.phoneNumber && searchForm.phoneNumber.length < 4) {
@@ -325,7 +327,7 @@ const statInfo = reactive({
 
 // 表格数据
 const loading = ref(false)
-const tableData = ref([])
+const tableData = ref<ResidentItem[]>([])
 
 // 分页
 const pagination = reactive({
@@ -438,12 +440,75 @@ const handleReset = () => {
 // 导出
 const handleExport = async () => {
   try {
-    const res = await exportResidents(searchForm)
-    downloadFile(res, `居民信息导出_${new Date().getTime()}.xlsx`)
+    const allParams = {
+      pageNum: 1,
+      pageSize: 999999,
+      ...searchForm
+    }
+    const res = await getResidentList(allParams)
+    const allData = res.data || []
+
+    if (!allData.length) {
+      ElMessage.warning('暂无数据可导出')
+      return
+    }
+
+    const ExcelJS = (await import('exceljs')).default
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('居民信息')
+
+    worksheet.columns = [
+      { header: '序号', key: 'index', width: 8 },
+      { header: '居民姓名', key: 'name', width: 12 },
+      { header: '身份证号', key: 'idCard', width: 24, style: { numFmt: '@' } },
+      { header: '性别', key: 'gender', width: 8 },
+      { header: '户主姓名', key: 'householderName', width: 12 },
+      { header: '与户主关系', key: 'relationship_to_head', width: 14 },
+      { header: '出生日期', key: 'dateOfBirth', width: 12 },
+      { header: '年龄', key: 'age', width: 6 },
+      { header: '联系电话', key: 'phoneNumber', width: 16, style: { numFmt: '@' } },
+      { header: '村组', key: 'villageGroup', width: 10 },
+      { header: '家庭地址', key: 'address', width: 30 },
+      { header: '银行帐号', key: 'bankCard', width: 18, style: { numFmt: '@' } },
+      { header: '股权数量', key: 'equityShares', width: 10 },
+      { header: '状态', key: 'status', width: 10 }
+    ]
+
+    allData.forEach((item: any, idx: number) => {
+      worksheet.addRow({
+        index: idx + 1,
+        name: item.name || '',
+        idCard: String(item.idCard || ''),
+        gender: item.gender || '',
+        householderName: item.householderName || item.household_head_name || '-',
+        relationship_to_head: item.relation || item.relationship_to_head || '',
+        dateOfBirth: item.birthDate || item.dateOfBirth || '',
+        age: item.age || '',
+        phoneNumber: String(item.phone || item.phoneNumber || ''),
+        villageGroup: item.villageGroup || '',
+        address: item.address || '',
+        bankCard: String(item.bankCard || ''),
+        equityShares: item.equity_shares || item.equityShares || 0,
+        status: item.status ? formatStatus(item.status) : ''
+      })
+    })
+
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `居民信息导出_${new Date().toISOString().slice(0, 10)}.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
     ElMessage.success('导出成功')
   } catch (error) {
     console.error('导出失败:', error)
-    ElMessage.error('导出失败')
+    ElMessage.error('导出失败，请重试')
   }
 }
 
@@ -490,37 +555,39 @@ const handleImportSuccess = () => {
 }
 
 // 获取居民姓名搜索建议
-const fetchResidentNameSuggestions = async (
+const fetchResidentNameSuggestions = (
   queryString: string,
-  callback: (data: { value: string }[]) => void
+  callback: (data: any[]) => void
 ) => {
   if (!queryString || queryString.trim().length < 1) {
     callback([])
     return
   }
-  try {
-    const res = await getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
-    callback(res.data || [])
-  } catch (error) {
-    callback([])
-  }
+  getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
+    .then((res) => {
+      callback(res.residentNames || [])
+    })
+    .catch(() => {
+      callback([])
+    })
 }
 
 // 获取户主姓名搜索建议
-const fetchHouseholdHeadNameSuggestions = async (
+const fetchHouseholdHeadNameSuggestions = (
   queryString: string,
-  callback: (data: { value: string }[]) => void
+  callback: (data: any[]) => void
 ) => {
   if (!queryString || queryString.trim().length < 1) {
     callback([])
     return
   }
-  try {
-    const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
-    callback(res.data || [])
-  } catch (error) {
-    callback([])
-  }
+  getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
+    .then((res) => {
+      callback(res.householdHeadNames || [])
+    })
+    .catch(() => {
+      callback([])
+    })
 }
 
 // 分页变化
@@ -535,8 +602,10 @@ const handlePageChange = (val: number) => {
 }
 
 // 获取状态标签类型
-const getStatusType = (status: string) => {
-  const typeMap: Record<string, string> = {
+const getStatusType = (
+  status: string
+): 'success' | 'warning' | 'info' | 'primary' | 'danger' => {
+  const typeMap: Record<string, 'success' | 'warning' | 'info' | 'primary' | 'danger'> = {
     active: 'success',
     migrated_out: 'warning',
     deceased: 'info',

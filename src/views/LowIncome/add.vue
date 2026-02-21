@@ -289,7 +289,7 @@ const subsidyCycleOptions = ref<string[]>(['每月', '每季度', '每半年', '
 // 表单数据
 const formData = reactive({
   id: null as number | null,
-  residentId: null as number | null,
+  residentId: null as number | string | null,
   name: '',
   idCard: '',
   gender: '',
@@ -317,7 +317,7 @@ const residentInfo = reactive({
   relationship_to_head: '',
   bank_card: '',
   bank_name: '',
-  household_id: ''
+  household_id: '' as string | number
 })
 
 // 加载字典数据
@@ -352,24 +352,26 @@ const loadDictionaries = async () => {
 }
 
 // 获取居民姓名建议
-const fetchResidentSuggestions = async (queryString: string, cb: (data: any[]) => void) => {
+const fetchResidentSuggestions = (queryString: string, cb: (data: any[]) => void) => {
   if (!queryString) {
     cb([])
     return
   }
 
-  try {
-    const response = await getResidents({ pageNum: 1, pageSize: 10, name: queryString })
-    const suggestions = (response.data || []).map((item: any) => ({
-      value: item.name,
-      id: item.id,
-      household_id: item.household_id
-    }))
-    cb(suggestions)
-  } catch (error) {
-    console.error('获取居民建议失败:', error)
-    cb([])
-  }
+  getResidents({ pageNum: 1, pageSize: 10, name: queryString })
+    .then((response) => {
+      const list = Array.isArray(response.data) ? response.data : []
+      const suggestions = list.map((item: any) => ({
+        value: item.name,
+        id: item.id,
+        household_id: item.household_id
+      }))
+      cb(suggestions)
+    })
+    .catch((error) => {
+      console.error('获取居民建议失败:', error)
+      cb([])
+    })
 }
 
 // 处理居民选择
@@ -395,10 +397,10 @@ const loadResidentInfo = async (residentId: number) => {
       residentInfo.household_id = resident.householdId || resident.household_id || ''
 
       // 自动填充居民基本信息
-      formData.residentId = resident.id
-      formData.name = resident.name
+      formData.residentId = resident.id ?? null
+      formData.name = resident.name || ''
       formData.idCard = resident.idCard || resident.id_card || ''
-      formData.gender = resident.gender
+      formData.gender = resident.gender || ''
       formData.dateOfBirth = resident.dateOfBirth || resident.date_of_birth || ''
       formData.age = String(resident.age || '')
       formData.phoneNumber = resident.phoneNumber || resident.phone_number || ''
@@ -437,7 +439,7 @@ const loadEditData = async (id: number) => {
       isEdit.value = true
 
       // 填充表单数据
-      formData.id = data.id
+      formData.id = data.id ?? null
       formData.residentId = data.residentId || data.resident_id || null
       formData.name = data.name || ''
       formData.idCard = data.idCard || data.id_card || ''

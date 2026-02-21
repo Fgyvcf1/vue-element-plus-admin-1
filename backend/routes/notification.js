@@ -130,6 +130,35 @@ router.get('/stats', checkPermission('todo:view'), async (_req, res) => {
   }
 })
 
+// 任务进度统计（用于首页事项进度图，仅统计 type=task）
+router.get('/task-progress-stats', checkPermission('todo:view'), async (_req, res) => {
+  try {
+    const [rows] = await db.pool.execute(
+      `
+      SELECT
+        SUM(CASE WHEN COALESCE(progress, 0) = 0 THEN 1 ELSE 0 END) AS not_started,
+        SUM(CASE WHEN COALESCE(progress, 0) BETWEEN 1 AND 99 THEN 1 ELSE 0 END) AS in_progress,
+        SUM(CASE WHEN COALESCE(progress, 0) >= 100 THEN 1 ELSE 0 END) AS completed
+      FROM notification
+      WHERE type = 'task'
+      `
+    )
+
+    const row = rows?.[0] || {}
+    res.json({
+      code: 20000,
+      data: [
+        { name: '未开始', value: toInt(row.not_started, 0), color: '#F56C6C' },
+        { name: '处理中', value: toInt(row.in_progress, 0), color: '#E6A23C' },
+        { name: '已完成', value: toInt(row.completed, 0), color: '#67C23A' }
+      ]
+    })
+  } catch (err) {
+    console.error('获取任务进度统计失败:', err.message)
+    res.status(500).json({ code: 50000, message: err.message })
+  }
+})
+
 router.get('/latest', checkPermission('todo:view'), async (req, res) => {
   const limit = Math.max(toInt(req.query.limit, 5), 1)
 

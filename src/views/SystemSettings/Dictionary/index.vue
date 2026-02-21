@@ -291,16 +291,18 @@ const handleSubmit = () => {
   })
 }
 
-const handleStatusChange = async (row: any, newStatus: string) => {
+const handleStatusChange = async (row: any, newStatus: string | number | boolean) => {
+  const status =
+    newStatus === true ? 'active' : newStatus === false ? 'inactive' : String(newStatus)
   try {
-    await updateDictionaryStatus(row.id, newStatus)
-    ElMessage.success(newStatus === 'active' ? '已启用' : '已停用')
+    await updateDictionaryStatus(row.id, status)
+    ElMessage.success(status === 'active' ? '已启用' : '已停用')
     fetchDictionaryItems()
     fetchCategories()
   } catch (error) {
     console.error('切换状态失败:', error)
     ElMessage.error('操作失败')
-    row.status = newStatus === 'active' ? 'inactive' : 'active'
+    row.status = status === 'active' ? 'inactive' : 'active'
   }
 }
 

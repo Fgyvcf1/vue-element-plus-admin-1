@@ -10,7 +10,7 @@ import { useAppStore } from '@/store/modules/app'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
 import type { RouteLocationNormalizedLoaded, RouteRecordRaw } from 'vue-router'
-import { UserType } from '@/api/login/types'
+import type { UserLoginType } from '@/api/login/types'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
@@ -119,7 +119,7 @@ onMounted(() => initLoginInfo())
 
 // 获取角色 & 生成路由
 const getRole = async () => {
-  const formData = await getFormData<UserType>()
+  const formData = await getFormData<UserLoginType>()
   const params = { roleName: formData.username }
 
   const useMock = import.meta.env.VITE_USE_MOCK === 'true'
@@ -170,7 +170,7 @@ const signIn = async () => {
 
     console.log('表单验证通过，开始登录')
     loading.value = true
-    const formData = await getFormData<UserType>()
+    const formData = await getFormData<UserLoginType>()
 
     try {
       const res = await loginApi(formData)

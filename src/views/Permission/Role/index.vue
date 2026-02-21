@@ -115,7 +115,8 @@ const moduleNames: Record<string, string> = {
   system: '系统管理'
 }
 
-const getModuleName = (module: string) => moduleNames[module] || module
+const getModuleName = (module: string | number) =>
+  moduleNames[String(module)] || String(module)
 
 const loadRoles = async () => {
   loading.value = true

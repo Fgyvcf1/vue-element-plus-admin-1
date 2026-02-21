@@ -27,10 +27,17 @@ const checkPermission = (permissionCode) => {
       }
 
       const user = users[0];
+      const roleCode = user.role_code || user.user_role;
 
       // 超级管理员拥有所有权限
-      if (user.role_code === 'superadmin' || user.user_role === 'superadmin') {
+      if (roleCode === 'superadmin') {
         req.user = { id: userId, roleCode: 'superadmin' };
+        return next();
+      }
+
+      // 人民调解：除只读用户外均可增删改查
+      if (permissionCode.startsWith('mediation:') && roleCode && roleCode !== 'readonly') {
+        req.user = { id: userId, roleCode };
         return next();
       }
 

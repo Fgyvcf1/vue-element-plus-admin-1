@@ -1,18 +1,53 @@
 const mysql = require('mysql2/promise')
+const fs = require('fs')
+const path = require('path')
+
+const configPath = path.join(__dirname, 'config.json')
+let fileConfig = {}
+if (fs.existsSync(configPath)) {
+  try {
+    const raw = fs.readFileSync(configPath, 'utf8')
+    fileConfig = JSON.parse(raw)
+  } catch (error) {
+    console.error('Failed to load backend/config.json:', error.message)
+  }
+}
 
 // MariaDB连接配置
 // 注意：生产环境请使用环境变量存储敏感信息
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'app_user',
-  password: process.env.DB_PASSWORD || 'strongpass791002',
-  database: process.env.DB_NAME || 'village',
-  port: process.env.DB_PORT || 3306,
+  host: process.env.DB_HOST || fileConfig.host || 'localhost',
+  user: process.env.DB_USER || fileConfig.user || 'app_user',
+  password: process.env.DB_PASSWORD || fileConfig.password || 'strongpass791002',
+  database: process.env.DB_NAME || fileConfig.database || 'village',
+  port: Number(process.env.DB_PORT || fileConfig.port || 3306),
   charset: 'utf8mb4',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 })
+
+const wrapExecute = (executeFn) => (sql, params) =>
+  executeFn(sql, normalizeExecuteParams(params))
+
+const wrapQuery = (queryFn) => (sql, params) =>
+  queryFn(sql, normalizeExecuteParams(params))
+
+const originalExecute = pool.execute.bind(pool)
+const originalQuery = pool.query.bind(pool)
+pool.execute = wrapExecute(originalExecute)
+pool.query = wrapQuery(originalQuery)
+
+const originalGetConnection = pool.getConnection.bind(pool)
+pool.getConnection = async () => {
+  const connection = await originalGetConnection()
+  if (!connection.__normalizeExecutePatched) {
+    connection.execute = wrapExecute(connection.execute.bind(connection))
+    connection.query = wrapQuery(connection.query.bind(connection))
+    connection.__normalizeExecutePatched = true
+  }
+  return connection
+}
 
 // 测试连接
 pool
@@ -72,6 +107,43 @@ function convertSql(sql) {
   return sql
 }
 
+const isPlainObject = (value) => {
+  if (!value || typeof value !== 'object') return false
+  return Object.prototype.toString.call(value) === '[object Object]'
+}
+
+const normalizeParams = (params) => {
+  if (!Array.isArray(params)) return params
+  return params.map((value) => (value === undefined ? null : value))
+}
+
+const normalizePlainObject = (params) => {
+  const normalized = {}
+  Object.entries(params).forEach(([key, value]) => {
+    normalized[key] = value === undefined ? null : value
+  })
+  return normalized
+}
+
+const normalizeExecuteParams = (params) => {
+  if (!params) return params
+  if (Array.isArray(params)) {
+    return params.map((value) => {
+      if (Array.isArray(value)) {
+        return value.map((inner) => (inner === undefined ? null : inner))
+      }
+      if (isPlainObject(value)) {
+        return normalizePlainObject(value)
+      }
+      return value === undefined ? null : value
+    })
+  }
+  if (isPlainObject(params)) {
+    return normalizePlainObject(params)
+  }
+  return params
+}
+
 // 兼容性包装器：模拟sqlite3的回调风格API
 const db = {
   // 模拟sqlite3的db.get方法 - 获取单行
@@ -82,6 +154,7 @@ const db = {
     }
     // 自动转换SQLite语法到MySQL语法
     sql = convertSql(sql)
+    params = normalizeParams(params)
     pool
       .execute(sql, params)
       .then(([rows]) => {
@@ -100,6 +173,7 @@ const db = {
     }
     // 自动转换SQLite语法到MySQL语法
     sql = convertSql(sql)
+    params = normalizeParams(params)
     pool
       .execute(sql, params)
       .then(([rows]) => {
@@ -118,6 +192,7 @@ const db = {
     }
     // 自动转换SQLite语法到MySQL语法
     sql = convertSql(sql)
+    params = normalizeParams(params)
     pool
       .execute(sql, params)
       .then(([result]) => {
@@ -159,6 +234,7 @@ const db = {
   runInTransaction: function (connection, sql, params) {
     return new Promise((resolve, reject) => {
       sql = convertSql(sql)
+      params = normalizeParams(params)
       console.log('执行事务SQL:', sql)
       console.log('SQL参数:', params)
       connection

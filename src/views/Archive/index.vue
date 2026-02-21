@@ -181,13 +181,14 @@ const createForm = reactive({
   prefix: ''
 })
 
-const getStatusType = (status: string) => {
-  const map: Record<string, string> = {
+type TagType = 'success' | 'warning' | 'info' | 'primary' | 'danger'
+const getStatusType = (status?: string): TagType => {
+  const map: Record<string, TagType> = {
     draft: 'info',
     in_progress: 'warning',
     completed: 'success'
   }
-  return map[status] || 'info'
+  return map[status || ''] || 'info'
 }
 
 const getStatusText = (status: string) => {

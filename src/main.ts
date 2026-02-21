@@ -6,6 +6,9 @@ import '@/plugins/unocss'
 // 导入全局的svg图标
 import '@/plugins/svgIcon'
 
+// 本地图标（Iconify 离线）
+import '@purge-icons/generated'
+
 // 初始化多语言
 import { setupI18n } from '@/plugins/vueI18n'
 
@@ -29,6 +32,7 @@ import { setupRouter } from './router'
 
 // 权限
 import { setupPermission } from './directives'
+import { loadAppConfig } from '@/utils/appConfig'
 
 import { createApp } from 'vue'
 
@@ -41,6 +45,8 @@ const setupAll = async () => {
   await setupI18n(app)
 
   setupStore(app)
+
+  await loadAppConfig()
 
   setupRouter(app)
 

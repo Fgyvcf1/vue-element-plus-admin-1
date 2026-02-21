@@ -29,15 +29,15 @@ console.error = (...args) => {
 }
 
 const app = express()
-const port = 3001 // 端口改回3001
+const port = Number(process.env.PORT || 3001)
 
 // CORS配置 - 允许Vue 3前端访问
 const corsOptions = {
   origin: [
     'http://localhost:4000',
     'http://127.0.0.1:4000',
-    'http://localhost:3001',
-    'http://127.0.0.1:3001'
+    `http://localhost:${port}`,
+    `http://127.0.0.1:${port}`
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id'],
@@ -49,8 +49,8 @@ app.use(bodyParser.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }))
 
 // 静态文件服务（用于访问上传的图片和生成的PDF）
-app.use('/uploads', express.static('uploads'))
-app.use('/archives', express.static('archives'))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+app.use('/archives', express.static(path.join(__dirname, 'archives')))
 
 // 登录路由
 app.post('/api/user/login', async (req, res) => {
@@ -129,6 +129,15 @@ app.get('/api/user/loginOut', (req, res) => {
 // API路由
 app.use('/api', routes)
 app.use('/api/permission', permissionRoutes)
+
+const frontendDir = process.env.FRONTEND_DIR || path.join(__dirname, 'frontend')
+const frontendIndex = path.join(frontendDir, 'index.html')
+if (fs.existsSync(frontendDir) && fs.existsSync(frontendIndex)) {
+  app.use(express.static(frontendDir))
+  app.get(/.*/, (_req, res) => {
+    res.sendFile(frontendIndex)
+  })
+}
 
 // 启动服务器
 try {

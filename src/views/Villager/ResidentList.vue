@@ -23,7 +23,7 @@ import { getResidents, getSearchSuggestions } from '@/api/resident'
 import { useI18n } from '@/hooks/web/useI18n'
 import { export_json_to_excel } from '@/utils/export2excel'
 import type { ResidentItem } from '@/api/resident/types'
-import ResidentDetailDialog from './components/ResidentDetailDialog.vue'
+import ResidentDetailDialog from '@/views/Resident/components/ResidentDetailDialog.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -80,8 +80,8 @@ const { tableRegister, tableState, tableMethods } = useTable({
     let total = 0
 
     if (res && res.data) {
-      if (Array.isArray(res.data.data)) {
-        residents = res.data.data.map((item: any) => ({
+      if (Array.isArray(res.data)) {
+        residents = res.data.map((item: any) => ({
           ...item,
           householdHeadName: item.household_head_name || item.householdHeadName,
           relationshipToHead: item.relationship_to_head || item.relationshipToHead,
@@ -95,9 +95,9 @@ const { tableRegister, tableState, tableMethods } = useTable({
         }))
       }
 
-      total = parseInt(res.data.total) || 0
-      totalHouseholds.value = parseInt(res.data.totalHouseholds) || 0
-      totalPersons.value = parseInt(res.data.totalPersons) || total
+      total = Number(res.total || 0)
+      totalHouseholds.value = Number(res.totalHouseholds || 0)
+      totalPersons.value = Number(res.totalPersons || total)
     }
 
     showResult.value = true
@@ -183,9 +183,10 @@ const crudSchemas = reactive<CrudSchema[]>([
     field: 'isHouseholdHead',
     label: '户主',
     search: {
-      component: 'Checkbox',
+      component: 'Switch',
       componentProps: {
-        label: '户主'
+        activeText: '是',
+        inactiveText: '否'
       }
     },
     table: { hidden: true },
@@ -273,7 +274,8 @@ const crudSchemas = reactive<CrudSchema[]>([
             migrated_out: '迁出',
             deceased: '死亡'
           }
-          return h('span', {}, statusMap[row.status] || row.status)
+          const statusKey = row.status ?? ''
+          return h('span', {}, statusMap[statusKey] || statusKey)
         }
       }
     }
@@ -308,41 +310,43 @@ const crudSchemas = reactive<CrudSchema[]>([
 const { allSchemas } = useCrudSchemas(crudSchemas)
 
 // 获取居民姓名搜索建议
-const fetchResidentNameSuggestions = async (queryString: string, callback: Function) => {
+function fetchResidentNameSuggestions(queryString: string, callback: Function) {
   if (!queryString || queryString.trim().length < 1) {
     callback([])
     return
   }
 
-  try {
-    const res = await getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
-    if (res && res.code === 20000) {
-      callback(res.residentNames || [])
-    } else {
+  getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
+    .then((res) => {
+      if (res && res.code === 20000) {
+        callback(res.residentNames || [])
+      } else {
+        callback([])
+      }
+    })
+    .catch(() => {
       callback([])
-    }
-  } catch {
-    callback([])
-  }
+    })
 }
 
 // 获取户主姓名搜索建议
-const fetchHouseholdHeadNameSuggestions = async (queryString: string, callback: Function) => {
+function fetchHouseholdHeadNameSuggestions(queryString: string, callback: Function) {
   if (!queryString || queryString.trim().length < 1) {
     callback([])
     return
   }
 
-  try {
-    const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
-    if (res && res.code === 20000) {
-      callback(res.householdHeadNames || [])
-    } else {
+  getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
+    .then((res) => {
+      if (res && res.code === 20000) {
+        callback(res.householdHeadNames || [])
+      } else {
+        callback([])
+      }
+    })
+    .catch(() => {
       callback([])
-    }
-  } catch {
-    callback([])
-  }
+    })
 }
 
 // 设置搜索参数
@@ -520,7 +524,7 @@ const loadVillageGroups = async () => {
 const generateBirthYears = () => {
   const currentYear = new Date().getFullYear()
   const startYear = currentYear - 100
-  const years = []
+  const years: { label: string; value: string }[] = []
 
   for (let year = startYear; year <= currentYear; year++) {
     years.push({

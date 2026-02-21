@@ -227,7 +227,7 @@
                   <el-tag
                     v-else
                     :type="disabilityInfo.certificateStatus === '在持' ? 'success' : 'info'"
-                    size="medium"
+                    size="default"
                   >
                     {{ disabilityInfo.certificateStatus }}
                   </el-tag>

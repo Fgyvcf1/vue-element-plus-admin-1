@@ -162,6 +162,7 @@ import {
 } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { getResidents, getResident } from '@/api/resident'
+import type { ResidentDetail } from '@/api/resident/types'
 import { addDisabledPerson, updateDisabledPerson, getDisabledPerson } from '@/api/disabled'
 import { getDictionaryByCategory } from '@/api/dictionary'
 
@@ -179,7 +180,7 @@ const disabilityLevelOptions = ref<{ label: string; value: string }[]>([])
 // 表单数据
 const formData = reactive({
   id: null as number | null,
-  residentId: null as number | null,
+  residentId: null as number | string | null,
   name: '',
   idCard: '',
   gender: '',
@@ -259,24 +260,26 @@ const loadDictionaries = async () => {
 }
 
 // 获取居民姓名建议
-const fetchResidentSuggestions = async (queryString: string, cb: (data: any[]) => void) => {
+const fetchResidentSuggestions = (queryString: string, cb: (data: any[]) => void) => {
   if (!queryString) {
     cb([])
     return
   }
 
-  try {
-    const response = await getResidents({ pageNum: 1, pageSize: 10, name: queryString })
-    const suggestions = (response.data.data || []).map((item: any) => ({
-      value: item.name,
-      id: item.id,
-      household_id: item.household_id
-    }))
-    cb(suggestions)
-  } catch (error) {
-    console.error('获取居民建议失败:', error)
-    cb([])
-  }
+  getResidents({ pageNum: 1, pageSize: 10, name: queryString })
+    .then((response) => {
+      const list = Array.isArray(response.data) ? response.data : []
+      const suggestions = list.map((item: any) => ({
+        value: item.name,
+        id: item.id,
+        household_id: item.household_id
+      }))
+      cb(suggestions)
+    })
+    .catch((error) => {
+      console.error('获取居民建议失败:', error)
+      cb([])
+    })
 }
 
 // 处理居民选择
@@ -294,13 +297,8 @@ const loadResidentInfo = async (residentId: number) => {
     const response = await getResident(residentId)
     console.log('获取居民信息响应:', response)
 
-    // 处理不同的响应格式
-    let resident = null
-    if (response.data && response.data.code === 20000 && response.data.data) {
-      // 标准格式: { code: 20000, data: {...} }
-      resident = response.data.data
-    } else if (response.data && response.data.id) {
-      // 直接返回数据格式: { id: ..., name: ... }
+    let resident: ResidentDetail | null = null
+    if (response.code === 20000 && response.data) {
       resident = response.data
     }
 
@@ -308,7 +306,7 @@ const loadResidentInfo = async (residentId: number) => {
       console.log('获取到居民数据:', resident)
 
       // 自动填充居民基本信息 - 同时支持驼峰和下划线命名
-      formData.residentId = resident.id
+      formData.residentId = resident.id ?? null
       formData.name = resident.name || ''
       formData.idCard = resident.idCard || resident.id_card || ''
       formData.gender = resident.gender || ''
