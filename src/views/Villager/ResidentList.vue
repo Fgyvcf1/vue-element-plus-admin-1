@@ -11,6 +11,7 @@ import {
   unref
 } from 'vue'
 import { useRouter } from 'vue-router'
+import { debounce } from 'lodash-es'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Table } from '@/components/Table'
@@ -81,18 +82,19 @@ const { tableRegister, tableState, tableMethods } = useTable({
 
     if (res && res.data) {
       if (Array.isArray(res.data)) {
-        residents = res.data.map((item: any) => ({
-          ...item,
-          householdHeadName: item.household_head_name || item.householdHeadName,
-          relationshipToHead: item.relationship_to_head || item.relationshipToHead,
-          phoneNumber: item.phone_number || item.phoneNumber,
-          equityShares:
-            item.equity_shares !== undefined ? item.equity_shares : item.equityShares || 0,
-          relationship_to_head: item.relationship_to_head || item.relationshipToHead,
-          phone_number: item.phone_number || item.phoneNumber,
-          equity_shares:
-            item.equity_shares !== undefined ? item.equity_shares : item.equityShares || 0
-        }))
+        residents = res.data.map((item: any) => {
+          const newItem: ResidentItem = { ...item };
+          newItem.householdHeadName = item.household_head_name || item.householdHeadName;
+          newItem.relationshipToHead = item.relationship_to_head || item.relationshipToHead;
+          newItem.phoneNumber = item.phone_number || item.phoneNumber;
+          newItem.equityShares = item.equity_shares !== undefined ? item.equity_shares : (item.equityShares || 0);
+
+          // 确保旧字段也更新，以便兼容旧代码或其它地方可能直接访问这些字段
+          newItem.relationship_to_head = newItem.relationshipToHead;
+          newItem.phone_number = newItem.phoneNumber;
+          newItem.equity_shares = newItem.equityShares;
+          return newItem;
+        });
       }
 
       total = Number(res.total || 0)
@@ -310,44 +312,46 @@ const crudSchemas = reactive<CrudSchema[]>([
 const { allSchemas } = useCrudSchemas(crudSchemas)
 
 // 获取居民姓名搜索建议
-function fetchResidentNameSuggestions(queryString: string, callback: Function) {
+const fetchResidentNameSuggestions = debounce(async (queryString: string, callback: Function) => {
   if (!queryString || queryString.trim().length < 1) {
     callback([])
     return
   }
 
-  getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
-    .then((res) => {
-      if (res && res.code === 20000) {
-        callback(res.residentNames || [])
-      } else {
-        callback([])
-      }
-    })
-    .catch(() => {
+  try {
+    const res = await getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
+    if (res && res.code === 20000) {
+      callback(res.residentNames || [])
+    } else {
       callback([])
-    })
-}
+    }
+  } catch (error) {
+    console.error('获取居民姓名搜索建议失败:', error)
+    callback([])
+  }
+}, 300)
+
 
 // 获取户主姓名搜索建议
-function fetchHouseholdHeadNameSuggestions(queryString: string, callback: Function) {
+const fetchHouseholdHeadNameSuggestions = debounce(async (queryString: string, callback: Function) => {
   if (!queryString || queryString.trim().length < 1) {
     callback([])
     return
   }
 
-  getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
-    .then((res) => {
-      if (res && res.code === 20000) {
-        callback(res.householdHeadNames || [])
-      } else {
-        callback([])
-      }
-    })
-    .catch(() => {
+  try {
+    const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
+    if (res && res.code === 20000) {
+      callback(res.householdHeadNames || [])
+    } else {
       callback([])
-    })
-}
+    }
+  } catch (error) {
+    console.error('获取户主姓名搜索建议失败:', error)
+    callback([])
+  }
+}, 300)
+
 
 // 设置搜索参数
 const setSearchParams = (params: any) => {

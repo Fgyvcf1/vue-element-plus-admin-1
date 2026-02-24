@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const routes = require('./routes')
 const permissionRoutes = require('./routes/permissionRoutes')
 const db = require('./db')
+const { initDatabase } = require('./init-db') // 引入数据库初始化函数
 const fs = require('fs') // 引入fs模块
 const path = require('path') // 引入path模块
 require('./cron') // 引入定时任务脚本
@@ -29,7 +30,7 @@ console.error = (...args) => {
 }
 
 const app = express()
-const port = Number(process.env.PORT || 3001)
+const port = Number(process.env.PORT || 3002) // 使用3002端口
 
 // CORS配置 - 允许Vue 3前端访问
 const corsOptions = {
@@ -139,32 +140,44 @@ if (fs.existsSync(frontendDir) && fs.existsSync(frontendIndex)) {
   })
 }
 
-// 启动服务器
-try {
-  const server = app.listen(port, () => {
-    console.log(`后端服务运行在 http://localhost:${port}`)
-  })
-
-  // 监听服务器错误
-  server.on('error', (error) => {
-    console.error('服务器启动失败:', error.message)
-  })
-
-  // 监听进程错误
-  process.on('uncaughtException', (error) => {
-    console.error('未捕获的异常:', error.message)
-    console.error(error.stack)
-  })
-
-  // 监听进程终止
-  process.on('SIGINT', () => {
-    console.log('服务器正在关闭...')
-    server.close(() => {
-      console.log('服务器已关闭')
-      process.exit(0)
+// 启动服务器前先初始化数据库
+async function startServer() {
+  try {
+    console.log('正在初始化数据库...')
+    const dbInitialized = await initDatabase()
+    if (!dbInitialized) {
+      console.error('数据库初始化失败，服务无法启动')
+      process.exit(1)
+    }
+    
+    const server = app.listen(port, () => {
+      console.log(`后端服务运行在 http://localhost:${port}`)
     })
-  })
-} catch (error) {
-  console.error('启动服务器时发生错误:', error.message)
-  console.error(error.stack)
+
+    // 监听服务器错误
+    server.on('error', (error) => {
+      console.error('服务器启动失败:', error.message)
+    })
+
+    // 监听进程错误
+    process.on('uncaughtException', (error) => {
+      console.error('未捕获的异常:', error.message)
+      console.error(error.stack)
+    })
+
+    // 监听进程终止
+    process.on('SIGINT', () => {
+      console.log('服务器正在关闭...')
+      server.close(() => {
+        console.log('服务器已关闭')
+        process.exit(0)
+      })
+    })
+  } catch (error) {
+    console.error('启动服务器时发生错误:', error.message)
+    console.error(error.stack)
+    process.exit(1)
+  }
 }
+
+startServer()

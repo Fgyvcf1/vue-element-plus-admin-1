@@ -24,9 +24,9 @@ if %errorlevel%==0 (
 )
 sc start "%SERVICE_NAME%" >nul
 
-netsh advfirewall firewall show rule name="%SERVICE_NAME% 3001" >nul 2>&1
+netsh advfirewall firewall show rule name="%SERVICE_NAME% 3002" >nul 2>&1
 if %errorlevel%==1 (
-  netsh advfirewall firewall add rule name="%SERVICE_NAME% 3001" dir=in action=allow protocol=TCP localport=3001 >nul
+  netsh advfirewall firewall add rule name="%SERVICE_NAME% 3002" dir=in action=allow protocol=TCP localport=3002 >nul
 )
 
 endlocal

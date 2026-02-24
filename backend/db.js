@@ -13,14 +13,20 @@ if (fs.existsSync(configPath)) {
   }
 }
 
+const dbHost = process.env.DB_HOST || fileConfig.host || 'localhost'
+const dbUser = process.env.DB_USER || fileConfig.user || 'root'
+const dbPassword = process.env.DB_PASSWORD || fileConfig.password || ''
+const dbName = process.env.DB_NAME || fileConfig.database || 'vue_element_plus_admin'
+const dbPort = Number(process.env.DB_PORT || fileConfig.port || 3307)
+
 // MariaDB连接配置
 // 注意：生产环境请使用环境变量存储敏感信息
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || fileConfig.host || 'localhost',
-  user: process.env.DB_USER || fileConfig.user || 'app_user',
-  password: process.env.DB_PASSWORD || fileConfig.password || 'strongpass791002',
-  database: process.env.DB_NAME || fileConfig.database || 'village',
-  port: Number(process.env.DB_PORT || fileConfig.port || 3306),
+  host: dbHost,
+  user: dbUser,
+  password: dbPassword,
+  database: dbName,
+  port: dbPort,
   charset: 'utf8mb4',
   waitForConnections: true,
   connectionLimit: 10,
@@ -53,7 +59,7 @@ pool.getConnection = async () => {
 pool
   .getConnection()
   .then((connection) => {
-    console.log('成功连接到MariaDB数据库')
+    console.log(`成功连接到MariaDB数据库（端口${dbPort}）`)
     connection.release()
   })
   .catch((err) => {

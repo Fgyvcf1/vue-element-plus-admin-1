@@ -12,7 +12,8 @@ export const CONTENT_TYPE: AxiosContentType = 'application/json'
 /**
  * 请求超时时间
  */
-export const REQUEST_TIMEOUT = 60000
+// Increase request timeout for large imports (e.g. resident data).
+export const REQUEST_TIMEOUT = 300000
 
 /**
  * 不重定向白名单

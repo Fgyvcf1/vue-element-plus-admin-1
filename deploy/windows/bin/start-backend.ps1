@@ -33,7 +33,7 @@ function Ensure-DataDirInitialized {
   $mysqld = Join-Path $MariaDbDir 'bin\mysqld.exe'
 
   if (Test-Path $installDb) {
-    & $installDb "--basedir=$MariaDbDir" "--datadir=$DataDir" | Out-Null
+    & $installDb "--datadir=$DataDir" | Out-Null
     return
   }
 
