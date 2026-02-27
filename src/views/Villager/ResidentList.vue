@@ -119,6 +119,46 @@ const refreshList = () => {
   getList()
 }
 
+// 获取居民姓名搜索建议
+const fetchResidentNameSuggestions = debounce(async (queryString: string, callback: Function) => {
+  if (!queryString || queryString.trim().length < 1) {
+    callback([])
+    return
+  }
+
+  try {
+    const res = await getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
+    if (res && res.code === 20000) {
+      callback(res.residentNames || [])
+    } else {
+      callback([])
+    }
+  } catch (error) {
+    console.error('获取居民姓名搜索建议失败:', error)
+    callback([])
+  }
+}, 300)
+
+// 获取户主姓名搜索建议
+const fetchHouseholdHeadNameSuggestions = debounce(async (queryString: string, callback: Function) => {
+  if (!queryString || queryString.trim().length < 1) {
+    callback([])
+    return
+  }
+
+  try {
+    const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
+    if (res && res.code === 20000) {
+      callback(res.householdHeadNames || [])
+    } else {
+      callback([])
+    }
+  } catch (error) {
+    console.error('获取户主姓名搜索建议失败:', error)
+    callback([])
+  }
+}, 300)
+
 // CRUD Schema
 const crudSchemas = reactive<CrudSchema[]>([
   {
@@ -310,47 +350,6 @@ const crudSchemas = reactive<CrudSchema[]>([
 ])
 
 const { allSchemas } = useCrudSchemas(crudSchemas)
-
-// 获取居民姓名搜索建议
-const fetchResidentNameSuggestions = debounce(async (queryString: string, callback: Function) => {
-  if (!queryString || queryString.trim().length < 1) {
-    callback([])
-    return
-  }
-
-  try {
-    const res = await getSearchSuggestions({ keyword: queryString, type: 'residentNames' })
-    if (res && res.code === 20000) {
-      callback(res.residentNames || [])
-    } else {
-      callback([])
-    }
-  } catch (error) {
-    console.error('获取居民姓名搜索建议失败:', error)
-    callback([])
-  }
-}, 300)
-
-
-// 获取户主姓名搜索建议
-const fetchHouseholdHeadNameSuggestions = debounce(async (queryString: string, callback: Function) => {
-  if (!queryString || queryString.trim().length < 1) {
-    callback([])
-    return
-  }
-
-  try {
-    const res = await getSearchSuggestions({ keyword: queryString, type: 'householdHeadNames' })
-    if (res && res.code === 20000) {
-      callback(res.householdHeadNames || [])
-    } else {
-      callback([])
-    }
-  } catch (error) {
-    console.error('获取户主姓名搜索建议失败:', error)
-    callback([])
-  }
-}, 300)
 
 
 // 设置搜索参数

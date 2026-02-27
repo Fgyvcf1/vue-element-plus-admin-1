@@ -1,4 +1,4 @@
-import { resolve } from 'path'
+﻿import { resolve } from 'path'
 import { loadEnv } from 'vite'
 import type { UserConfig, ConfigEnv } from 'vite'
 import Vue from '@vitejs/plugin-vue'
@@ -42,7 +42,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     plugins: [
       Vue({
         script: {
-          // 开启defineModel
+          // 寮€鍚痙efineModel
           defineModel: true
         }
       }),
@@ -60,7 +60,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
             cache: false,
             failOnWarning: false,
             failOnError: false,
-            include: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.tsx'] // 检查的文件
+            include: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.tsx'] // 妫€鏌ョ殑鏂囦欢
           })
         : undefined,
       VueI18nPlugin({
@@ -80,10 +80,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         extractors: [
           {
             extensions: ['*'],
-            extractor: (code) => {
+            extractor: (code: string) => {
               const results = new Set(code.match(iconifyCollectionRe) || [])
               const viMatches = code.match(/vi-[\w-]+:[\w-]+/g) || []
-              viMatches.forEach((icon) => {
+              viMatches.forEach((icon: string) => {
                 const normalized = icon.replace(/^vi-/, '')
                 if (iconifyCollectionCheckRe.test(normalized)) {
                   results.add(normalized)
@@ -145,7 +145,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       // brotliSize: false,
       rollupOptions: {
         plugins: env.VITE_USE_BUNDLE_ANALYZER === 'true' ? [visualizer()] : undefined,
-        // 拆包
+        // 鎷嗗寘
         output: {
           manualChunks: {
             'vue-chunks': ['vue', 'vue-router', 'pinia', 'vue-i18n'],
@@ -160,25 +160,25 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     },
     server: {
       port: 4000,
-      strictPort: true, // 严格模式，端口被占用时报错而不是自动切换
+      strictPort: true, // Fail if port is already in use.
       watch: {
-        // 避免监听打包产物目录，防止 Windows 上被占用导致 Vite 崩溃
+        // Avoid watching build output on Windows.
         ignored: ['**/release/**', '**/dist/**', '**/dist-pro/**']
       },
       proxy: {
-        // 选项写法 - 排除mock路径
+        // Exclude mock paths from proxy.
         '/api': {
-          target: 'http://localhost:3001',
+          target: 'http://localhost:3002',
           changeOrigin: true,
           bypass: (req) => {
-            // 如果请求是mock路径，不代理，让vite-plugin-mock处理
+            // Let vite-plugin-mock handle mock paths.
             if (req.url?.startsWith('/api/mock')) {
               return req.url
             }
           }
         },
         '/uploads': {
-          target: 'http://localhost:3001',
+          target: 'http://localhost:3002',
           changeOrigin: true
         }
       },
@@ -213,3 +213,4 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     }
   }
 }
+
