@@ -1,0 +1,17 @@
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 10, reused 0, downloaded 3, added 0
+Progress: resolved 11, reused 0, downloaded 9, added 0
+Progress: resolved 11, reused 0, downloaded 10, added 0
+Progress: resolved 11, reused 0, downloaded 11, added 0
+ ERR_PNPM_NO_MATCHING_VERSION  No matching version found for vite@^5.5.2 while fetching it from https://registry.npmmirror.com/
+
+This error happened while installing a direct dependency of D:\vue-element-plus-admin
+
+The latest release of vite is "7.3.1". Published at 2026/1/7
+
+Other releases are:
+  * alpha: 6.0.0-alpha.24
+  * beta: 8.0.0-beta.15 published at 2026/2/19 11:12:15
+  * previous: 5.4.21
+
+If you need the full list of all 712 published versions run "pnpm view vite versions".

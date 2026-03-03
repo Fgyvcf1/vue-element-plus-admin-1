@@ -332,3 +332,44 @@
   "sqlMessage": "Unknown column 'email' in 'SET'"
 }
 
+[2026-02-20T06:27:47.128Z] SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+    at JSON.parse (<anonymous>)
+    at parse (D:\vue-element-plus-admin\backend\node_modules\body-parser\lib\types\json.js:72:19)
+    at D:\vue-element-plus-admin\backend\node_modules\body-parser\lib\read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:238:16)
+    at done (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:508:28)
+    at endReadableNT (node:internal/streams/readable:1701:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) 
+[2026-02-20T06:27:55.547Z] SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+    at JSON.parse (<anonymous>)
+    at parse (D:\vue-element-plus-admin\backend\node_modules\body-parser\lib\types\json.js:72:19)
+    at D:\vue-element-plus-admin\backend\node_modules\body-parser\lib\read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:238:16)
+    at done (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:508:28)
+    at endReadableNT (node:internal/streams/readable:1701:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) 
+[2026-02-20T06:28:27.346Z] SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+    at JSON.parse (<anonymous>)
+    at parse (D:\vue-element-plus-admin\backend\node_modules\body-parser\lib\types\json.js:72:19)
+    at D:\vue-element-plus-admin\backend\node_modules\body-parser\lib\read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:238:16)
+    at done (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (D:\vue-element-plus-admin\backend\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:508:28)
+    at endReadableNT (node:internal/streams/readable:1701:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) 
+[2026-02-20T06:53:54.212Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-20T07:23:53.264Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-20T07:34:25.183Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-20T11:46:07.448Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-20T14:35:38.789Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-20T14:36:20.380Z] 服务器启动失败: listen EADDRINUSE: address already in use :::3001 
+[2026-02-24T13:15:50.646Z] [2026-02-24T13:17:00.337Z] 连接数据库失败: Unknown database 'vue_element_plus_admin' 
+[2026-02-24T13:24:17.942Z] [2026-02-24T13:28:30.286Z] [2026-02-24T13:31:08.728Z] [2026-02-24T13:32:06.569Z] 

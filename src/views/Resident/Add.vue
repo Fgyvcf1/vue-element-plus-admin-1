@@ -634,16 +634,26 @@ const handleHouseholdHeadInput = (value: string) => {
 const handleRelationshipChange = (value: string) => {
   console.log('关系变化:', value)
   if (value === '本人' || value === '户主') {
-    // 如果是户主，自动将居民信息复制到户主信息
-    householdForm.householdHeadName = residentForm.name
-    householdForm.householdHeadIdCard = residentForm.id_card
-    householdForm.gender = residentForm.gender
-    householdForm.ethnicity = residentForm.ethnicity
-    householdForm.villageGroup = residentForm.village_group
-    householdForm.address = residentForm.Home_address
-    householdForm.phoneNumber = residentForm.phone_number
+    // 如果是户主，仅在户主字段为空时自动填充，避免覆盖已手动填写的数据
+    let filled = false
+    const fillIfEmpty = (key: keyof typeof householdForm, value: string) => {
+      if (!householdForm[key] && value) {
+        householdForm[key] = value as any
+        filled = true
+      }
+    }
 
-    ElMessage.info('已自动将居民信息填充到户主信息，请补充户主的户口类型和住房类型')
+    fillIfEmpty('householdHeadName', residentForm.name)
+    fillIfEmpty('householdHeadIdCard', residentForm.id_card)
+    fillIfEmpty('gender', residentForm.gender)
+    fillIfEmpty('ethnicity', residentForm.ethnicity)
+    fillIfEmpty('villageGroup', residentForm.village_group)
+    fillIfEmpty('address', residentForm.Home_address)
+    fillIfEmpty('phoneNumber', residentForm.phone_number)
+
+    if (filled) {
+      ElMessage.info('已自动将居民信息填充到户主信息，请补充户主的户口类型和住房类型')
+    }
   }
 }
 

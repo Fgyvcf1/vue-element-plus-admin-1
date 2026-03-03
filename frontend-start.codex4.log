@@ -1,0 +1,47 @@
+
+> vue-element-plus-admin@3.0.0 dev D:\vue-element-plus-admin
+> vite
+
+[32m✔[0m [33mConsole Ninja[0m extension is connected to [33mVite[0m, see [36mhttps://tinyurl.com/2vt8jxzw[0m
+Re-optimizing dependencies because lockfile has changed
+
+  [32m[1mVITE[22m v6.0.7[39m  [2mready in [0m[1m54408[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m4000[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.1.85:[1m4000[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.1.152:[1m4000[22m/[39m
+  [32m➜[39m  [1mUnoCSS Inspector[22m: [36mhttp://localhost:[1m4000[22m/__unocss/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[32m
+ ⚡VITE-PLUGIN-URL-COPY v1.1.4[39m
+[32m
+  ✔ [39m [32m·local· already copied to clipboard - http://localhost:4000/ [39m
+[2m14:33:56[22m [36m[1m[vite][22m[39m [32mvite.config.ts changed, restarting server...[39m
+[2m14:34:02[22m [36m[1m[vite][22m[39m server restarted.
+[2m15:50:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m15:50:13[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m15:50:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m15:50:13[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m15:50:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mstats.html[22m
+[2m15:50:36[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mstats.html[22m
+[2m15:50:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m15:50:37[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m15:54:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m15:54:40[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m15:56:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mstats.html[22m
+[2m15:56:05[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mstats.html[22m
+[2m15:56:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mstats.html[22m
+[2m15:56:05[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mstats.html[22m
+[2m15:56:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m15:56:05[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mdist-pro/index.html[22m
+[2m16:03:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mrelease/app/backend/frontend/index.html[22m
+[2m16:03:58[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mrelease/app/backend/frontend/index.html[22m
+[2m16:04:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mrelease/app/backend/templates/agreement-template.html[22m
+[2m16:04:26[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mrelease/app/backend/templates/agreement-template.html[22m
+[2m16:04:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mrelease/app/backend/templates/application-template.html[22m
+[2m16:04:26[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mrelease/app/backend/templates/application-template.html[22m
+[2m16:04:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mrelease/app/backend/templates/case-file-template.html[22m
+[2m16:04:26[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mrelease/app/backend/templates/case-file-template.html[22m
+[2m16:04:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mrelease/app/backend/templates/record-template.html[22m
+[2m16:04:26[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mrelease/app/backend/templates/record-template.html[22m
+ ELIFECYCLE  Command failed with exit code 1.

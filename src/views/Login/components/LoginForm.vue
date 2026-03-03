@@ -205,7 +205,16 @@ const signIn = async () => {
       if (appStore.getDynamicRouter) {
         await getRole()
       } else {
-        await permissionStore.generateRoutes('static', undefined, userStore.getPermissions).catch(() => {})
+        const menuRes = await getMyPermission().catch(() => null)
+        if (menuRes?.data?.menus) {
+          const menus = menuRes.data.menus || []
+          const permissions = menuRes.data.permissions || userStore.getPermissions
+          userStore.setRoleRouters(menus)
+          userStore.setPermissions(permissions)
+          await permissionStore.generateRoutes('server', menus, permissions).catch(() => {})
+        } else {
+          await permissionStore.generateRoutes('static', undefined, userStore.getPermissions).catch(() => {})
+        }
         permissionStore.getAddRouters.forEach((route) => {
           router.addRoute(route as RouteRecordRaw)
         })

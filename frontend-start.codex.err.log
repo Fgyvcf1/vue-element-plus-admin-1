@@ -1,0 +1,12 @@
+file:///D:/vue-element-plus-admin/node_modules/unconfig/dist/index.mjs:55
+            return mod[key];
+            ^
+
+RangeError: Maximum call stack size exceeded
+    at Object.get (file:///D:/vue-element-plus-admin/node_modules/unconfig/dist/index.mjs:55:13)
+    at Object.get (D:\vue-element-plus-admin\node_modules\jiti\dist\jiti.cjs:1:147420)
+    at Object.get (file:///D:/vue-element-plus-admin/node_modules/unconfig/dist/index.mjs:55:23)
+    ... collapsed 46 duplicate lines matching above 2 lines 23 times...
+    at Object.get (D:\vue-element-plus-admin\node_modules\jiti\dist\jiti.cjs:1:147420)
+
+Node.js v24.12.0

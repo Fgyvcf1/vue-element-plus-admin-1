@@ -1,0 +1,19 @@
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: EBUSY: resource busy or locked, scandir 'D:\vue-element-plus-admin\release\app\backend'
+Emitted 'error' event on FSWatcher instance at:
+    at FSWatcher._handleError (file:///D:/vue-element-plus-admin/node_modules/.pnpm/vite@6.0.7_@types+node@22.1_415c906f76eb7ab715a96fc11a4fc355/node_modules/vite/dist/node/chunks/dep-BJP6rrE_.js:29423:10)
+    at NodeFsHandler._boundHandleError (file:///D:/vue-element-plus-admin/node_modules/.pnpm/vite@6.0.7_@types+node@22.1_415c906f76eb7ab715a96fc11a4fc355/node_modules/vite/dist/node/chunks/dep-BJP6rrE_.js:27896:43)
+    at ReaddirpStream.emit (node:events:508:28)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+  errno: -4082,
+  code: 'EBUSY',
+  syscall: 'scandir',
+  path: 'D:\\vue-element-plus-admin\\release\\app\\backend'
+}
+
+Node.js v24.12.0

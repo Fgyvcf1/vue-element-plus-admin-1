@@ -13,6 +13,7 @@ const normalizePermissionIds = (value) => {
   return value.map((id) => toInt(id, 0)).filter((id) => id > 0)
 }
 
+
 const toBool = (value) => Number(value) === 1
 
 const buildMenuTree = (rows) => {
@@ -74,6 +75,7 @@ const buildMenuTree = (rows) => {
 
   return roots
 }
+
 
 // ============================================
 // 角色管理接口
@@ -307,7 +309,7 @@ router.get('/me', requireAuth, async (req, res) => {
         `
         SELECT *
         FROM sys_menu
-        WHERE status = 1 AND menu_type != 3
+        WHERE status = 1 AND menu_type != 3 AND name <> 'MenuSettings'
         ORDER BY sort_order ASC, id ASC
         `
       )
@@ -323,7 +325,7 @@ router.get('/me', requireAuth, async (req, res) => {
           `
           SELECT *
           FROM sys_menu
-          WHERE status = 1 AND menu_type != 3
+          WHERE status = 1 AND menu_type != 3 AND name <> 'MenuSettings'
           ORDER BY sort_order ASC, id ASC
           `
         )

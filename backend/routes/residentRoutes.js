@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const db = require('../db')
+const { generateUniqueHouseholdId } = require('../utils/householdIdGenerator')
+const { normalizeVillageGroup, resolveVillageCode } = require('../utils/householdIdResolver')
 const { checkPermission } = require('../middleware/auth');  // 引入权限检查中间件
 
 // 获取当前本地时间（北京时间）的辅助函数
@@ -13,7 +15,7 @@ function getLocalTime() {
 }
 
 // 生成户主ID的辅助函数
-function generateHouseholdId(villageGroup, idCard) {
+function generateHouseholdIdLegacy(villageGroup, idCard) {
   return new Promise((resolve, reject) => {
     // 1. 生成基础户主ID：村组名字首个字母大写 + 身份证后6位
     // 提取村组名称的前两个字的首字母大写
@@ -2540,6 +2542,26 @@ function generateHouseholdId(villageGroup, idCard) {
   })
 }
 
+const getVillageCode = async (villageGroup) => resolveVillageCode(db, villageGroup)
+
+// 生成户主ID的辅助函数（优先使用村组编码）
+const generateHouseholdId = async (villageGroup, idCard) => {
+  const villageCode = await getVillageCode(villageGroup)
+  const checkExists = async (householdNumber) => {
+    const [rows] = await db.pool.execute(
+      'SELECT household_number FROM households WHERE household_number = ?',
+      [householdNumber]
+    )
+    return rows.length > 0
+  }
+  return generateUniqueHouseholdId(
+    normalizeVillageGroup(villageGroup),
+    idCard,
+    checkExists,
+    villageCode
+  )
+}
+
 // 居民信息API - 从真实数据库获取数据
 router.get('/residents', checkPermission('resident:view'), (req, res) => {
   console.log('收到/residents请求，查询参数:', req.query)
@@ -2551,7 +2573,7 @@ router.get('/residents', checkPermission('resident:view'), (req, res) => {
               r.id_card AS idCard, 
               r.gender,
               r.ethnicity,
-              r.date_of_birth AS dateOfBirth, 
+              DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS dateOfBirth, 
               YEAR(CURDATE()) - YEAR(r.date_of_birth) AS age, 
               r.village_group AS villageGroup, 
               h.address, 
@@ -3064,7 +3086,7 @@ router.get('/residents/:id', checkPermission('resident:view'), (req, res) => {
                 r.name,
                 r.id_card AS idCard,
                 r.gender,
-                r.date_of_birth AS dateOfBirth,
+                DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS dateOfBirth,
                 YEAR(CURDATE()) - YEAR(r.date_of_birth) AS age,
                 r.village_group AS villageGroup,
                 r.Home_address AS homeAddress,
@@ -3517,12 +3539,13 @@ router.get('/households/:id/members', checkPermission('resident:view'), (req, re
                 r.name, 
                 r.id_card, 
                 r.gender, 
-                r.date_of_birth, 
+                DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS date_of_birth, 
                 YEAR(CURDATE()) - YEAR(r.date_of_birth) AS age, 
                 r.village_group, 
-                r.bank_card, 
-                r.bank_name, 
+                r.bank_card AS bankCard, 
+                r.bank_name AS bankName, 
                 r.phone_number, 
+                r.equity_shares AS equityShares,
                 r.household_id, 
                 r.status, 
                 r.relationship_to_head, 
@@ -3663,6 +3686,62 @@ router.put('/residents/:id/status', checkPermission('resident:edit'), async (req
       await connection.rollback()
     }
     res.status(500).json({ code: 500, message: '更新居民状态失败: ' + err.message })
+  } finally {
+    if (connection) {
+      connection.release()
+    }
+  }
+})
+
+// 删除居民
+router.delete('/residents/:id', checkPermission('resident:edit'), async (req, res) => {
+  const { id } = req.params
+  let connection
+
+  try {
+    connection = await db.pool.getConnection()
+    await connection.beginTransaction()
+
+    const [rows] = await connection.execute(
+      'SELECT id, household_id, relationship_to_head FROM residents WHERE id = ?',
+      [id]
+    )
+
+    if (rows.length === 0) {
+      await connection.rollback()
+      return res.status(404).json({ code: 404, message: '居民不存在' })
+    }
+
+    const resident = rows[0]
+    const householdId = resident.household_id
+    const relationship = resident.relationship_to_head || ''
+    const isHead = relationship === '本人' || relationship === '户主'
+
+    if (householdId && isHead) {
+      const [others] = await connection.execute(
+        'SELECT id FROM residents WHERE household_id = ? AND id <> ? LIMIT 1',
+        [householdId, id]
+      )
+      if (others.length > 0) {
+        await connection.rollback()
+        return res.status(400).json({
+          code: 400,
+          message: '当前居民为户主且家庭内还有成员，请先更换户主或迁出/删除其他成员'
+        })
+      }
+      await connection.execute('DELETE FROM households WHERE household_number = ?', [householdId])
+    }
+
+    await connection.execute('DELETE FROM residents WHERE id = ?', [id])
+    await connection.commit()
+
+    res.json({ code: 20000, message: '删除成功' })
+  } catch (err) {
+    console.error('删除居民失败:', err.message)
+    if (connection) {
+      await connection.rollback()
+    }
+    res.status(500).json({ code: 500, message: '删除失败: ' + err.message })
   } finally {
     if (connection) {
       connection.release()
@@ -3966,7 +4045,7 @@ router.get('/residents/search-by-name', checkPermission('resident:view'), (req, 
                 r.id_card AS idCard,
                 r.gender,
                 r.ethnicity,
-                r.date_of_birth AS dateOfBirth,
+                DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS dateOfBirth,
                 r.age,
                 r.phone_number AS phoneNumber,
                 r.homehold_id,

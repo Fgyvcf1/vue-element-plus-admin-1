@@ -46,7 +46,7 @@ router.get('/committee-members', checkPermission('organization:view'), async (re
   const pageSizeNum = Number.parseInt(pageSize, 10)
   const pageNum = Number.parseInt(page, 10) || 1
 
-  let listSql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, r.date_of_birth, r.\`Home_address\` AS address
+  let listSql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS date_of_birth, r.\`Home_address\` AS address
                  ${filterSql}
                  ORDER BY cm.term_number DESC, cm.created_at DESC`
   if (Number.isInteger(pageSizeNum) && pageSizeNum > 0) {
@@ -113,7 +113,7 @@ router.get('/committee-members/history', checkPermission('organization:view'), a
     return
   }
 
-  const sql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, r.date_of_birth, r.\`Home_address\` AS address
+  const sql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS date_of_birth, r.\`Home_address\` AS address
              FROM committee_members cm
              JOIN residents r ON cm.resident_id = r.id
              WHERE cm.resident_id = ?
@@ -185,7 +185,7 @@ router.get('/committee-members/statistics', checkPermission('organization:view')
 router.get('/committee-members/:id', checkPermission('organization:view'), async (req, res) => {
   const { id } = req.params
 
-  const sql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, r.date_of_birth, r.\`Home_address\` AS address
+  const sql = `SELECT cm.*, r.name, r.gender, r.phone_number, r.id_card, DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS date_of_birth, r.\`Home_address\` AS address
              FROM committee_members cm
              JOIN residents r ON cm.resident_id = r.id
              WHERE cm.id = ?`

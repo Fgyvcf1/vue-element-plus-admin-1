@@ -9,7 +9,7 @@ const routes = require('./routes')
 const permissionRoutes = require('./routes/permissionRoutes')
 const db = require('./db')
 
-const port = Number(process.env.PORT || 3001)
+const port = Number(process.env.PORT || 3002)
 
 /**
  * 杀死占用指定端口的进程
@@ -176,7 +176,7 @@ app.use((err, req, res, next) => {
 const server = app.listen(port, () => {
   console.log(`后端服务运行在 http://localhost:${port}`)
   console.log(`CORS配置: 允许来自 localhost:4000 和 localhost:5173 的请求`)
-  console.log('居民查询API: http://localhost:3001/api/residents')
+  console.log('居民查询API: http://localhost:3002/api/residents')
 })
 
 // 监听服务器错误

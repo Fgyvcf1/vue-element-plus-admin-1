@@ -41,6 +41,24 @@ router.beforeEach(async (to, from, next) => {
     }
 
     const isSuperAdmin = userStore.getUserInfo?.role === 'superadmin'
+    const hasRouteAccess = () => {
+      if (isSuperAdmin) return true
+      const allowedNames = new Set<string>()
+      const walk = (routes: AppRouteRecordRaw[]) => {
+        routes.forEach((route) => {
+          if (route.name) {
+            allowedNames.add(String(route.name))
+          }
+          if (route.children && route.children.length > 0) {
+            walk(route.children)
+          }
+        })
+      }
+      walk(permissionStore.getRouters || [])
+      if (allowedNames.size === 0) return true
+      const matchedNames = to.matched.map((m) => m.name).filter(Boolean) as string[]
+      return matchedNames.some((name) => allowedNames.has(String(name)))
+    }
 
     // 非超级管理员禁止访问权限管理/系统设置
     if (!isSuperAdmin && (to.path.startsWith('/permission') || to.path.startsWith('/system'))) {
@@ -54,14 +72,34 @@ router.beforeEach(async (to, from, next) => {
       console.log('静态路由模式，检查权限...')
 
       // 静态路由模式下补齐权限与菜单
-      if (userStore.getPermissions.length === 0) {
+      let menus: AppCustomRouteRecordRaw[] = Array.isArray(userStore.getRoleRouters)
+        ? (userStore.getRoleRouters as AppCustomRouteRecordRaw[])
+        : []
+
+      if (userStore.getPermissions.length === 0 || menus.length === 0) {
         const res = await getMyPermission().catch(() => null)
         if (res?.data) {
+          menus = res.data.menus || []
+          userStore.setRoleRouters(menus)
           userStore.setPermissions(res.data.permissions || [])
         }
+      }
+
+      if (menus.length > 0) {
+        await permissionStore
+          .generateRoutes('server', menus, userStore.getPermissions)
+          .catch(() => {})
+      } else {
         await permissionStore
           .generateRoutes('static', undefined, userStore.getPermissions)
           .catch(() => {})
+      }
+
+      // 检查菜单访问权限（防止手动输入URL）
+      if (!hasRouteAccess()) {
+        ElMessage.warning('当前账号没有权限')
+        next(false)
+        return
       }
 
       // 检查路由权限
@@ -124,7 +162,13 @@ router.beforeEach(async (to, from, next) => {
       console.log('动态路由添加完成')
     }
 
-    // 动态路由模式下也做权限校验（防止手动输入URL）
+    // 动态路由模式下也做菜单/权限校验（防止手动输入URL）
+    if (!hasRouteAccess()) {
+      ElMessage.warning('当前账号没有权限')
+      next(false)
+      return
+    }
+
     const requiredPermission = to.meta?.permission as string
     if (requiredPermission && !userStore.hasPermission(requiredPermission)) {
       ElMessage.warning('当前账号没有权限')

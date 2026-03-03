@@ -1,0 +1,256 @@
+ WARN  using --force I sure hope you know what you are doing
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +1427
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 1427, reused 3, downloaded 0, added 0
+Progress: resolved 1427, reused 96, downloaded 0, added 0
+Progress: resolved 1427, reused 105, downloaded 0, added 0
+Progress: resolved 1427, reused 159, downloaded 0, added 0
+Progress: resolved 1427, reused 320, downloaded 0, added 0
+Progress: resolved 1427, reused 579, downloaded 0, added 0
+Progress: resolved 1427, reused 823, downloaded 0, added 0
+Progress: resolved 1427, reused 962, downloaded 0, added 0
+Progress: resolved 1427, reused 1053, downloaded 0, added 0
+Progress: resolved 1427, reused 1154, downloaded 0, added 0
+Progress: resolved 1427, reused 1396, downloaded 0, added 2
+Progress: resolved 1427, reused 1396, downloaded 0, added 11
+Progress: resolved 1427, reused 1396, downloaded 0, added 27
+Progress: resolved 1427, reused 1396, downloaded 0, added 42
+Progress: resolved 1427, reused 1396, downloaded 0, added 49
+Progress: resolved 1427, reused 1396, downloaded 0, added 65
+Progress: resolved 1427, reused 1396, downloaded 0, added 70
+Progress: resolved 1427, reused 1396, downloaded 0, added 80
+Progress: resolved 1427, reused 1396, downloaded 0, added 84
+Progress: resolved 1427, reused 1396, downloaded 0, added 99
+Progress: resolved 1427, reused 1396, downloaded 0, added 100
+Progress: resolved 1427, reused 1396, downloaded 0, added 104
+Progress: resolved 1427, reused 1396, downloaded 0, added 109
+Progress: resolved 1427, reused 1396, downloaded 0, added 110
+Progress: resolved 1427, reused 1396, downloaded 0, added 111
+Progress: resolved 1427, reused 1396, downloaded 0, added 117
+Progress: resolved 1427, reused 1396, downloaded 0, added 118
+Progress: resolved 1427, reused 1396, downloaded 0, added 121
+Progress: resolved 1427, reused 1396, downloaded 0, added 122
+Progress: resolved 1427, reused 1396, downloaded 0, added 124
+Progress: resolved 1427, reused 1396, downloaded 0, added 125
+Progress: resolved 1427, reused 1396, downloaded 0, added 134
+Progress: resolved 1427, reused 1396, downloaded 0, added 146
+Progress: resolved 1427, reused 1396, downloaded 0, added 175
+Progress: resolved 1427, reused 1396, downloaded 0, added 187
+Progress: resolved 1427, reused 1396, downloaded 0, added 202
+Progress: resolved 1427, reused 1396, downloaded 0, added 214
+Progress: resolved 1427, reused 1396, downloaded 0, added 223
+Progress: resolved 1427, reused 1396, downloaded 0, added 229
+Progress: resolved 1427, reused 1396, downloaded 0, added 233
+Progress: resolved 1427, reused 1396, downloaded 0, added 237
+Progress: resolved 1427, reused 1396, downloaded 0, added 242
+Progress: resolved 1427, reused 1396, downloaded 0, added 248
+Progress: resolved 1427, reused 1396, downloaded 0, added 264
+Progress: resolved 1427, reused 1396, downloaded 0, added 269
+Progress: resolved 1427, reused 1396, downloaded 0, added 271
+Progress: resolved 1427, reused 1396, downloaded 0, added 278
+Progress: resolved 1427, reused 1396, downloaded 0, added 282
+Progress: resolved 1427, reused 1396, downloaded 0, added 283
+Progress: resolved 1427, reused 1396, downloaded 0, added 286
+Progress: resolved 1427, reused 1396, downloaded 0, added 290
+Progress: resolved 1427, reused 1396, downloaded 0, added 294
+Progress: resolved 1427, reused 1396, downloaded 0, added 304
+Progress: resolved 1427, reused 1396, downloaded 1, added 316
+Progress: resolved 1427, reused 1396, downloaded 1, added 328
+Progress: resolved 1427, reused 1396, downloaded 1, added 340
+Progress: resolved 1427, reused 1396, downloaded 1, added 350
+Progress: resolved 1427, reused 1396, downloaded 1, added 360
+Progress: resolved 1427, reused 1396, downloaded 2, added 371
+Progress: resolved 1427, reused 1396, downloaded 2, added 389
+Progress: resolved 1427, reused 1396, downloaded 2, added 392
+Progress: resolved 1427, reused 1396, downloaded 4, added 403
+Progress: resolved 1427, reused 1396, downloaded 4, added 415
+Progress: resolved 1427, reused 1396, downloaded 4, added 426
+Progress: resolved 1427, reused 1396, downloaded 5, added 449
+Progress: resolved 1427, reused 1396, downloaded 5, added 459
+Progress: resolved 1427, reused 1396, downloaded 5, added 470
+Progress: resolved 1427, reused 1396, downloaded 5, added 471
+Progress: resolved 1427, reused 1396, downloaded 5, added 472
+Progress: resolved 1427, reused 1396, downloaded 5, added 482
+Progress: resolved 1427, reused 1396, downloaded 6, added 505
+Progress: resolved 1427, reused 1396, downloaded 6, added 512
+Progress: resolved 1427, reused 1396, downloaded 7, added 514
+Progress: resolved 1427, reused 1396, downloaded 8, added 520
+Progress: resolved 1427, reused 1396, downloaded 11, added 522
+Progress: resolved 1427, reused 1396, downloaded 12, added 535
+Progress: resolved 1427, reused 1396, downloaded 15, added 541
+Progress: resolved 1427, reused 1396, downloaded 15, added 542
+Progress: resolved 1427, reused 1396, downloaded 15, added 544
+Progress: resolved 1427, reused 1396, downloaded 15, added 547
+Progress: resolved 1427, reused 1396, downloaded 15, added 549
+Progress: resolved 1427, reused 1396, downloaded 16, added 553
+Progress: resolved 1427, reused 1396, downloaded 16, added 555
+Progress: resolved 1427, reused 1396, downloaded 16, added 556
+Progress: resolved 1427, reused 1396, downloaded 17, added 570
+Progress: resolved 1427, reused 1396, downloaded 17, added 575
+Progress: resolved 1427, reused 1396, downloaded 18, added 576
+Progress: resolved 1427, reused 1396, downloaded 19, added 580
+Progress: resolved 1427, reused 1396, downloaded 21, added 583
+Progress: resolved 1427, reused 1396, downloaded 22, added 583
+Progress: resolved 1427, reused 1396, downloaded 23, added 593
+Progress: resolved 1427, reused 1396, downloaded 24, added 593
+Progress: resolved 1427, reused 1396, downloaded 25, added 595
+Progress: resolved 1427, reused 1396, downloaded 25, added 596
+Progress: resolved 1427, reused 1396, downloaded 28, added 596
+Progress: resolved 1427, reused 1396, downloaded 30, added 598
+Progress: resolved 1427, reused 1396, downloaded 30, added 602
+Progress: resolved 1427, reused 1396, downloaded 30, added 606
+Progress: resolved 1427, reused 1396, downloaded 30, added 616
+Progress: resolved 1427, reused 1396, downloaded 31, added 635
+Progress: resolved 1427, reused 1396, downloaded 31, added 636
+Progress: resolved 1427, reused 1396, downloaded 31, added 655
+Progress: resolved 1427, reused 1396, downloaded 31, added 666
+Progress: resolved 1427, reused 1396, downloaded 31, added 691
+Progress: resolved 1427, reused 1396, downloaded 31, added 733
+Progress: resolved 1427, reused 1396, downloaded 31, added 748
+Progress: resolved 1427, reused 1396, downloaded 31, added 760
+Progress: resolved 1427, reused 1396, downloaded 31, added 787
+Progress: resolved 1427, reused 1396, downloaded 31, added 826
+Progress: resolved 1427, reused 1396, downloaded 31, added 829
+Progress: resolved 1427, reused 1396, downloaded 31, added 849
+Progress: resolved 1427, reused 1396, downloaded 31, added 907
+Progress: resolved 1427, reused 1396, downloaded 31, added 941
+Progress: resolved 1427, reused 1396, downloaded 31, added 976
+Progress: resolved 1427, reused 1396, downloaded 31, added 990
+Progress: resolved 1427, reused 1396, downloaded 31, added 1016
+Progress: resolved 1427, reused 1396, downloaded 31, added 1019
+Progress: resolved 1427, reused 1396, downloaded 31, added 1033
+Progress: resolved 1427, reused 1396, downloaded 31, added 1042
+Progress: resolved 1427, reused 1396, downloaded 31, added 1050
+Progress: resolved 1427, reused 1396, downloaded 31, added 1091
+Progress: resolved 1427, reused 1396, downloaded 31, added 1093
+Progress: resolved 1427, reused 1396, downloaded 31, added 1105
+Progress: resolved 1427, reused 1396, downloaded 31, added 1152
+Progress: resolved 1427, reused 1396, downloaded 31, added 1175
+Progress: resolved 1427, reused 1396, downloaded 31, added 1248
+Progress: resolved 1427, reused 1396, downloaded 31, added 1283
+Progress: resolved 1427, reused 1396, downloaded 31, added 1324
+Progress: resolved 1427, reused 1396, downloaded 31, added 1362
+Progress: resolved 1427, reused 1396, downloaded 31, added 1382
+Progress: resolved 1427, reused 1396, downloaded 31, added 1406
+Progress: resolved 1427, reused 1396, downloaded 31, added 1426
+Progress: resolved 1427, reused 1396, downloaded 31, added 1427
+Progress: resolved 1427, reused 1396, downloaded 31, added 1427, done
+
+dependencies:
++ @element-plus/icons-vue 2.3.2
++ @iconify/iconify 3.1.1
++ @iconify/vue 4.3.0
++ @vueuse/core 12.3.0
++ @wangeditor/editor 5.1.23
++ @wangeditor/editor-for-vue 5.1.12
++ @zxcvbn-ts/core 3.0.4
++ animate.css 4.1.1
++ axios 1.7.9
++ cropperjs 1.6.2
++ dayjs 1.11.13
++ driver.js 1.4.0
++ echarts 5.6.0
++ echarts-wordcloud 2.1.0
++ element-plus 2.9.2
++ exceljs 4.4.0
++ lodash-es 4.17.21
++ mitt 3.0.1
++ monaco-editor 0.52.2
++ nprogress 0.2.0
++ pinia 2.3.0
++ pinia-plugin-persistedstate 4.7.1
++ qrcode 1.5.4
++ qs 6.15.0
++ url 0.11.4
++ vue 3.5.13
++ vue-draggable-plus 0.6.1
++ vue-i18n 11.0.1
++ vue-json-pretty 2.6.0
++ vue-router 4.5.0
++ vue-types 5.1.3
++ xgplayer 3.0.23
++ xlsx 0.18.5
+
+devDependencies:
++ @commitlint/cli 19.8.1
++ @commitlint/config-conventional 19.8.1
++ @eslint/js 9.17.0
++ @iconify-json/ant-design 1.2.5
++ @iconify-json/bi 1.2.7
++ @iconify-json/ci 1.2.2
++ @iconify-json/emojione-monotone 1.2.1
++ @iconify-json/ep 1.2.4
++ @iconify-json/ion 1.2.6
++ @iconify-json/material-symbols 1.2.56
++ @iconify-json/mdi 1.2.3
++ @iconify-json/radix-icons 1.2.6
++ @iconify-json/tdesign 1.2.12
++ @iconify-json/vaadin 1.2.1
++ @iconify-json/zmdi 1.2.0
++ @iconify/json 2.2.440
++ @intlify/unplugin-vue-i18n 6.0.8
++ @types/fs-extra 11.0.4
++ @types/inquirer 9.0.9
++ @types/lodash-es 4.17.12
++ @types/mockjs 1.0.10
++ @types/node 22.10.5
++ @types/nprogress 0.2.3
++ @types/qrcode 1.5.6
++ @types/qs 6.14.0
++ @types/sortablejs 1.15.9
++ @typescript-eslint/eslint-plugin 8.56.0
++ @typescript-eslint/parser 8.56.0
++ @unocss/transformer-variant-group 0.65.4
++ @vitejs/plugin-legacy 6.1.1
++ @vitejs/plugin-vue 5.2.1
++ @vitejs/plugin-vue-jsx 4.2.0
++ autoprefixer 10.4.24
++ chalk 5.6.2
++ consola 3.4.2
++ eslint 9.17.0
++ eslint-config-prettier 9.1.2
++ eslint-define-config 2.1.0
++ eslint-plugin-prettier 5.5.5
++ eslint-plugin-vue 9.33.0
++ esno 4.8.0
++ fs-extra 11.3.3
++ husky 9.1.7
++ inquirer 12.11.1
++ less 4.2.1
++ lint-staged 15.5.2
++ mockjs 1.1.0
++ plop 4.0.5
++ postcss 8.4.49
++ postcss-html 1.8.1
++ postcss-less 6.0.0
++ prettier 3.8.1
++ rimraf 6.1.3
++ rollup 4.30.1
++ rollup-plugin-visualizer 5.14.0
++ sass-embedded 1.97.3
++ stylelint 16.26.1
++ stylelint-config-html 1.1.0
++ stylelint-config-recommended 14.0.1
++ stylelint-config-standard 36.0.1
++ stylelint-order 6.0.4
++ terser 5.37.0
++ typescript 5.7.3
++ typescript-eslint 8.56.0
++ unocss 0.65.4
++ unplugin-auto-import 21.0.0
++ unplugin-vue-components 31.0.0
++ vite 6.0.7
++ vite-plugin-ejs 1.7.0
++ vite-plugin-eslint 1.8.1
++ vite-plugin-mock 2.9.6
++ vite-plugin-progress 0.0.7
++ vite-plugin-purge-icons 0.10.0
++ vite-plugin-style-import 2.0.0
++ vite-plugin-svg-icons 2.0.1
++ vite-plugin-url-copy 1.1.4
++ vue-eslint-parser 10.4.0
++ vue-tsc 2.2.12
+
+Done in 2m 31.5s using pnpm v10.29.3

@@ -30,6 +30,7 @@ export const getDictionaryItems = (params: {
 // 新增字典项
 export const createDictionaryItem = (data: {
   category: string
+  code?: string
   value: string
   display_order?: number
   status?: string
@@ -43,7 +44,7 @@ export const createDictionaryItem = (data: {
 // 修改字典项
 export const updateDictionaryItem = (
   id: number,
-  data: { category?: string; value?: string; display_order?: number }
+  data: { category?: string; code?: string; value?: string; display_order?: number }
 ) => {
   return request.put({
     url: `/dictionary/${id}`,

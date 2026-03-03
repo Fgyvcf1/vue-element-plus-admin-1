@@ -77,6 +77,13 @@
                   </span>
                 </template>
               </el-table-column>
+              <el-table-column
+                v-if="selectedCategory === '村组'"
+                prop="code"
+                label="编码"
+                width="120"
+                align="center"
+              />
               <el-table-column prop="display_order" label="排序" width="80" align="center" />
               <el-table-column label="启用" width="80" align="center">
                 <template #default="{ row }">
@@ -115,6 +122,9 @@
         </el-form-item>
         <el-form-item label="字典值" prop="value">
           <el-input v-model="itemForm.value" placeholder="请输入字典值" />
+        </el-form-item>
+        <el-form-item v-if="itemForm.category === '村组'" label="编码" prop="code">
+          <el-input v-model="itemForm.code" placeholder="请输入村组编码" />
         </el-form-item>
         <el-form-item label="排序序号" prop="display_order">
           <el-input-number
@@ -180,12 +190,22 @@ const editId = ref<number | null>(null)
 const itemFormRef = ref<FormInstance>()
 const itemForm = reactive({
   category: '',
+  code: '',
   value: '',
   display_order: 0
 })
 
+const validateCode = (_rule: any, value: string, callback: (error?: Error) => void) => {
+  if (itemForm.category === '村组' && !value) {
+    callback(new Error('请输入村组编码'))
+    return
+  }
+  callback()
+}
+
 const itemRules: FormRules = {
   value: [{ required: true, message: '请输入字典值', trigger: 'blur' }],
+  code: [{ validator: validateCode, trigger: 'blur' }],
   display_order: [{ required: true, message: '请输入排序序号', trigger: 'blur' }]
 }
 
@@ -245,6 +265,7 @@ const handleAddItem = () => {
   editId.value = null
   dialogTitle.value = '新增字典项'
   itemForm.category = selectedCategory.value
+  itemForm.code = ''
   itemForm.value = ''
   itemForm.display_order = dictionaryList.value.length + 1
   dialogVisible.value = true
@@ -256,6 +277,7 @@ const handleEditItem = (row: any) => {
   editId.value = row.id
   dialogTitle.value = '编辑字典项'
   itemForm.category = row.category
+  itemForm.code = row.code || ''
   itemForm.value = row.value
   itemForm.display_order = row.display_order ?? 0
   dialogVisible.value = true
@@ -265,10 +287,12 @@ const handleEditItem = (row: any) => {
 const handleSubmit = () => {
   itemFormRef.value?.validate(async (valid) => {
     if (!valid) return
+    const submitCode = itemForm.category === '村组' ? itemForm.code : undefined
     try {
       if (isEdit.value && editId.value !== null) {
         await updateDictionaryItem(editId.value, {
           category: itemForm.category,
+          code: submitCode,
           value: itemForm.value,
           display_order: itemForm.display_order
         })
@@ -276,6 +300,7 @@ const handleSubmit = () => {
       } else {
         await createDictionaryItem({
           category: itemForm.category,
+          code: submitCode,
           value: itemForm.value,
           display_order: itemForm.display_order
         })

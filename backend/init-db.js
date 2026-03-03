@@ -1,4 +1,6 @@
 const db = require('./db');
+const fs = require('fs');
+const path = require('path');
 
 async function initDatabase() {
   console.log('开始初始化数据库...');
@@ -175,6 +177,15 @@ async function initDatabase() {
     }
     console.log('✅ 角色数据初始化完成');
 
+    // 6.1 读取角色ID，避免硬编码
+    const [roleRows] = await connection.execute(
+      "SELECT id, role_code FROM roles WHERE role_code IN ('superadmin','admin','user','readonly')"
+    );
+    const roleMap = roleRows.reduce((acc, row) => {
+      acc[row.role_code] = row.id;
+      return acc;
+    }, {});
+
     // 7. 初始化基础菜单（仅在 sys_menu 为空时）
     const [menuCountRows] = await connection.execute('SELECT COUNT(*) as cnt FROM sys_menu');
     if ((menuCountRows[0]?.cnt || 0) === 0) {
@@ -288,17 +299,90 @@ async function initDatabase() {
       console.log('ℹ️ sys_menu 已有数据，跳过初始化');
     }
 
+    // 7.1 补齐缺失菜单（避免升级后菜单丢失）
+    const seedMenuPath = path.join(__dirname, 'seed', 'sys_menu.json');
+    if (fs.existsSync(seedMenuPath)) {
+      try {
+        const seedMenus = JSON.parse(fs.readFileSync(seedMenuPath, 'utf8'));
+        if (Array.isArray(seedMenus) && seedMenus.length > 0) {
+          const [existingRows] = await connection.execute(
+            'SELECT id, name, parent_id FROM sys_menu'
+          );
+          const existingByName = new Map(existingRows.map((row) => [row.name, row.id]));
+          const seedById = new Map(seedMenus.map((row) => [row.id, row]));
+          const resolvedByName = new Map(existingByName);
+          const visited = new Set();
+          let insertedCount = 0;
+
+          const ensureMenu = async (seedItem) => {
+            if (!seedItem || !seedItem.name) return;
+            if (visited.has(seedItem.name)) return;
+            visited.add(seedItem.name);
+
+            let parentId = 0;
+            if (seedItem.parent_id && seedItem.parent_id !== 0) {
+              const parentSeed = seedById.get(seedItem.parent_id);
+              if (parentSeed) {
+                await ensureMenu(parentSeed);
+                parentId = resolvedByName.get(parentSeed.name) || 0;
+              }
+            }
+
+            if (resolvedByName.has(seedItem.name)) {
+              return;
+            }
+
+            const insertSql = `INSERT INTO sys_menu
+              (parent_id, name, path, component, redirect, title, icon, menu_type, permission_code,
+               sort_order, hidden, always_show, no_cache, affix, active_menu, status)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+            const [result] = await connection.execute(insertSql, [
+              parentId,
+              seedItem.name,
+              seedItem.path || '',
+              seedItem.component || '#',
+              seedItem.redirect || null,
+              seedItem.title || seedItem.name,
+              seedItem.icon || null,
+              seedItem.menu_type || 2,
+              seedItem.permission_code || null,
+              seedItem.sort_order || 0,
+              seedItem.hidden ? 1 : 0,
+              seedItem.always_show ? 1 : 0,
+              seedItem.no_cache ? 1 : 0,
+              seedItem.affix ? 1 : 0,
+              seedItem.active_menu || null,
+              seedItem.status === 0 ? 0 : 1
+            ]);
+            resolvedByName.set(seedItem.name, result.insertId);
+            insertedCount += 1;
+          };
+
+          for (const item of seedMenus) {
+            await ensureMenu(item);
+          }
+
+          if (insertedCount > 0) {
+            console.log(`✅ 补齐 sys_menu 菜单 ${insertedCount} 条`);
+          }
+        }
+      } catch (e) {
+        console.warn('⚠️ 补齐菜单失败（忽略）:', e.message);
+      }
+    }
+
     // 8. 给超级管理员分配全部菜单（role_menu 为空时）
-    const [roleRows] = await connection.execute(
+    const [superadminRows] = await connection.execute(
       "SELECT id FROM roles WHERE role_code = 'superadmin' LIMIT 1"
     );
     const [roleMenuCountRows] = await connection.execute(
       'SELECT COUNT(*) as cnt FROM role_menu'
     );
-    if (roleRows.length && (roleMenuCountRows[0]?.cnt || 0) === 0) {
+    if (superadminRows.length && (roleMenuCountRows[0]?.cnt || 0) === 0) {
       await connection.execute(
         'INSERT IGNORE INTO role_menu (role_id, menu_id) SELECT ?, id FROM sys_menu',
-        [roleRows[0].id]
+        [superadminRows[0].id]
       );
       console.log('✅ 超级管理员菜单权限初始化完成');
     }
@@ -330,18 +414,22 @@ async function initDatabase() {
       console.log('✅ users 表已就绪');
       
       // 初始化默认管理员账户
-      const [existingUsers] = await connection.execute("SELECT COUNT(*) as cnt FROM users");
-      if (existingUsers[0].cnt === 0) {
+      const [existingAdmin] = await connection.execute(
+        "SELECT id FROM users WHERE username = 'admin' LIMIT 1"
+      );
+      if (existingAdmin.length === 0) {
         const hashedPassword = require('crypto').createHash('md5').update('123456').digest('hex');
+        const adminRoleId = roleMap.superadmin || roleMap.admin || null;
+        const adminRoleCode = roleMap.superadmin ? 'superadmin' : 'admin';
         await connection.execute(
           `INSERT INTO users 
            (username, password, password_hash, real_name, role, department, phone_number, created_at, updated_at, status, role_id) 
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          ['admin', '123456', hashedPassword, '管理员', 'admin', 'IT部门', '13800138000', new Date().toISOString().slice(0, 19).replace('T', ' '), new Date().toISOString().slice(0, 19).replace('T', ' '), 'active', 2]
+          ['admin', '123456', hashedPassword, '管理员', adminRoleCode, 'IT部门', '13800138000', new Date().toISOString().slice(0, 19).replace('T', ' '), new Date().toISOString().slice(0, 19).replace('T', ' '), 'active', adminRoleId]
         );
         console.log('✅ 默认管理员账户已创建 (用户名: admin, 密码: 123456)');
       } else {
-        console.log('ℹ️ 用户表已有数据，跳过默认管理员创建');
+        console.log('ℹ️ 管理员账户已存在，跳过创建');
       }
     } catch (e) {
       console.error('⚠️ 初始化用户表时出现错误:', e.message);

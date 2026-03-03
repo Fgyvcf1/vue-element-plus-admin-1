@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const db = require('../db')
+const { generateUniqueHouseholdId } = require('../../../../utils/householdIdGenerator')
 
 // 获取当前本地时间（北京时间）的辅助函数
 function getLocalTime() {
@@ -12,7 +13,7 @@ function getLocalTime() {
 }
 
 // 生成户主ID的辅助函数
-function generateHouseholdId(villageGroup, idCard) {
+function generateHouseholdIdLegacy(villageGroup, idCard) {
   return new Promise((resolve, reject) => {
     // 1. 生成基础户主ID：村组名字首个字母大写 + 身份证后6位
     // 提取村组名称的前两个字的首字母大写
@@ -208,6 +209,34 @@ function generateHouseholdId(villageGroup, idCard) {
       resolve(newHouseholdId)
     })
   })
+}
+
+const getVillageCode = async (villageGroup) => {
+  if (!villageGroup) return ''
+  try {
+    const [rows] = await db.pool.execute(
+      "SELECT code FROM dictionaries WHERE category = '村组' AND value = ? LIMIT 1",
+      [villageGroup]
+    )
+    const code = rows?.[0]?.code
+    return code ? String(code).trim().toUpperCase() : ''
+  } catch (error) {
+    console.warn('获取村组编码失败，将回退首字母规则:', error.message)
+    return ''
+  }
+}
+
+// 生成户主ID的辅助函数（优先使用村组编码）
+const generateHouseholdId = async (villageGroup, idCard) => {
+  const villageCode = await getVillageCode(villageGroup)
+  const checkExists = async (householdNumber) => {
+    const [rows] = await db.pool.execute(
+      'SELECT household_number FROM households WHERE household_number = ?',
+      [householdNumber]
+    )
+    return rows.length > 0
+  }
+  return generateUniqueHouseholdId(villageGroup, idCard, checkExists, villageCode)
 }
 
 // 居民信息API - 从真实数据库获取数据

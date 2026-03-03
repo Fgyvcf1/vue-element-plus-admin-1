@@ -1,6 +1,7 @@
 /**
  * 户编号生成工具
- * 统一生成规则：村组首字母(2位) + 身份证后6位
+ * 统一生成规则：村组编码(优先) + 身份证后6位
+ * 如无村组编码则回退为：村组首字母(2位) + 身份证后6位
  */
 
 // 常用汉字拼音首字母映射表
@@ -150,8 +151,24 @@ const getChineseFirstLetter = (char) => {
  * @param {string} idCard - 身份证号
  * @returns {string} - 基础户编号（村组首字母2位 + 身份证后6位）
  */
-const generateBaseHouseholdId = (villageGroup, idCard) => {
-  if (!villageGroup || !idCard || idCard.length < 6) {
+const normalizeCode = (code) => {
+  if (!code) return ''
+  const trimmed = String(code).trim()
+  return trimmed ? trimmed.toUpperCase() : ''
+}
+
+const generateBaseHouseholdId = (villageGroup, idCard, villageCode) => {
+  if (!idCard || idCard.length < 6) {
+    return ''
+  }
+
+  const normalizedCode = normalizeCode(villageCode)
+  if (normalizedCode) {
+    const idCardSuffix = idCard.substring(idCard.length - 6)
+    return `${normalizedCode}${idCardSuffix}`
+  }
+
+  if (!villageGroup) {
     return ''
   }
 
@@ -185,8 +202,8 @@ const generateBaseHouseholdId = (villageGroup, idCard) => {
  * @param {Function} checkExists - 检查户编号是否存在的异步函数
  * @returns {Promise<string>} - 唯一的户编号
  */
-const generateUniqueHouseholdId = async (villageGroup, idCard, checkExists) => {
-  const baseId = generateBaseHouseholdId(villageGroup, idCard)
+const generateUniqueHouseholdId = async (villageGroup, idCard, checkExists, villageCode) => {
+  const baseId = generateBaseHouseholdId(villageGroup, idCard, villageCode)
 
   if (!baseId) {
     // 如果信息不完整，使用时间戳生成

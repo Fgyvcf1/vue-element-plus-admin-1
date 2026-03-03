@@ -82,6 +82,15 @@
             @click="cancelEdit"
             >取消</el-button
           >
+          <el-button
+            v-if="canEditResident"
+            :style="{ visibility: isEditable && !isAddingNew ? 'visible' : 'hidden' }"
+            type="danger"
+            size="small"
+            :loading="loading"
+            @click="handleDelete"
+            >删除</el-button
+          >
         </div>
       </div>
     </template>
@@ -552,7 +561,14 @@
         <el-table-column prop="idCard" label="身份证号码" width="180" />
         <el-table-column prop="phoneNumber" label="联系电话" width="120" />
         <el-table-column prop="maritalStatus" label="婚姻状况" width="80" />
-        <el-table-column prop="bankCard" label="银行帐号" width="150" />
+        <el-table-column
+          prop="bankCard"
+          label="银行帐号"
+          width="220"
+          class-name="member-nowrap"
+        />
+        <el-table-column prop="bankName" label="开户行" width="150" />
+        <el-table-column prop="equityShares" label="股权数" width="70" />
       </el-table>
     </el-card>
 
@@ -744,6 +760,7 @@ import {
   addResident,
   updateResident,
   updateResidentStatus,
+  deleteResident,
   getSearchSuggestions
 } from '@/api/resident'
 import {
@@ -1132,6 +1149,45 @@ const cancelEdit = () => {
   initData()
 }
 
+// 删除居民
+const handleDelete = async () => {
+  if (!canEditResident.value) {
+    ElMessage.warning('当前账号没有权限')
+    return
+  }
+  if (!currentResidentId.value) {
+    ElMessage.warning('未选择居民')
+    return
+  }
+
+  const residentName = residentForm.value.name || ''
+  try {
+    await ElMessageBox.confirm(
+      `确定删除居民【${residentName}】吗？删除后不可恢复。`,
+      '警告',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    loading.value = true
+    await deleteResident(currentResidentId.value.toString())
+    ElMessage.success('删除成功')
+    dialogVisible.value = false
+    emit('refresh-list')
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      console.error('删除居民失败:', error)
+      const errMessage =
+        (error as any)?.response?.data?.message || (error as any)?.message || '删除失败'
+      ElMessage.error(errMessage)
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
 // 加载户主信息
 const loadHouseholdInfo = async (householdId: string | number) => {
   try {
@@ -1227,6 +1283,7 @@ const loadHouseholdMembers = async (householdId: string | number) => {
         phoneNumber: member.phone_number || member.phoneNumber || '',
         bankCard: member.bank_card || member.bankCard || '',
         bankName: member.bank_name || member.bankName || '',
+        equityShares: member.equity_shares || member.equityShares || '',
         dateOfBirth: member.date_of_birth || member.dateOfBirth || '',
         villageGroup: member.village_group || member.villageGroup || '',
         relationshipToHead: member.relationship_to_head || member.relationshipToHead || '',
@@ -1975,6 +2032,13 @@ onMounted(() => {
 // 标题栏下拉菜单弹出层样式
 :deep(.header-dropdown-popper) {
   z-index: 30001 !important;
+}
+
+/* 家庭成员表：银行账号不换行 */
+:deep(.member-nowrap .cell) {
+  white-space: nowrap;
+  text-overflow: clip;
+  overflow: hidden;
 }
 
 /* 注意：禁用输入框背景样式已在全局样式文件 index.less 中定义 */

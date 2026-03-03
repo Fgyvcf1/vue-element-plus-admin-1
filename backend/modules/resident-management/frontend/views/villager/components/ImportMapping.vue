@@ -228,19 +228,27 @@ export default {
                     value = cell.v || ''
                     break
                   case 'n': // 数字
-                    value = cell.v || 0
-                    // 转换为字符串，避免科学计数法
-                    if (Number.isInteger(value)) {
-                      value = value.toString()
+                    // 优先使用格式化后的显示值，避免身份证/手机号精度丢失
+                    if (cell.w !== undefined && cell.w !== null && String(cell.w).trim() !== '') {
+                      value = String(cell.w).trim()
                     } else {
-                      value = value.toLocaleString()
+                      const formatted = XLSX.utils.format_cell(cell)
+                      value =
+                        formatted !== undefined && formatted !== null
+                          ? String(formatted).trim()
+                          : String(cell.v || '')
                     }
                     break
                   case 'b': // 布尔值
                     value = cell.v ? '是' : '否'
                     break
                   case 'd': // 日期
-                    value = cell.v ? new Date(cell.v).toLocaleDateString() : ''
+                    value =
+                      cell.w !== undefined && cell.w !== null && String(cell.w).trim() !== ''
+                        ? String(cell.w).trim()
+                        : cell.v
+                          ? new Date(cell.v).toLocaleDateString()
+                          : ''
                     break
                   default:
                     // 其他类型直接格式化

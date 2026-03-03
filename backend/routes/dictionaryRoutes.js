@@ -22,7 +22,7 @@ router.get('/category', async (req, res) => {
     }
 
     const sql =
-      "SELECT id, category, value, display_order, status, created_at, updated_at FROM dictionaries WHERE category = ? AND status = 'active' ORDER BY display_order ASC, id ASC"
+      "SELECT id, category, code, value, display_order, status, created_at, updated_at FROM dictionaries WHERE category = ? AND status = 'active' ORDER BY display_order ASC, id ASC"
     const [rows] = await db.pool.execute(sql, [category])
     const formatted = rows.map((r) => ({ ...r, label: r.value }))
     res.json({ code: 20000, message: 'success', data: formatted })
@@ -79,7 +79,7 @@ router.get('/', async (req, res) => {
 
     const includeAll = String(include_all || '') === '1'
     let sql =
-      'SELECT id, category, value, display_order, status, created_at, updated_at FROM dictionaries WHERE category = ?'
+      'SELECT id, category, code, value, display_order, status, created_at, updated_at FROM dictionaries WHERE category = ?'
     const params = [category]
     if (!includeAll) {
       sql += " AND status = 'active'"
@@ -105,7 +105,7 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
     const [rows] = await db.pool.execute(
-      'SELECT id, category, value, display_order, status, created_at, updated_at FROM dictionaries WHERE id = ?',
+      'SELECT id, category, code, value, display_order, status, created_at, updated_at FROM dictionaries WHERE id = ?',
       [id]
     )
     if (rows.length === 0) {
@@ -127,7 +127,7 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', checkPermission('system:role'), async (req, res) => {
   try {
-    const { category, value, display_order, status } = req.body
+    const { category, value, code, display_order, status } = req.body
     if (!category || !value) {
       return res.status(400).json({ code: 40000, message: '分类和字典值不能为空' })
     }
@@ -143,9 +143,9 @@ router.post('/', checkPermission('system:role'), async (req, res) => {
 
     const itemStatus = status || 'active'
     const [result] = await db.pool.execute(
-      `INSERT INTO dictionaries (category, value, display_order, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, NOW(), NOW())`,
-      [category, value, order, itemStatus]
+      `INSERT INTO dictionaries (category, code, value, display_order, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
+      [category, code || null, value, order, itemStatus]
     )
 
     res.json({ code: 20000, message: '字典项创建成功', data: { id: result.insertId } })
@@ -165,13 +165,17 @@ router.post('/', checkPermission('system:role'), async (req, res) => {
 router.put('/:id', checkPermission('system:role'), async (req, res) => {
   try {
     const { id } = req.params
-    const { category, value, display_order } = req.body
+    const { category, value, code, display_order } = req.body
 
     const updates = []
     const params = []
     if (category !== undefined) {
       updates.push('category = ?')
       params.push(category)
+    }
+    if (code !== undefined) {
+      updates.push('code = ?')
+      params.push(code)
     }
     if (value !== undefined) {
       updates.push('value = ?')

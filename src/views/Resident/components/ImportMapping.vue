@@ -320,11 +320,17 @@ const getRecommendedMapping = (excelField: string) => {
   const mapping: Record<string, string> = {
     姓名: 'name',
     户主姓名: 'household_head_name',
+    户主组别: 'household_village_group',
+    户主村组: 'household_village_group',
     与户主关系: 'relationship_to_head',
     性别: 'gender',
     民族: 'ethnicity',
     组别: 'village_group',
+    村组: 'village_group',
+    村组名称: 'village_group',
     户籍详细地址: 'Home_address',
+    户籍地址: 'Home_address',
+    户籍住址: 'Home_address',
     出生日期: 'date_of_birth',
     身份证号码: 'id_card',
     身份证号: 'id_card',
@@ -338,6 +344,9 @@ const getRecommendedMapping = (excelField: string) => {
     股权数量: 'equity_shares',
     住址: 'Home_address',
     地址: 'Home_address',
+    家庭住址: 'Home_address',
+    家庭地址: 'Home_address',
+    现住址: 'Home_address',
     电话: 'phone_number',
     联系电话: 'phone_number'
   }

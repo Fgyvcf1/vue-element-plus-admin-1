@@ -1,0 +1,223 @@
+Progress: resolved 0, reused 1, downloaded 0, added 0
+ WARN  deprecated eslint-define-config@2.1.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+Progress: resolved 24, reused 3, downloaded 13, added 0
+Progress: resolved 44, reused 8, downloaded 24, added 0
+Progress: resolved 54, reused 10, downloaded 29, added 0
+Progress: resolved 62, reused 10, downloaded 38, added 0
+ WARN  deprecated @iconify/iconify@3.1.1: no longer maintained, switch to modern iconify-icon web component
+Progress: resolved 86, reused 17, downloaded 47, added 0
+Progress: resolved 90, reused 19, downloaded 48, added 0
+Progress: resolved 95, reused 19, downloaded 54, added 0
+Progress: resolved 97, reused 22, downloaded 60, added 0
+Progress: resolved 112, reused 30, downloaded 66, added 0
+Progress: resolved 117, reused 33, downloaded 71, added 0
+Progress: resolved 123, reused 34, downloaded 77, added 0
+Progress: resolved 130, reused 37, downloaded 79, added 0
+Progress: resolved 135, reused 41, downloaded 81, added 0
+Progress: resolved 138, reused 43, downloaded 85, added 0
+Progress: resolved 139, reused 43, downloaded 87, added 0
+Progress: resolved 143, reused 43, downloaded 90, added 0
+Progress: resolved 146, reused 45, downloaded 91, added 0
+Progress: resolved 151, reused 45, downloaded 95, added 0
+Progress: resolved 157, reused 45, downloaded 97, added 0
+Progress: resolved 178, reused 63, downloaded 104, added 0
+Progress: resolved 204, reused 64, downloaded 105, added 0
+Progress: resolved 236, reused 64, downloaded 105, added 0
+Progress: resolved 311, reused 64, downloaded 105, added 0
+Progress: resolved 329, reused 64, downloaded 105, added 0
+Progress: resolved 362, reused 64, downloaded 105, added 0
+Progress: resolved 391, reused 66, downloaded 106, added 0
+Progress: resolved 403, reused 78, downloaded 106, added 0
+Progress: resolved 408, reused 98, downloaded 107, added 0
+Progress: resolved 408, reused 115, downloaded 116, added 0
+Progress: resolved 408, reused 115, downloaded 127, added 0
+Progress: resolved 408, reused 115, downloaded 128, added 0
+Progress: resolved 408, reused 115, downloaded 139, added 0
+Progress: resolved 408, reused 115, downloaded 141, added 0
+Progress: resolved 408, reused 115, downloaded 152, added 0
+Progress: resolved 408, reused 115, downloaded 155, added 0
+Progress: resolved 408, reused 115, downloaded 168, added 0
+Progress: resolved 408, reused 115, downloaded 173, added 0
+Progress: resolved 408, reused 115, downloaded 197, added 0
+Progress: resolved 408, reused 115, downloaded 218, added 0
+Progress: resolved 408, reused 115, downloaded 221, added 0
+Progress: resolved 411, reused 115, downloaded 231, added 0
+Progress: resolved 467, reused 133, downloaded 247, added 0
+Progress: resolved 486, reused 139, downloaded 277, added 0
+Progress: resolved 507, reused 143, downloaded 290, added 0
+Progress: resolved 555, reused 146, downloaded 308, added 0
+Progress: resolved 590, reused 155, downloaded 365, added 0
+Progress: resolved 671, reused 185, downloaded 409, added 0
+Progress: resolved 713, reused 196, downloaded 441, added 0
+Progress: resolved 789, reused 204, downloaded 462, added 0
+Progress: resolved 796, reused 204, downloaded 486, added 0
+Progress: resolved 846, reused 207, downloaded 510, added 0
+Progress: resolved 848, reused 213, downloaded 530, added 0
+Progress: resolved 956, reused 244, downloaded 547, added 0
+Progress: resolved 979, reused 248, downloaded 596, added 0
+Progress: resolved 1015, reused 257, downloaded 620, added 0
+Progress: resolved 1040, reused 257, downloaded 640, added 0
+Progress: resolved 1076, reused 259, downloaded 674, added 0
+Progress: resolved 1166, reused 278, downloaded 706, added 0
+Progress: resolved 1195, reused 287, downloaded 747, added 0
+Progress: resolved 1255, reused 302, downloaded 786, added 0
+Progress: resolved 1301, reused 304, downloaded 805, added 0
+Progress: resolved 1301, reused 308, downloaded 822, added 0
+Progress: resolved 1337, reused 309, downloaded 850, added 0
+Progress: resolved 1414, reused 311, downloaded 912, added 0
+ WARN  12 deprecated subdependencies found: @iconify/iconify@2.1.2, fstream@1.0.12, glob@7.2.3, inflight@1.0.6, lodash.isequal@4.5.0, resolve-url@0.2.1, rimraf@2.7.1, source-map-resolve@0.5.3, source-map-url@0.4.1, sourcemap-codec@1.4.8, stable@0.1.8, urix@0.1.0
+Packages: +1091 -21
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+Progress: resolved 1414, reused 311, downloaded 952, added 0
+Progress: resolved 1414, reused 311, downloaded 983, added 0
+Progress: resolved 1414, reused 311, downloaded 983, added 1
+Progress: resolved 1414, reused 311, downloaded 984, added 9
+Progress: resolved 1414, reused 311, downloaded 984, added 20
+Progress: resolved 1414, reused 311, downloaded 984, added 49
+Progress: resolved 1414, reused 311, downloaded 984, added 85
+Progress: resolved 1414, reused 311, downloaded 984, added 102
+Progress: resolved 1414, reused 311, downloaded 984, added 113
+Progress: resolved 1414, reused 311, downloaded 984, added 148
+Progress: resolved 1414, reused 311, downloaded 984, added 165
+Progress: resolved 1414, reused 311, downloaded 984, added 221
+Progress: resolved 1414, reused 311, downloaded 984, added 282
+Progress: resolved 1414, reused 311, downloaded 984, added 291
+Progress: resolved 1414, reused 311, downloaded 984, added 296
+Progress: resolved 1414, reused 311, downloaded 984, added 314
+Progress: resolved 1414, reused 311, downloaded 984, added 332
+Progress: resolved 1414, reused 311, downloaded 984, added 376
+Progress: resolved 1414, reused 311, downloaded 984, added 433
+Progress: resolved 1414, reused 311, downloaded 984, added 458
+Progress: resolved 1414, reused 311, downloaded 984, added 490
+Progress: resolved 1414, reused 311, downloaded 984, added 514
+Progress: resolved 1414, reused 311, downloaded 984, added 546
+Progress: resolved 1414, reused 311, downloaded 984, added 570
+Progress: resolved 1414, reused 311, downloaded 984, added 580
+Progress: resolved 1414, reused 311, downloaded 984, added 622
+Progress: resolved 1414, reused 311, downloaded 984, added 675
+Progress: resolved 1414, reused 311, downloaded 984, added 791
+Progress: resolved 1414, reused 311, downloaded 984, added 850
+Progress: resolved 1414, reused 311, downloaded 984, added 875
+Progress: resolved 1414, reused 311, downloaded 984, added 891
+Progress: resolved 1414, reused 311, downloaded 984, added 920
+Progress: resolved 1414, reused 311, downloaded 984, added 935
+Progress: resolved 1414, reused 311, downloaded 984, added 977
+Progress: resolved 1414, reused 311, downloaded 984, added 1028
+Progress: resolved 1414, reused 311, downloaded 984, added 1029
+Progress: resolved 1414, reused 311, downloaded 984, added 1084
+Progress: resolved 1414, reused 311, downloaded 984, added 1087, done
+ WARN  Issues with peer dependencies found
+.
+├─┬ vite-plugin-mock 2.9.6
+│ └─┬ @rollup/plugin-node-resolve 13.3.0
+│   ├── ✕ unmet peer rollup@^2.42.0: found 4.30.1
+│   └─┬ @rollup/pluginutils 3.1.0
+│     └── ✕ unmet peer rollup@^1.20.0||^2.0.0: found 4.30.1
+└─┬ pinia-plugin-persistedstate 4.7.1
+  └── ✕ unmet peer pinia@>=3.0.0: found 2.3.0
+
+dependencies:
++ @element-plus/icons-vue 2.3.2
++ @iconify/iconify 3.1.1 deprecated
++ @wangeditor/editor 5.1.23
++ @wangeditor/editor-for-vue 5.1.12
++ @zxcvbn-ts/core 3.0.4
++ animate.css 4.1.1
++ cropperjs 1.6.2 (2.1.0 is available)
++ dayjs 1.11.13 (1.11.19 is available)
++ driver.js 1.4.0
++ echarts 5.6.0 (6.0.0 is available)
++ echarts-wordcloud 2.1.0
++ exceljs 4.4.0
++ lodash-es 4.17.21 (4.17.23 is available)
++ mitt 3.0.1
++ monaco-editor 0.52.2 (0.55.1 is available)
++ nprogress 0.2.0
++ pinia-plugin-persistedstate 4.7.1
++ qrcode 1.5.4
++ qs 6.15.0
++ url 0.11.4
++ vue-draggable-plus 0.6.1
++ vue-i18n 11.0.1 (11.2.8 is available)
++ vue-json-pretty 2.6.0
++ vue-types 5.1.3 (6.0.0 is available)
++ xgplayer 3.0.23
++ xlsx 0.18.5
+
+devDependencies:
+- @babel/eslint-parser 7.28.6
++ @commitlint/cli 19.8.1 (20.4.1 is available)
++ @commitlint/config-conventional 19.8.1 (20.4.1 is available)
++ @iconify/json 2.2.440
++ @intlify/unplugin-vue-i18n 6.0.8 (11.0.7 is available)
++ @types/fs-extra 11.0.4
++ @types/inquirer 9.0.9
++ @types/lodash-es 4.17.12
++ @types/mockjs 1.0.10
++ @types/node 22.10.5 (25.3.0 is available)
++ @types/nprogress 0.2.3
++ @types/qrcode 1.5.6
++ @types/qs 6.14.0
++ @types/sortablejs 1.15.9
++ @typescript-eslint/eslint-plugin 8.56.0
++ @typescript-eslint/parser 8.56.0
++ @unocss/transformer-variant-group 0.65.4 (66.6.0 is available)
++ @vitejs/plugin-legacy 6.1.1 (7.2.1 is available)
++ @vitejs/plugin-vue-jsx 4.2.0 (5.1.4 is available)
++ autoprefixer 10.4.24
++ chalk 5.6.2
++ consola 3.4.2
++ eslint-config-prettier 9.1.2 (10.1.8 is available)
++ eslint-define-config 2.1.0 deprecated
++ eslint-plugin-prettier 5.5.5
++ eslint-plugin-vue 9.33.0 (10.8.0 is available)
++ esno 4.8.0
++ fs-extra 11.3.3
++ husky 9.1.7
++ inquirer 12.11.1 (13.2.5 is available)
++ less 4.2.1 (4.5.1 is available)
++ lint-staged 15.5.2 (16.2.7 is available)
++ mockjs 1.1.0
++ plop 4.0.5
++ postcss 8.4.49 (8.5.6 is available)
++ postcss-html 1.8.1
++ postcss-less 6.0.0
++ prettier 3.8.1
++ rimraf 6.1.3
++ rollup 4.30.1 (4.57.1 is available)
++ rollup-plugin-visualizer 5.14.0 (6.0.5 is available)
+- sass 1.97.3
++ sass-embedded 1.97.3
++ stylelint 16.26.1 (17.3.0 is available)
++ stylelint-config-html 1.1.0
++ stylelint-config-recommended 14.0.1 (18.0.0 is available)
++ stylelint-config-standard 36.0.1 (40.0.0 is available)
++ stylelint-order 6.0.4 (7.0.1 is available)
++ terser 5.37.0 (5.46.0 is available)
++ typescript 5.7.3 (5.9.3 is available)
++ typescript-eslint 8.56.0
++ unocss 0.65.4 (66.6.0 is available)
++ unplugin-auto-import 21.0.0
++ unplugin-vue-components 31.0.0
+- vite 5.4.21
++ vite 6.0.7 (7.3.1 is available)
++ vite-plugin-ejs 1.7.0
++ vite-plugin-eslint 1.8.1
++ vite-plugin-mock 2.9.6 (3.0.2 is available)
++ vite-plugin-progress 0.0.7
++ vite-plugin-purge-icons 0.10.0
++ vite-plugin-style-import 2.0.0
++ vite-plugin-svg-icons 2.0.1
++ vite-plugin-url-copy 1.1.4
++ vue-tsc 2.2.12 (3.2.4 is available)
+
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: @parcel/watcher@2.5.6, core-js@3.48.0,              │
+│   es5-ext@0.10.64, esbuild@0.11.3, esbuild@0.21.5, esbuild@0.24.2,           │
+│   esbuild@0.27.3, vue-demi@0.14.10.                                          │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 1m 49.7s using pnpm v10.29.3

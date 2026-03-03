@@ -7,7 +7,10 @@ import '@/plugins/unocss'
 import '@/plugins/svgIcon'
 
 // 本地图标（Iconify 离线）
-import '@purge-icons/generated'
+// 在生产环境中动态导入 purge-icons 生成的文件
+if (process.env.NODE_ENV === 'production') {
+  import('@purge-icons/generated')
+}
 
 // 初始化多语言
 import { setupI18n } from '@/plugins/vueI18n'

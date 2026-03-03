@@ -3,18 +3,42 @@ const express = require('express')
 const router = express.Router()
 const db = require('./db')
 const { generateUniqueHouseholdId } = require('./utils/householdIdGenerator')
+const {
+  normalizeVillageGroup,
+  resolveVillageCode
+} = require('./utils/householdIdResolver')
 
 // 辅助函数：将 Excel 日期数字转换为 YYYY-MM-DD 格式
 const excelDateToJSDate = (excelDate) => {
-  if (typeof excelDate === 'number' && excelDate > 0) {
-    // Excel日期是从1900-01-01开始计算天数，但JavaScript的Date对象是从1970-01-01开始
-    // 25569 是 1970-01-01 到 1900-01-01 的天数差
-    const date = new Date(Math.round((excelDate - 25569) * 86400 * 1000))
-    const year = date.getFullYear()
-    const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const day = date.getDate().toString().padStart(2, '0')
+  if (excelDate instanceof Date && !Number.isNaN(excelDate.getTime())) {
+    const year = excelDate.getFullYear()
+    const month = (excelDate.getMonth() + 1).toString().padStart(2, '0')
+    const day = excelDate.getDate().toString().padStart(2, '0')
     return `${year}-${month}-${day}`
   }
+
+  let numericValue = null
+  if (typeof excelDate === 'number') {
+    numericValue = excelDate
+  } else if (typeof excelDate === 'string') {
+    const trimmed = excelDate.trim()
+    if (/^\d+(\.\d+)?$/.test(trimmed)) {
+      numericValue = Number.parseFloat(trimmed)
+    } else if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}/.test(trimmed)) {
+      return trimmed.substring(0, 10).replace(/\//g, '-')
+    }
+  }
+
+  if (typeof numericValue === 'number' && numericValue > 0) {
+    // Excel日期是从1900-01-01开始计算天数，使用UTC避免时区偏移
+    const utcMilliseconds = Math.round((numericValue - 25569) * 86400 * 1000)
+    const date = new Date(utcMilliseconds)
+    const year = date.getUTCFullYear()
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0')
+    const day = date.getUTCDate().toString().padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   return excelDate // 如果不是数字日期，则直接返回
 }
 
@@ -75,16 +99,18 @@ router.post('/import-residents', async (req, res) => {
   console.log('总行数:', data.length)
   console.log('前几行数据:', JSON.stringify(data.slice(0, 3)))
 
+  let successCount = 0
   try {
-    let successCount = 0
     // 快速解析和验证数据
     const parseErrors = []
-    const headOfHouseholdRows = [] // 户主数据（与户主关系 = "本人"）
-    const familyMemberRows = [] // 家庭成员数据（与户主关系 ≠ "本人"）
+    const missingVillageCodeRows = []
+    let headOfHouseholdRows = [] // 户主数据（与户主关系 = "本人"）
+    let familyMemberRows = [] // 家庭成员数据（与户主关系 ≠ "本人"）
     const currentDate = new Date().toISOString().split('T')[0]
 
     const householdIdMap = new Map() // 户主姓名 -> household_id
     const householdMapByName = new Map() // 按姓名分组的户主信息
+    const generatedHouseholdNumbers = new Set() // 本次导入已生成的户编号，避免批量重复
 
     // 预先加载所有户主信息，按姓名和地址建立索引
     console.log('预先加载户主信息...')
@@ -112,6 +138,9 @@ router.post('/import-residents', async (req, res) => {
       }
     }
     console.log('户主姓名分组数量:', householdMapByName.size)
+
+    // 预先加载村组编码（用于户编号生成）
+    // 导入逻辑使用统一的村组编码解析函数（与居民管理模块保持一致）
 
     // 第一阶段：快速解析数据
     for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
@@ -155,6 +184,21 @@ router.post('/import-residents', async (req, res) => {
         }
       }
 
+      // 兜底合并户主/居民字段，避免只映射了“户主字段”导致居民信息缺失
+      if (!rowData.householdData.village_group && rowData.residentData.village_group) {
+        rowData.householdData.village_group = rowData.residentData.village_group
+      }
+      if (!rowData.residentData.village_group && rowData.householdData.village_group) {
+        rowData.residentData.village_group = rowData.householdData.village_group
+      }
+      if (!rowData.householdData.address) {
+        rowData.householdData.address =
+          rowData.residentData.Home_address || rowData.residentData.address || ''
+      }
+      if (!rowData.residentData.Home_address && rowData.householdData.address) {
+        rowData.residentData.Home_address = rowData.householdData.address
+      }
+
       // 验证必要字段
       if (!rowData.residentData.name || !rowData.residentData.id_card) {
         console.log(`第${rowIndex + 2}行数据:`, JSON.stringify(rowData.residentData))
@@ -171,6 +215,27 @@ router.post('/import-residents', async (req, res) => {
       }
     }
 
+    // 文件内去重（按身份证号）
+    const duplicateIdCards = []
+    const seenIdCards = new Set()
+    const dedupeRows = (rows) => {
+      const uniqueRows = []
+      for (const rowData of rows) {
+        const idCard = rowData?.residentData?.id_card
+        if (idCard && seenIdCards.has(idCard)) {
+          duplicateIdCards.push(`第${rowData.rowIndex}行: 身份证号重复 ${idCard}`)
+          continue
+        }
+        if (idCard) {
+          seenIdCards.add(idCard)
+        }
+        uniqueRows.push(rowData)
+      }
+      return uniqueRows
+    }
+    headOfHouseholdRows = dedupeRows(headOfHouseholdRows)
+    familyMemberRows = dedupeRows(familyMemberRows)
+
     // 只输出关键统计信息
     console.log(
       '数据解析完成 - 户主:',
@@ -179,6 +244,8 @@ router.post('/import-residents', async (req, res) => {
       familyMemberRows.length,
       '人, 错误:',
       parseErrors.length,
+      '个, 文件内重复:',
+      duplicateIdCards.length,
       '个'
     )
 
@@ -239,15 +306,25 @@ router.post('/import-residents', async (req, res) => {
         console.log(`户主 ${householdHeadName} 的 households 记录不存在，需要创建`)
 
         const { householdData, residentData } = rowData
-        const villageGroup = householdData.village_group || residentData.village_group || ''
+        const villageGroupRaw = householdData.village_group || residentData.village_group || ''
+        const villageGroup = normalizeVillageGroup(villageGroupRaw) || villageGroupRaw || ''
         const idCard = residentData.id_card || ''
 
-        // 生成户编号
+        const villageCode = await resolveVillageCode(db, villageGroupRaw)
+        if (!villageCode && villageGroupRaw) {
+          missingVillageCodeRows.push(
+            `第${rowData.rowIndex}行: 村组=${villageGroupRaw} 未匹配到字典编码`
+          )
+        }
+
         householdNumber = await generateUniqueHouseholdId(
-          villageGroup,
+          normalizeVillageGroup(villageGroupRaw),
           idCard,
-          checkHouseholdNumberExists
+          async (number) =>
+            generatedHouseholdNumbers.has(number) || checkHouseholdNumberExists(number),
+          villageCode
         )
+        generatedHouseholdNumbers.add(householdNumber)
 
         // 插入家庭数据
         const householdColumns = [
@@ -316,15 +393,24 @@ router.post('/import-residents', async (req, res) => {
       for (const rowData of newHeads) {
         const { householdData, residentData } = rowData
         const householdHeadName = householdData.household_head_name || residentData.name
-        const villageGroup = householdData.village_group || residentData.village_group || ''
+        const villageGroupRaw = householdData.village_group || residentData.village_group || ''
+        const villageGroup = normalizeVillageGroup(villageGroupRaw) || villageGroupRaw || ''
         const idCard = residentData.id_card || ''
 
-        // 生成户主ID
+        const villageCode = await resolveVillageCode(db, villageGroupRaw)
+        if (!villageCode && villageGroupRaw) {
+          missingVillageCodeRows.push(
+            `第${rowData.rowIndex}行: 村组=${villageGroupRaw} 未匹配到字典编码`
+          )
+        }
         const householdNumber = await generateUniqueHouseholdId(
-          villageGroup,
+          normalizeVillageGroup(villageGroupRaw),
           idCard,
-          checkHouseholdNumberExists
+          async (number) =>
+            generatedHouseholdNumbers.has(number) || checkHouseholdNumberExists(number),
+          villageCode
         )
+        generatedHouseholdNumbers.add(householdNumber)
 
         // 插入家庭数据
         const householdColumns = [
@@ -474,7 +560,7 @@ router.post('/import-residents', async (req, res) => {
             // 检查地址是否相似（包含关系）
             if (
               cleanMemberAddress.includes(cleanHouseholdAddress) ||
-              cleanHouseholdAddress.includes(cleanHouseholdAddress)
+              cleanHouseholdAddress.includes(cleanMemberAddress)
             ) {
               console.log(
                 '按地址匹配成功:',
@@ -665,7 +751,11 @@ router.post('/import-residents', async (req, res) => {
         successCount,
         errorCount: 0,
         headOfHouseholdCount: headOfHouseholdRows.length,
-        familyMemberCount: familyMemberRows.length
+        familyMemberCount: familyMemberRows.length,
+        duplicateCount: duplicateIdCards.length,
+        duplicates: duplicateIdCards.slice(0, 20),
+        missingVillageCodeCount: missingVillageCodeRows.length,
+        missingVillageCodeSamples: missingVillageCodeRows.slice(0, 20)
       }
     })
   } catch (error) {

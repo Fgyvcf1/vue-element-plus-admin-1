@@ -1,0 +1,63 @@
+Progress: resolved 0, reused 1, downloaded 0, added 0
+Progress: resolved 33, reused 12, downloaded 7, added 0
+Progress: resolved 88, reused 18, downloaded 47, added 0
+Progress: resolved 104, reused 18, downloaded 57, added 0
+Progress: resolved 154, reused 18, downloaded 57, added 0
+Progress: resolved 201, reused 19, downloaded 61, added 0
+Progress: resolved 250, reused 19, downloaded 61, added 0
+Progress: resolved 257, reused 19, downloaded 62, added 0
+Progress: resolved 258, reused 35, downloaded 68, added 0
+Progress: resolved 259, reused 38, downloaded 85, added 0
+Progress: resolved 259, reused 38, downloaded 95, added 0
+Progress: resolved 259, reused 38, downloaded 96, added 0
+Progress: resolved 259, reused 38, downloaded 97, added 0
+Progress: resolved 259, reused 38, downloaded 131, added 0
+Progress: resolved 259, reused 38, downloaded 142, added 0
+Progress: resolved 259, reused 38, downloaded 156, added 0
+Progress: resolved 279, reused 38, downloaded 162, added 0
+Progress: resolved 292, reused 38, downloaded 166, added 0
+Progress: resolved 296, reused 40, downloaded 176, added 0
+Progress: resolved 297, reused 40, downloaded 182, added 0
+Progress: resolved 301, reused 40, downloaded 189, added 0
+Progress: resolved 301, reused 40, downloaded 190, added 0
+Progress: resolved 303, reused 40, downloaded 193, added 0
+Progress: resolved 303, reused 40, downloaded 194, added 0
+Packages: +235
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 305, reused 40, downloaded 195, added 11
+Progress: resolved 305, reused 40, downloaded 195, added 37
+Progress: resolved 305, reused 40, downloaded 195, added 43
+Progress: resolved 305, reused 40, downloaded 195, added 94
+Progress: resolved 305, reused 40, downloaded 195, added 154
+Progress: resolved 305, reused 40, downloaded 195, added 173
+Progress: resolved 305, reused 40, downloaded 195, added 205
+Progress: resolved 305, reused 40, downloaded 195, added 214
+Progress: resolved 305, reused 40, downloaded 195, added 234
+Progress: resolved 305, reused 40, downloaded 195, added 235
+Progress: resolved 305, reused 40, downloaded 195, added 235, done
+
+dependencies:
++ @iconify/vue 4.3.0 (5.0.0 is available)
++ @vueuse/core 12.3.0 (14.2.1 is available)
++ axios 1.7.9
++ element-plus 2.9.2 (2.13.2 is available)
++ pinia 2.3.0 (3.0.4 is available)
++ vue 3.5.13 (3.5.28 is available)
++ vue-router 4.5.0 (5.0.2 is available)
+
+devDependencies:
++ @babel/eslint-parser 7.28.6
++ @vitejs/plugin-vue 5.2.1
++ eslint 9.17.0 (10.0.0 is available)
++ sass 1.97.3
++ vite 5.4.21 (7.3.1 is available)
+
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: @parcel/watcher@2.5.6, esbuild@0.21.5,              │
+│   vue-demi@0.14.10.                                                          │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 40.4s using pnpm v10.29.3
