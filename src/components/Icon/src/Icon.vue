@@ -28,7 +28,10 @@ const symbolId = computed(() => {
 })
 
 // 是否使用在线图标
-const useOnlineIcon = import.meta.env.VITE_USE_ONLINE_ICON === 'true'
+// 当离线图标未生成时自动兜底为在线图标
+const useOnlineIcon =
+  import.meta.env.VITE_USE_ONLINE_ICON === 'true' ||
+  import.meta.env.VITE_DISABLE_PURGE_ICONS === 'true'
 const IconifyComponent = useOnlineIcon ? IconifyOnline : IconifyOffline
 
 const getIconifyStyle = computed(() => {
