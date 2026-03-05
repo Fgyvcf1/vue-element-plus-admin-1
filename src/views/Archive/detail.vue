@@ -328,8 +328,8 @@
                 <el-card shadow="hover">
                   <div class="timeline-header">
                     <span class="timeline-title">调解记录 #{{ recordsList.length - index }}</span>
-                    <el-tag :type="record.agreement === 'yes' ? 'success' : 'info'" size="small">
-                      {{ record.agreement === 'yes' ? '已达成协议' : '未达成协议' }}
+                    <el-tag :type="isAgreementYes(record.agreement) ? 'success' : 'info'" size="small">
+                      {{ isAgreementYes(record.agreement) ? '已达成协议' : '未达成协议' }}
                     </el-tag>
                   </div>
                   <div class="timeline-content">
@@ -337,6 +337,19 @@
                     <p><strong>调解员：</strong>{{ record.mediators }}</p>
                     <p><strong>调解过程：</strong>{{ record.process_record }}</p>
                     <p><strong>调解结果：</strong>{{ record.mediation_result }}</p>
+                    <div v-if="recordImagesMap[String(record.id)]?.length" class="record-images">
+                      <div class="record-images-label">现场图片：</div>
+                      <div class="record-images-grid">
+                        <div
+                          v-for="(img, imgIndex) in recordImagesMap[String(record.id)]"
+                          :key="img.id || `${record.id}-img-${imgIndex}`"
+                          class="record-image-item"
+                          @click="openFilePreview(resolveFileUrl(img.file_path), 'image')"
+                        >
+                          <img :src="resolveFileUrl(img.file_path)" :alt="img.file_name" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </el-card>
               </el-timeline-item>
@@ -563,6 +576,11 @@
 
             <el-table :data="fileList" size="small" style="margin-top: 16px; width: 100%">
               <el-table-column prop="file_name" label="文件名" min-width="200" />
+              <el-table-column prop="description" label="来源" width="120">
+                <template #default="{ row }">
+                  {{ row?.description || '附件' }}
+                </template>
+              </el-table-column>
               <el-table-column prop="file_size" label="大小" width="100">
                 <template #default="{ row }">
                   {{ formatFileSize(row?.file_size) }}
@@ -747,11 +765,31 @@
         <el-button type="primary" :icon="Printer" @click="handlePrint">打印</el-button>
       </template>
     </el-dialog>
+
+    <!-- 现场图片预览 -->
+    <el-dialog
+      v-model="imagePreviewVisible"
+      width="80%"
+      :show-close="false"
+      :close-on-click-modal="true"
+      :close-on-press-escape="true"
+      class="image-preview-dialog"
+    >
+      <div class="image-preview-body">
+        <img v-if="previewFileType === 'image'" :src="previewFileUrl" alt="预览图片" />
+        <iframe
+          v-else
+          class="preview-iframe"
+          :src="previewFileUrl"
+          frameborder="0"
+        ></iframe>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -792,6 +830,17 @@ const archiveData = reactive({
   status: 'pending'
 })
 
+const createEmptyPerson = () => ({
+  name: '',
+  id_card: '',
+  phone: '',
+  gender: '',
+  nation: '汉族',
+  age: '',
+  occupation: '',
+  address: ''
+})
+
 // 申请书表单
 const applicationForm = reactive({
   dispute_type: '',
@@ -800,30 +849,8 @@ const applicationForm = reactive({
   occurrence_location: '',
   dispute_description: '',
   request_content: '',
-  applicants: [
-    {
-      name: '',
-      id_card: '',
-      phone: '',
-      gender: '',
-      nation: '汉族',
-      age: '',
-      occupation: '',
-      address: ''
-    }
-  ],
-  respondents: [
-    {
-      name: '',
-      id_card: '',
-      phone: '',
-      gender: '',
-      nation: '汉族',
-      age: '',
-      occupation: '',
-      address: ''
-    }
-  ]
+  applicants: [createEmptyPerson()],
+  respondents: [createEmptyPerson()]
 })
 
 // 调解记录
@@ -857,18 +884,59 @@ const uploadHeaders = ref({ Authorization: `Bearer ${localStorage.getItem('token
 
 // 打印对话框
 const printDialogVisible = ref(false)
+const imagePreviewVisible = ref(false)
+const previewFileUrl = ref('')
+const previewFileType = ref<'image' | 'pdf'>('image')
 
 // 计算属性
-const canEditAgreement = computed(() => {
-  // 如果有历史记录且最新记录达成协议，或者当前表单选择了达成协议
-  if (recordsList.value.length > 0 && recordsList.value[0].agreement === 'yes') {
-    return true
+const isAgreementYes = (value: any) => {
+  if (value === true || value === 1) return true
+  if (value === '是' || value === '已达成协议') return true
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase()
+    return ['yes', 'y', 'true', '1'].includes(normalized)
   }
-  return recordForm.agreement === 'yes'
+  return false
+}
+
+const hasAgreementRecord = computed(() => {
+  return recordsList.value.some((record) => isAgreementYes(record?.agreement))
+})
+
+const hasAgreementFormData = computed(() => {
+  return Boolean(
+    agreementForm.agreement_date ||
+      agreementForm.agreement_content ||
+      agreementForm.performance_period ||
+      agreementForm.breach_liability ||
+      agreementForm.party_a_sign ||
+      agreementForm.party_b_sign ||
+      agreementForm.mediator_sign
+  )
+})
+
+const canEditAgreement = computed(() => {
+  // 如果任意记录达成协议、或当前表单选择达成协议、或已存在协议内容
+  if (hasAgreementRecord.value) return true
+  if (isAgreementYes(recordForm.agreement)) return true
+  return hasAgreementFormData.value
 })
 
 const isRecordLocked = computed(() => {
-  return recordsList.value.length > 0 && recordsList.value[0].agreement === 'yes'
+  return hasAgreementRecord.value
+})
+
+const recordImagesMap = computed<Record<string, any[]>>(() => {
+  const map: Record<string, any[]> = {}
+  fileList.value
+    .filter((item) => item && item.record_id)
+    .filter((item) => item.description === '现场图片' || !item.description)
+    .forEach((item) => {
+      const key = String(item.record_id)
+      if (!map[key]) map[key] = []
+      map[key].push(item)
+    })
+  return map
 })
 
 const disputeDescriptionLines = computed(() => {
@@ -908,6 +976,41 @@ const agreementDay = computed(() => {
 const saving = ref(false)
 const activeTab = ref('application')
 
+const resetForms = () => {
+  archiveData.archive_id = ''
+  archiveData.status = 'pending'
+
+  applicationForm.dispute_type = ''
+  applicationForm.apply_date = ''
+  applicationForm.occurrence_date = ''
+  applicationForm.occurrence_location = ''
+  applicationForm.dispute_description = ''
+  applicationForm.request_content = ''
+  applicationForm.applicants = [createEmptyPerson()]
+  applicationForm.respondents = [createEmptyPerson()]
+
+  recordsList.value = []
+  recordForm.mediation_date = ''
+  recordForm.mediation_location = ''
+  recordForm.mediators = ''
+  recordForm.process_record = ''
+  recordForm.mediation_result = ''
+  recordForm.agreement = 'no'
+  recordImageList.value = []
+  isRecordFormCollapsed.value = false
+
+  agreementForm.agreement_date = ''
+  agreementForm.agreement_content = ''
+  agreementForm.performance_period = ''
+  agreementForm.breach_liability = ''
+  agreementForm.party_a_sign = ''
+  agreementForm.party_b_sign = ''
+  agreementForm.mediator_sign = ''
+
+  fileList.value = []
+  activeTab.value = 'application'
+}
+
 // 方法
 const getStatusType = (status?: string) => {
   if (status === 'completed') return 'success'
@@ -933,6 +1036,20 @@ const formatFileSize = (size?: number) => {
   return (size / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
+const resolveFileUrl = (filePath?: string) => {
+  if (!filePath) return ''
+  if (/^https?:\/\//i.test(filePath)) return filePath
+  const baseUrl = getApiOrigin()
+  return `${baseUrl}${filePath}`
+}
+
+const openFilePreview = (url: string, type: 'image' | 'pdf') => {
+  if (!url) return
+  previewFileType.value = type
+  previewFileUrl.value = url
+  imagePreviewVisible.value = true
+}
+
 const enterEdit = () => {
   if (!canEdit.value) {
     ElMessage.warning('当前账号没有编辑权限')
@@ -946,16 +1063,7 @@ const enterEdit = () => {
 
 // 申请人/被申请人操作
 const addApplicant = () => {
-  applicationForm.applicants.push({
-    name: '',
-    id_card: '',
-    phone: '',
-    gender: '',
-    nation: '汉族',
-    age: '',
-    occupation: '',
-    address: ''
-  })
+  applicationForm.applicants.push(createEmptyPerson())
 }
 
 const removeApplicant = (index: number) => {
@@ -965,16 +1073,7 @@ const removeApplicant = (index: number) => {
 }
 
 const addRespondent = () => {
-  applicationForm.respondents.push({
-    name: '',
-    id_card: '',
-    phone: '',
-    gender: '',
-    nation: '汉族',
-    age: '',
-    occupation: '',
-    address: ''
-  })
+  applicationForm.respondents.push(createEmptyPerson())
 }
 
 const removeRespondent = (index: number) => {
@@ -1098,6 +1197,10 @@ const getFirstRespondentAddress = () => applicationForm.respondents[0]?.address 
 
 // 调解记录折叠
 const toggleRecordForm = () => {
+  if (isRecordLocked.value) {
+    ElMessage.warning('已达成协议，不能再新增调解记录')
+    return
+  }
   isRecordFormCollapsed.value = !isRecordFormCollapsed.value
 }
 
@@ -1132,22 +1235,26 @@ const canPreview = (fileName?: string) => {
   return previewTypes.some((type) => lowerFileName.endsWith(type))
 }
 
+const getApiOrigin = () => {
+  return import.meta.env.VITE_API_BASE_URL || window.location.origin
+}
+
 const handlePreview = (file: any) => {
   const imageTypes = ['.jpg', '.jpeg', '.png', '.gif']
   const fileName = file.file_name?.toLowerCase() || ''
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+  const fileUrl = resolveFileUrl(file.file_path)
 
   if (imageTypes.some((type) => fileName.endsWith(type))) {
-    window.open(`${baseUrl}${file.file_path}`, '_blank')
+    openFilePreview(fileUrl, 'image')
   } else if (fileName.endsWith('.pdf')) {
-    window.open(`${baseUrl}${file.file_path}`, '_blank')
+    openFilePreview(fileUrl, 'pdf')
   }
 }
 
 const handleDownload = (file: any) => {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+  const baseUrl = getApiOrigin()
   const a = document.createElement('a')
-  a.href = `${baseUrl}${file.file_path}`
+  a.href = resolveFileUrl(file.file_path)
   a.download = file.file_name
   document.body.appendChild(a)
   a.click()
@@ -1272,8 +1379,9 @@ const handleSave = async () => {
       recordForm.agreement = 'no'
       recordImageList.value = []
 
-      // 重新加载记录列表
+      // 重新加载记录列表和附件
       await loadArchiveDetail()
+      await loadAttachments()
     } else if (activeTab.value === 'agreement') {
       await saveAgreement(archiveId.value, agreementForm)
       ElMessage.success('调解协议保存成功')
@@ -1290,10 +1398,26 @@ const goBack = () => {
   router.push('/mediation/archive')
 }
 
-onMounted(() => {
-  loadArchiveDetail()
-  loadAttachments()
-})
+watch(
+  archiveId,
+  (id) => {
+    if (!id) return
+    resetForms()
+    loadArchiveDetail()
+    loadAttachments()
+  },
+  { immediate: true }
+)
+
+watch(
+  isRecordLocked,
+  (locked) => {
+    if (locked) {
+      isRecordFormCollapsed.value = true
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
@@ -1408,6 +1532,36 @@ onMounted(() => {
 
 .timeline-content p {
   margin: 8px 0;
+}
+
+.record-images {
+  margin-top: 10px;
+}
+
+.record-images-label {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.record-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.record-image-item {
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.record-image-item img {
+  display: block;
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
 }
 
 .new-record-section {
@@ -1591,5 +1745,34 @@ onMounted(() => {
   .signature-value {
     border-bottom: 1px solid #000;
   }
+}
+
+.image-preview-dialog :deep(.el-dialog__header) {
+  display: none;
+}
+
+.image-preview-dialog :deep(.el-dialog__body) {
+  padding: 0;
+}
+
+.image-preview-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 16px;
+}
+
+.image-preview-body img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.preview-iframe {
+  width: 100%;
+  height: 80vh;
+  background: #fff;
+  border: 0;
 }
 </style>

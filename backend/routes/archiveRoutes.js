@@ -71,11 +71,31 @@ const archiveUpload = multer({
   }
 })
 
+const recordImageUpload = multer({
+  storage: archiveStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: function (req, file, cb) {
+    const allowedTypes = /jpeg|jpg|png|gif|bmp|webp/
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase())
+    const mimetype = allowedTypes.test(file.mimetype)
+    if (mimetype && extname) return cb(null, true)
+    else cb(new Error('只允许上传图片文件!'))
+  }
+})
+
 function getLocalTime() {
   const now = new Date()
   const timezoneOffset = now.getTimezoneOffset() * 60000
   const localDate = new Date(now.getTime() - timezoneOffset)
   return localDate.toISOString().slice(0, 19).replace('T', ' ')
+}
+
+function isAgreementYesValue(value) {
+  if (value === true || value === 1) return true
+  if (value === '是' || value === '已达成协议') return true
+  if (value === null || value === undefined) return false
+  const normalized = String(value).trim().toLowerCase()
+  return ['yes', 'y', 'true', '1'].includes(normalized)
 }
 
 // 获取调解档案状态统计（用于仪表盘事项进度图）
@@ -221,9 +241,29 @@ router.get('/archives', async (req, res) => {
 
 router.get('/archives/prefixes', async (req, res) => {
   try {
-    const [rows] = await db.pool.execute(
-      'SELECT prefix, current_number FROM archive_sequences ORDER BY prefix'
-    )
+    let rows = []
+    try {
+      const [result] = await db.pool.execute(
+        `
+        SELECT 
+          d.value as prefix,
+          COALESCE(MAX(a.sequence_number), 0) as current_number
+        FROM dictionaries d
+        LEFT JOIN mediation_archives a ON a.prefix = d.value
+        WHERE d.category = ?
+          AND (d.status = 'active' OR d.status IS NULL)
+        GROUP BY d.value
+        ORDER BY d.display_order ASC, d.id ASC
+      `,
+        ['调解档案前缀']
+      )
+      rows = result
+    } catch (error) {
+      if (error && error.code !== 'ER_NO_SUCH_TABLE') {
+        throw error
+      }
+      rows = []
+    }
     res.json({ code: 20000, data: rows })
   } catch (err) {
     console.error('获取前缀列表失败:', err.message)
@@ -399,6 +439,16 @@ router.get('/archives/:id', async (req, res) => {
     )
     const agreement = agreementRows[0] || null
 
+    const hasAgreementRecord = recordRows.some((row) => isAgreementYesValue(row.agreement))
+    const hasAgreementData = Boolean(agreement)
+    if (archive.status !== 'completed' && (hasAgreementRecord || hasAgreementData)) {
+      await db.pool.execute(
+        'UPDATE mediation_archives SET status = ?, updated_at = NOW() WHERE archive_id = ?',
+        ['completed', archiveIdStr]
+      )
+      archive.status = 'completed'
+    }
+
     // 获取附件
     const [attachmentRows] = await db.pool.execute(
       'SELECT * FROM archive_attachments WHERE archive_id = ? ORDER BY created_at',
@@ -427,8 +477,92 @@ router.get('/archives/:id', async (req, res) => {
 router.delete('/archives/:id', async (req, res) => {
   const { id } = req.params
   try {
-    await db.pool.execute('DELETE FROM mediation_archives WHERE archive_id = ?', [id])
-    res.json({ code: 20000, message: '档案删除成功' })
+    const connection = await db.pool.getConnection()
+    const tableExists = async (tableName) => {
+      const [rows] = await connection.execute(
+        'SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?',
+        [tableName]
+      )
+      return (rows[0]?.count || 0) > 0
+    }
+
+    try {
+      await connection.beginTransaction()
+
+      const filePaths = new Set()
+      const collectFilePaths = async (tableName) => {
+        if (!(await tableExists(tableName))) return
+        const [rows] = await connection.execute(
+          `SELECT file_path FROM ${tableName} WHERE archive_id = ?`,
+          [id]
+        )
+        rows.forEach((row) => {
+          if (row?.file_path) filePaths.add(row.file_path)
+        })
+      }
+
+      await collectFilePaths('archive_attachments')
+      await collectFilePaths('archive_files')
+
+      const tablesToClean = [
+        'archive_attachments',
+        'archive_files',
+        'mediation_agreements',
+        'mediation_records',
+        'mediation_applicants',
+        'mediation_respondents',
+        'mediation_applications'
+      ]
+
+      for (const tableName of tablesToClean) {
+        if (await tableExists(tableName)) {
+          await connection.execute(`DELETE FROM ${tableName} WHERE archive_id = ?`, [id])
+        }
+      }
+
+      const [result] = await connection.execute(
+        'DELETE FROM mediation_archives WHERE archive_id = ?',
+        [id]
+      )
+
+      await connection.commit()
+
+      const resolveFilePath = (rawPath) => {
+        if (!rawPath) return null
+        const normalized = String(rawPath)
+        if (/^https?:\/\//i.test(normalized)) return null
+        if (/^\/(uploads|archives)\//i.test(normalized)) {
+          return path.join(__dirname, '..', normalized.replace(/^\//, ''))
+        }
+        if (/^[A-Za-z]:[\\/]/.test(normalized) && path.isAbsolute(normalized)) {
+          return normalized
+        }
+        return path.join(__dirname, '..', normalized.replace(/^[\\/]+/, ''))
+      }
+
+      for (const rawPath of filePaths) {
+        const filePath = resolveFilePath(rawPath)
+        if (!filePath) continue
+        try {
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath)
+          }
+        } catch (fileErr) {
+          console.error('删除附件文件失败:', fileErr.message)
+        }
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ code: 404, message: '档案不存在' })
+      }
+
+      res.json({ code: 20000, message: '档案删除成功' })
+    } catch (err) {
+      await connection.rollback()
+      throw err
+    } finally {
+      connection.release()
+    }
   } catch (err) {
     console.error('删除档案失败:', err.message)
     res.status(500).json({ code: 500, message: '删除档案失败: ' + err.message })
@@ -626,13 +760,12 @@ router.post('/archives/:id/records', async (req, res) => {
       `
       SELECT agreement
       FROM mediation_records
-      WHERE archive_id = ? AND agreement = 'yes'
+      WHERE archive_id = ?
       ORDER BY mediation_date DESC, id DESC
-      LIMIT 1
       `,
       [id]
     )
-    if (agreementRows.length > 0) {
+    if (agreementRows.some((row) => isAgreementYesValue(row.agreement))) {
       await connection.rollback()
       return res.status(400).json({ code: 400, message: '已达成协议，不能再新增调解记录' })
     }
@@ -640,6 +773,8 @@ router.post('/archives/:id/records', async (req, res) => {
     // 获取最大ID并生成新ID
     const [maxIdResult] = await connection.execute('SELECT MAX(id) as maxId FROM mediation_records')
     const newId = (maxIdResult[0].maxId || 0) + 1
+
+    const normalizedAgreement = isAgreementYesValue(agreement) ? 'yes' : 'no'
 
     await connection.execute(
       `INSERT INTO mediation_records (id, archive_id, mediation_date, mediation_location, mediators, process_record, mediation_result, agreement, created_at) 
@@ -652,12 +787,12 @@ router.post('/archives/:id/records', async (req, res) => {
         mediators,
         process_record,
         mediation_result,
-        agreement
+        normalizedAgreement
       ]
     )
 
     // 如果达成协议，更新档案状态为已完成
-    if (agreement === 'yes') {
+    if (normalizedAgreement === 'yes') {
       await connection.execute(
         'UPDATE mediation_archives SET status = ?, updated_at = NOW() WHERE archive_id = ?',
         ['completed', id]
@@ -670,6 +805,77 @@ router.post('/archives/:id/records', async (req, res) => {
     console.error('保存调解记录失败:', err.message)
     if (connection) await connection.rollback()
     res.status(500).json({ code: 500, message: '保存调解记录失败: ' + err.message })
+  } finally {
+    if (connection) connection.release()
+  }
+})
+
+// 上传调解记录现场图片
+router.post('/archives/:id/records/images', recordImageUpload.array('files', 10), async (req, res) => {
+  const { id } = req.params
+  const files = req.files
+
+  if (!files || files.length === 0) {
+    return res.status(400).json({ code: 400, message: '请选择要上传的图片' })
+  }
+
+  let connection
+  try {
+    connection = await db.pool.getConnection()
+    await connection.beginTransaction()
+
+    const [recordRows] = await connection.execute(
+      'SELECT id FROM mediation_records WHERE archive_id = ? ORDER BY mediation_date DESC, id DESC LIMIT 1',
+      [id]
+    )
+    if (recordRows.length === 0) {
+      await connection.rollback()
+      return res.status(400).json({ code: 400, message: '请先保存调解记录再上传图片' })
+    }
+    const recordId = recordRows[0].id
+
+    const [maxIdResult] = await connection.execute(
+      'SELECT MAX(id) as maxId FROM archive_attachments'
+    )
+    let maxId = maxIdResult[0].maxId || 0
+
+    const insertedAttachments = []
+    for (const file of files) {
+      maxId++
+      const decodedFilename = decodeFilename(file.originalname)
+      await connection.execute(
+        `INSERT INTO archive_attachments (id, archive_id, record_id, file_name, file_path, file_type, file_size, description, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+        [
+          maxId,
+          id,
+          recordId,
+          decodedFilename,
+          `/uploads/archive-images/${file.filename}`,
+          path.extname(decodedFilename).slice(1).toLowerCase(),
+          file.size,
+          '现场图片'
+        ]
+      )
+
+      insertedAttachments.push({
+        id: maxId,
+        archive_id: id,
+        record_id: recordId,
+        file_name: decodedFilename,
+        file_path: `/uploads/archive-images/${file.filename}`,
+        file_type: path.extname(decodedFilename).slice(1).toLowerCase(),
+        file_size: file.size,
+        description: '现场图片'
+      })
+    }
+
+    await connection.commit()
+    res.json({ code: 20000, message: '图片上传成功', data: insertedAttachments })
+  } catch (err) {
+    console.error('上传调解记录图片失败:', err.message)
+    if (connection) await connection.rollback()
+    res.status(500).json({ code: 500, message: '上传调解记录图片失败: ' + err.message })
   } finally {
     if (connection) connection.release()
   }

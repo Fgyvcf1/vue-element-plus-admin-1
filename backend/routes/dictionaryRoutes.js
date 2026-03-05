@@ -249,9 +249,32 @@ router.put('/:id/status', checkPermission('system:role'), async (req, res) => {
 router.delete('/:id', checkPermission('system:role'), async (req, res) => {
   try {
     const { id } = req.params
-    const [result] = await db.pool.execute('DELETE FROM dictionaries WHERE id = ?', [id])
+    const { category, value, code } = req.query
+    const numericId = Number(id)
+    const hasValidId = Number.isFinite(numericId) && numericId > 0
 
-    if (result.affectedRows === 0) {
+    if (hasValidId) {
+      const [result] = await db.pool.execute('DELETE FROM dictionaries WHERE id = ?', [numericId])
+      if (result.affectedRows > 0) {
+        return res.json({ code: 20000, message: '字典项删除成功' })
+      }
+    }
+
+    if (!category || !value) {
+      return res
+        .status(400)
+        .json({ code: 40000, message: '缺少字典项标识（id或category/value）' })
+    }
+
+    const params = [category, value]
+    let sql = 'DELETE FROM dictionaries WHERE category = ? AND value = ?'
+    if (code) {
+      sql += ' AND code = ?'
+      params.push(code)
+    }
+
+    const [fallbackResult] = await db.pool.execute(sql, params)
+    if (fallbackResult.affectedRows === 0) {
       return res.status(404).json({ code: 40400, message: '字典项不存在' })
     }
 

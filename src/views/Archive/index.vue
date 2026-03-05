@@ -134,7 +134,7 @@
             <el-option
               v-for="item in prefixList"
               :key="item.prefix"
-              :label="`${item.prefix} (当前序号: ${item.sequence_number || item.current_number})`"
+              :label="`${item.prefix} (当前序号: ${item.next_number}（将生成）)`"
               :value="item.prefix"
             />
           </el-select>
@@ -248,7 +248,14 @@ const getList = async () => {
 const getPrefixList = async () => {
   try {
     const res = await getArchivePrefixes()
-    prefixList.value = res.data || []
+    const list = res.data || []
+    prefixList.value = list.map((item: any) => {
+      const currentNumber = item.sequence_number ?? item.current_number ?? 0
+      return {
+        ...item,
+        next_number: currentNumber + 1
+      }
+    })
   } catch (error) {
     console.error('获取前缀列表失败:', error)
   }
@@ -268,14 +275,19 @@ const resetQuery = () => {
   getList()
 }
 
-const handleCreate = () => {
+const handleCreate = async () => {
+  await getPrefixList()
+  if (prefixList.value.length === 0) {
+    ElMessage.warning('请先在【系统设置-字典管理】中配置“调解档案前缀”')
+    return
+  }
   createForm.prefix = ''
   createDialogVisible.value = true
 }
 
 const handleSubmitCreate = async () => {
   if (!createForm.prefix) {
-    ElMessage.warning('请选择村组')
+    ElMessage.warning('请选择档案编号前缀')
     return
   }
   createLoading.value = true
@@ -311,6 +323,7 @@ const handleDelete = async (row: any) => {
     await deleteArchive(row.archive_id)
     ElMessage.success('删除成功')
     getList()
+    getPrefixList()
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除失败:', error)

@@ -78,7 +78,7 @@
                 </template>
               </el-table-column>
               <el-table-column
-                v-if="selectedCategory === '村组'"
+                v-if="categoryUsesCode(selectedCategory)"
                 prop="code"
                 label="编码"
                 width="120"
@@ -123,7 +123,7 @@
         <el-form-item label="字典值" prop="value">
           <el-input v-model="itemForm.value" placeholder="请输入字典值" />
         </el-form-item>
-        <el-form-item v-if="itemForm.category === '村组'" label="编码" prop="code">
+        <el-form-item v-if="categoryUsesCode(itemForm.category)" label="编码" prop="code">
           <el-input v-model="itemForm.code" placeholder="请输入村组编码" />
         </el-form-item>
         <el-form-item label="排序序号" prop="display_order">
@@ -177,6 +177,10 @@ import {
   deleteDictionaryItem
 } from '@/api/dictionary'
 
+const categoryUsesCode = (category: string) => {
+  return ['村组'].includes(category)
+}
+
 const loading = ref(false)
 const categoryList = ref<{ category: string; count?: number }[]>([])
 const selectedCategory = ref('')
@@ -196,7 +200,7 @@ const itemForm = reactive({
 })
 
 const validateCode = (_rule: any, value: string, callback: (error?: Error) => void) => {
-  if (itemForm.category === '村组' && !value) {
+  if (categoryUsesCode(itemForm.category) && !value) {
     callback(new Error('请输入村组编码'))
     return
   }
@@ -287,7 +291,7 @@ const handleEditItem = (row: any) => {
 const handleSubmit = () => {
   itemFormRef.value?.validate(async (valid) => {
     if (!valid) return
-    const submitCode = itemForm.category === '村组' ? itemForm.code : undefined
+    const submitCode = categoryUsesCode(itemForm.category) ? itemForm.code : undefined
     try {
       if (isEdit.value && editId.value !== null) {
         await updateDictionaryItem(editId.value, {
@@ -336,7 +340,7 @@ const handleDeleteItem = async (row: any) => {
     await ElMessageBox.confirm('确认删除该字典项吗？删除后不可恢复！', '警告', {
       type: 'error'
     })
-    await deleteDictionaryItem(row.id)
+    await deleteDictionaryItem(row.id ? row.id : { category: row.category, value: row.value, code: row.code })
     ElMessage.success('删除成功')
     fetchDictionaryItems()
     fetchCategories()

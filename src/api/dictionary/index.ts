@@ -61,8 +61,32 @@ export const updateDictionaryStatus = (id: number, status: string) => {
 }
 
 // 删除字典项
-export const deleteDictionaryItem = (id: number) => {
+export const deleteDictionaryItem = (
+  target:
+    | number
+    | {
+        id?: number | null
+        category: string
+        value: string
+        code?: string
+      }
+) => {
+  if (typeof target === 'number') {
+    return request.delete({
+      url: `/dictionary/${target}`
+    })
+  }
+  if (target.id) {
+    return request.delete({
+      url: `/dictionary/${target.id}`
+    })
+  }
   return request.delete({
-    url: `/dictionary/${id}`
+    url: '/dictionary/0',
+    params: {
+      category: target.category,
+      value: target.value,
+      code: target.code
+    }
   })
 }
