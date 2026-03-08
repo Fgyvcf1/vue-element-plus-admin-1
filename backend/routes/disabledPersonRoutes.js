@@ -24,6 +24,25 @@ const normalizeValue = (value, toNull = false) => {
   return value
 }
 
+const buildParsedDateExpr = (field) => `CASE
+  WHEN ${field} IS NULL OR TRIM(${field}) = '' THEN NULL
+  WHEN TRIM(${field}) REGEXP '^[0-9]{8}$' THEN STR_TO_DATE(TRIM(${field}), '%Y%m%d')
+  WHEN TRIM(${field}) REGEXP '^[0-9]{4}[-/][0-9]{1,2}[-/][0-9]{1,2}.*$'
+    THEN STR_TO_DATE(REPLACE(SUBSTRING(TRIM(${field}), 1, 10), '/', '-'), '%Y-%m-%d')
+  ELSE NULL
+END`
+
+const buildResidentAgeExpr = (alias = 'r') => {
+  const birthDateExpr = buildParsedDateExpr(`${alias}.date_of_birth`)
+  const deathDateExpr = buildParsedDateExpr(`${alias}.death_date`)
+  return `CASE
+    WHEN ${birthDateExpr} IS NULL THEN NULL
+    WHEN ${alias}.status = 'deceased'
+      THEN TIMESTAMPDIFF(YEAR, ${birthDateExpr}, COALESCE(${deathDateExpr}, CURDATE()))
+    ELSE TIMESTAMPDIFF(YEAR, ${birthDateExpr}, CURDATE())
+  END`
+}
+
 const buildFilters = (query) => {
   const filters = []
   const params = []
@@ -85,7 +104,7 @@ router.get('/disabled-persons', checkPermission('special:view'), async (req, res
       r.id_card AS idCard,
       r.gender,
       r.ethnicity,
-      TIMESTAMPDIFF(YEAR, r.date_of_birth, CURDATE()) AS age,
+      ${buildResidentAgeExpr('r')} AS age,
       r.phone_number AS phoneNumber,
       r.village_group AS villageGroup,
       r.Home_address AS address
@@ -147,7 +166,7 @@ router.get('/disabled-persons/:id', checkPermission('special:view'), async (req,
       r.id_card AS idCard,
       r.gender,
       r.ethnicity,
-      TIMESTAMPDIFF(YEAR, r.date_of_birth, CURDATE()) AS age,
+      ${buildResidentAgeExpr('r')} AS age,
       r.village_group AS villageGroup,
       r.phone_number AS residentPhoneNumber,
       r.Home_address AS address,

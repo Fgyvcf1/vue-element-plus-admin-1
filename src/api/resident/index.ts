@@ -3,7 +3,9 @@ import type {
   ResidentListParams,
   ResidentListResponse,
   ResidentDetail,
-  SearchSuggestionsResponse
+  SearchSuggestionsResponse,
+  ResidentDeathReportParams,
+  ResidentDeathReportResponse
 } from './types'
 
 // 获取居民列表
@@ -116,6 +118,14 @@ export const getSearchSuggestions = (params: { keyword: string; type: string }) 
     url: '/search-suggestions',
     params
   }) as Promise<SearchSuggestionsResponse>
+}
+
+// 获取死亡人口报表数据
+export const getResidentDeathReport = (params: ResidentDeathReportParams) => {
+  return request.get({
+    url: '/residents/death-report',
+    params
+  }) as Promise<ResidentDeathReportResponse>
 }
 
 // 导入居民数据

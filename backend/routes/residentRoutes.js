@@ -14,6 +14,27 @@ function getLocalTime() {
   return localDate.toISOString().slice(0, 19).replace('T', ' ')
 }
 
+// 兼容多种文本日期格式（YYYYMMDD / YYYY-MM-DD / YYYY/MM/DD / 带时间）
+const buildParsedDateExpr = (field) => `CASE
+  WHEN ${field} IS NULL OR TRIM(${field}) = '' THEN NULL
+  WHEN TRIM(${field}) REGEXP '^[0-9]{8}$' THEN STR_TO_DATE(TRIM(${field}), '%Y%m%d')
+  WHEN TRIM(${field}) REGEXP '^[0-9]{4}[-/][0-9]{1,2}[-/][0-9]{1,2}.*$'
+    THEN STR_TO_DATE(REPLACE(SUBSTRING(TRIM(${field}), 1, 10), '/', '-'), '%Y-%m-%d')
+  ELSE NULL
+END`
+
+// 居民年龄：死亡人员按“出生->死亡”，其余按“出生->当前日期”
+const buildResidentAgeExpr = (alias = 'r') => {
+  const birthDateExpr = buildParsedDateExpr(`${alias}.date_of_birth`)
+  const deathDateExpr = buildParsedDateExpr(`${alias}.death_date`)
+  return `CASE
+    WHEN ${birthDateExpr} IS NULL THEN NULL
+    WHEN ${alias}.status = 'deceased'
+      THEN TIMESTAMPDIFF(YEAR, ${birthDateExpr}, COALESCE(${deathDateExpr}, CURDATE()))
+    ELSE TIMESTAMPDIFF(YEAR, ${birthDateExpr}, CURDATE())
+  END`
+}
+
 // 生成户主ID的辅助函数
 function generateHouseholdIdLegacy(villageGroup, idCard) {
   return new Promise((resolve, reject) => {
@@ -2574,7 +2595,7 @@ router.get('/residents', checkPermission('resident:view'), (req, res) => {
               r.gender,
               r.ethnicity,
               DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS dateOfBirth, 
-              YEAR(CURDATE()) - YEAR(r.date_of_birth) AS age, 
+              ${buildResidentAgeExpr('r')} AS age,
               r.village_group AS villageGroup, 
               h.address, 
               r.bank_card AS bankCard, 
@@ -3077,6 +3098,97 @@ router.post('/residents/:id/migrate-household', checkPermission('resident:edit')
   }
 })
 
+// 人口死亡情况报表（按年月查询）
+router.get('/residents/death-report', checkPermission('resident:view'), async (req, res) => {
+  const year = Number(req.query.year)
+  const month = Number(req.query.month)
+
+  if (!Number.isInteger(year) || year < 1900 || year > 9999) {
+    return res.status(400).json({ code: 400, message: '年份参数不正确' })
+  }
+
+  if (!Number.isInteger(month) || month < 1 || month > 12) {
+    return res.status(400).json({ code: 400, message: '月份参数不正确' })
+  }
+
+  try {
+    const parseDateExpr = (field) => `CASE
+      WHEN ${field} IS NULL OR TRIM(${field}) = '' THEN NULL
+      WHEN TRIM(${field}) REGEXP '^[0-9]{8}$' THEN STR_TO_DATE(TRIM(${field}), '%Y%m%d')
+      WHEN TRIM(${field}) REGEXP '^[0-9]{4}[-/][0-9]{1,2}[-/][0-9]{1,2}.*$'
+        THEN STR_TO_DATE(REPLACE(SUBSTRING(TRIM(${field}), 1, 10), '/', '-'), '%Y-%m-%d')
+      ELSE NULL
+    END`
+
+    const parsedDeathDateExpr = parseDateExpr('l.death_date')
+    const parsedChangeDateExpr = parseDateExpr('l.change_date')
+    const parsedBirthDateExpr = parseDateExpr('r.date_of_birth')
+
+    const sql = `SELECT
+                  COALESCE(rs.village_group, '') AS villageGroup,
+                  COALESCE(rs.name, '') AS deceasedName,
+                  COALESCE(rs.gender, '') AS gender,
+                  COALESCE(rs.ethnicity, '') AS ethnicity,
+                  COALESCE(rs.id_card, '') AS idCard,
+                  COALESCE(rs.relationship_to_head, '') AS relationshipToHead,
+                  COALESCE(h.household_head_name, '') AS householdHeadName,
+                  COALESCE(logs.death_reason, logs.change_reason, '') AS remark,
+                  DATE_FORMAT(logs.parsed_death_date, '%Y-%m-%d') AS deathDate,
+                  CASE
+                    WHEN rs.parsed_birth_date IS NULL THEN ''
+                    ELSE DATE_FORMAT(rs.parsed_birth_date, '%Y-%m-%d')
+                  END AS birthDate,
+                  CASE
+                    WHEN rs.parsed_birth_date IS NULL THEN ''
+                    ELSE TIMESTAMPDIFF(YEAR, rs.parsed_birth_date, logs.parsed_death_date)
+                  END AS age
+                FROM (
+                  SELECT
+                    l.resident_id,
+                    l.change_type,
+                    l.change_reason,
+                    l.new_status,
+                    l.death_reason,
+                    COALESCE(
+                      ${parsedDeathDateExpr},
+                      CASE
+                        WHEN l.change_type = '死亡注销' OR l.new_status = 'deceased'
+                          THEN ${parsedChangeDateExpr}
+                        ELSE NULL
+                      END
+                    ) AS parsed_death_date
+                  FROM household_change_log l
+                  WHERE l.change_type = '死亡注销'
+                     OR l.new_status = 'deceased'
+                     OR (l.death_date IS NOT NULL AND TRIM(l.death_date) <> '')
+                ) logs
+                INNER JOIN (
+                  SELECT
+                    r.*,
+                    ${parsedBirthDateExpr} AS parsed_birth_date
+                  FROM residents r
+                ) rs ON rs.id = logs.resident_id
+                LEFT JOIN households h ON h.household_number = rs.household_id
+                WHERE logs.parsed_death_date IS NOT NULL
+                  AND YEAR(logs.parsed_death_date) = ?
+                  AND MONTH(logs.parsed_death_date) = ?
+                ORDER BY logs.parsed_death_date ASC, rs.village_group ASC, rs.name ASC`
+
+    const [rows] = await db.pool.execute(sql, [year, month])
+    return res.json({
+      code: 20000,
+      message: '查询成功',
+      data: rows,
+      total: rows.length,
+      year,
+      month
+    })
+  } catch (error) {
+    console.error('查询人口死亡报表失败:', error.message)
+    return res.status(500).json({ code: 500, message: '查询人口死亡报表失败: ' + error.message })
+  }
+})
+
 // 获取单个居民详情
 router.get('/residents/:id', checkPermission('resident:view'), (req, res) => {
   const { id } = req.params
@@ -3087,7 +3199,7 @@ router.get('/residents/:id', checkPermission('resident:view'), (req, res) => {
                 r.id_card AS idCard,
                 r.gender,
                 DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS dateOfBirth,
-                YEAR(CURDATE()) - YEAR(r.date_of_birth) AS age,
+                ${buildResidentAgeExpr('r')} AS age,
                 r.village_group AS villageGroup,
                 r.Home_address AS homeAddress,
                 r.bank_card AS bankCard,
@@ -3540,7 +3652,7 @@ router.get('/households/:id/members', checkPermission('resident:view'), (req, re
                 r.id_card, 
                 r.gender, 
                 DATE_FORMAT(r.date_of_birth, '%Y-%m-%d') AS date_of_birth, 
-                YEAR(CURDATE()) - YEAR(r.date_of_birth) AS age, 
+                ${buildResidentAgeExpr('r')} AS age,
                 r.village_group, 
                 r.bank_card AS bankCard, 
                 r.bank_name AS bankName, 
@@ -3595,13 +3707,13 @@ router.put('/residents/:id/status', checkPermission('resident:edit'), async (req
     // 开始事务
     await connection.beginTransaction()
 
-    // 首先获取居民的当前状态
-    const [rows] = await connection.execute('SELECT status FROM residents WHERE id = ?', [id])
+    // 首先获取居民当前状态和死亡日期
+    const [rows] = await connection.execute('SELECT status, death_date FROM residents WHERE id = ?', [
+      id
+    ])
     const previousStatus = rows.length > 0 ? rows[0].status : null
+    const previousDeathDate = rows.length > 0 ? rows[0].death_date : null
     const currentTime = new Date().toISOString().slice(0, 19).replace('T', ' ')
-
-    // 更新residents表中的status字段
-    await connection.execute('UPDATE residents SET status = ? WHERE id = ?', [status, id])
 
     // 确定变更类型
     let changeType = ''
@@ -3627,6 +3739,20 @@ router.put('/residents/:id/status', checkPermission('resident:edit'), async (req
       changeType = '状态变更'
       changeDate = currentTime
     }
+
+    // 同步维护 residents.death_date
+    // 规则：死亡状态写入日期；非死亡状态清空
+    let residentDeathDate = null
+    if (status === 'deceased') {
+      residentDeathDate = death_date || previousDeathDate || null
+    }
+
+    // 更新residents表中的status和death_date字段
+    await connection.execute('UPDATE residents SET status = ?, death_date = ? WHERE id = ?', [
+      status,
+      residentDeathDate,
+      id
+    ])
 
     // 向户籍变动记录表中插入一条记录
     const logSql = `INSERT INTO household_change_log
@@ -4129,42 +4255,49 @@ router.get('/population-structure', checkPermission('resident:view'), async (req
   console.log('获取人口结构统计...')
 
   try {
-    // 按年龄段分组查询居民数据，需要从date_of_birth计算age
+    // 按年龄段分组查询居民数据（精确年龄，按当天是否过生日计算）
+    const parsedBirthDateExpr = buildParsedDateExpr('date_of_birth')
+    const exactAgeExpr = `TIMESTAMPDIFF(YEAR, ${parsedBirthDateExpr}, CURDATE())`
+
     const [rows] = await db.pool.execute(
       `SELECT
         CASE
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) < 7 THEN '0-6岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 7 AND 17 THEN '7-17岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 18 AND 59 THEN '18-59岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 60 AND 69 THEN '60-69岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 70 AND 79 THEN '70-79岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 80 AND 89 THEN '80-89岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 90 AND 99 THEN '90-99岁'
+          WHEN age < 7 THEN '0-6岁'
+          WHEN age BETWEEN 7 AND 17 THEN '7-17岁'
+          WHEN age BETWEEN 18 AND 59 THEN '18-59岁'
+          WHEN age BETWEEN 60 AND 69 THEN '60-69岁'
+          WHEN age BETWEEN 70 AND 79 THEN '70-79岁'
+          WHEN age BETWEEN 80 AND 89 THEN '80-89岁'
+          WHEN age BETWEEN 90 AND 99 THEN '90-99岁'
           ELSE '100岁以上'
         END as ageGroup,
         COUNT(*) as count
-      FROM residents
-      WHERE status = 'active'
+      FROM (
+        SELECT ${exactAgeExpr} AS age
+        FROM residents
+        WHERE status = 'active'
+          AND ${parsedBirthDateExpr} IS NOT NULL
+      ) t
       GROUP BY
         CASE
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) < 7 THEN '0-6岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 7 AND 17 THEN '7-17岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 18 AND 59 THEN '18-59岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 60 AND 69 THEN '60-69岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 70 AND 79 THEN '70-79岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 80 AND 89 THEN '80-89岁'
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 90 AND 99 THEN '90-99岁'
+          WHEN age < 7 THEN '0-6岁'
+          WHEN age BETWEEN 7 AND 17 THEN '7-17岁'
+          WHEN age BETWEEN 18 AND 59 THEN '18-59岁'
+          WHEN age BETWEEN 60 AND 69 THEN '60-69岁'
+          WHEN age BETWEEN 70 AND 79 THEN '70-79岁'
+          WHEN age BETWEEN 80 AND 89 THEN '80-89岁'
+          WHEN age BETWEEN 90 AND 99 THEN '90-99岁'
           ELSE '100岁以上'
         END
       ORDER BY
         CASE
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) < 7 THEN 0
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 7 AND 17 THEN 1
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 18 AND 59 THEN 2
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 60 AND 69 THEN 3
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 70 AND 79 THEN 4
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 80 AND 89 THEN 5
-          WHEN (YEAR(CURDATE()) - YEAR(date_of_birth)) BETWEEN 90 AND 99 THEN 6
+          WHEN age < 7 THEN 0
+          WHEN age BETWEEN 7 AND 17 THEN 1
+          WHEN age BETWEEN 18 AND 59 THEN 2
+          WHEN age BETWEEN 60 AND 69 THEN 3
+          WHEN age BETWEEN 70 AND 79 THEN 4
+          WHEN age BETWEEN 80 AND 89 THEN 5
+          WHEN age BETWEEN 90 AND 99 THEN 6
           ELSE 7
         END
     `

@@ -31,6 +31,19 @@ const residentRouter: AppRouteRecordRaw[] = [
         }
       },
       {
+        path: 'population-death-report',
+        component: () => import('@/views/Resident/PopulationDeathReport.vue'),
+        name: 'ResidentPopulationDeathReport',
+        meta: {
+          title: '人口增减上报',
+          noTagsView: true,
+          noCache: true,
+          hidden: true,
+          canTo: true,
+          activeMenu: '/resident/query'
+        }
+      },
+      {
         path: 'add',
         component: () => import('@/views/Resident/Add.vue'),
         name: 'ResidentAdd',

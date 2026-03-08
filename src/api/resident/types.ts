@@ -139,3 +139,28 @@ export interface SearchSuggestionsResponse {
   residentNames?: ResidentNameSuggestion[]
   householdHeadNames?: HouseholdHeadSuggestion[]
 }
+
+export interface ResidentDeathReportParams {
+  year: number
+  month: number
+}
+
+export interface ResidentDeathReportItem {
+  villageGroup?: string
+  deceasedName?: string
+  gender?: string
+  ethnicity?: string
+  age?: number | string
+  birthDate?: string
+  idCard?: string
+  deathDate?: string
+  householdHeadName?: string
+  relationshipToHead?: string
+  remark?: string
+}
+
+export interface ResidentDeathReportResponse extends IResponse<ResidentDeathReportItem[]> {
+  total?: number
+  year?: number
+  month?: number
+}

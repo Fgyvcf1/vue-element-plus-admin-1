@@ -71,6 +71,11 @@
                 <el-option label="死亡" value="deceased" />
               </el-select>
             </el-form-item>
+            <el-form-item label-width="0" class="compact-form-item action-form-item">
+              <el-button type="primary" plain @click="handlePopulationDeathReport">
+                人口增减上报
+              </el-button>
+            </el-form-item>
           </div>
           <div class="search-buttons">
             <el-button type="primary" @click="handleSearch" size="small">
@@ -85,7 +90,12 @@
               <Icon icon="ep:download" class="mr-1" />
               导出
             </el-button>
-            <el-button v-hasPermi="'resident:add'" type="warning" @click="handleImport" size="small">
+            <el-button
+              v-hasPermi="'resident:add'"
+              type="warning"
+              @click="handleImport"
+              size="small"
+            >
               <Icon icon="ep:upload" class="mr-1" />
               导入
             </el-button>
@@ -385,6 +395,11 @@ const handleAddLowIncome = () => {
   })
 }
 
+// 人口增减上报
+const handlePopulationDeathReport = () => {
+  router.push('/resident/population-death-report')
+}
+
 // 获取列表数据
 const fetchList = async () => {
   loading.value = true
@@ -555,10 +570,7 @@ const handleImportSuccess = () => {
 }
 
 // 获取居民姓名搜索建议
-const fetchResidentNameSuggestions = (
-  queryString: string,
-  callback: (data: any[]) => void
-) => {
+const fetchResidentNameSuggestions = (queryString: string, callback: (data: any[]) => void) => {
   if (!queryString || queryString.trim().length < 1) {
     callback([])
     return
@@ -602,9 +614,7 @@ const handlePageChange = (val: number) => {
 }
 
 // 获取状态标签类型
-const getStatusType = (
-  status: string
-): 'success' | 'warning' | 'info' | 'primary' | 'danger' => {
+const getStatusType = (status: string): 'success' | 'warning' | 'info' | 'primary' | 'danger' => {
   const typeMap: Record<string, 'success' | 'warning' | 'info' | 'primary' | 'danger'> = {
     active: 'success',
     migrated_out: 'warning',
@@ -686,6 +696,15 @@ onUnmounted(() => {
             :deep(.el-select),
             :deep(.el-date-editor) {
               width: 100%;
+            }
+
+            &.action-form-item {
+              width: auto;
+              min-width: auto;
+
+              :deep(.el-form-item__content) {
+                margin-left: 0 !important;
+              }
             }
           }
         }

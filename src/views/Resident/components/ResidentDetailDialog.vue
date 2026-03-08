@@ -561,12 +561,7 @@
         <el-table-column prop="idCard" label="身份证号码" width="180" />
         <el-table-column prop="phoneNumber" label="联系电话" width="120" />
         <el-table-column prop="maritalStatus" label="婚姻状况" width="80" />
-        <el-table-column
-          prop="bankCard"
-          label="银行帐号"
-          width="220"
-          class-name="member-nowrap"
-        />
+        <el-table-column prop="bankCard" label="银行帐号" width="220" class-name="member-nowrap" />
         <el-table-column prop="bankName" label="开户行" width="150" />
         <el-table-column prop="equityShares" label="股权数" width="70" />
       </el-table>
@@ -701,7 +696,11 @@
         </el-form>
 
         <!-- 操作按钮区域 -->
-        <div v-if="canEditResident" class="migration-buttons" style="margin-top: 15px; text-align: right">
+        <div
+          v-if="canEditResident"
+          class="migration-buttons"
+          style="margin-top: 15px; text-align: right"
+        >
           <el-button
             v-if="!isMigrationEditable"
             type="primary"
@@ -932,15 +931,41 @@ const statusType = computed(() => {
 })
 
 // 计算属性：年龄
+const parseResidentDate = (value: string) => {
+  if (!value) return null
+  const text = String(value).trim()
+  if (!text) return null
+
+  if (/^\d{8}$/.test(text)) {
+    return new Date(`${text.slice(0, 4)}-${text.slice(4, 6)}-${text.slice(6, 8)}`)
+  }
+
+  if (/^\d{4}[/-]\d{1,2}[/-]\d{1,2}/.test(text)) {
+    return new Date(text.slice(0, 10).replace(/\//g, '-'))
+  }
+
+  const parsed = new Date(text)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
 const age = computed(() => {
   if (!residentForm.value.dateOfBirth) {
     return ''
   }
-  const birthDate = new Date(residentForm.value.dateOfBirth)
-  const now = new Date()
-  let age = now.getFullYear() - birthDate.getFullYear()
-  const monthDiff = now.getMonth() - birthDate.getMonth()
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birthDate.getDate())) {
+  const birthDate = parseResidentDate(residentForm.value.dateOfBirth)
+  if (!birthDate) {
+    return ''
+  }
+
+  // 死亡人员按死亡日期计算年龄，其余按当前日期计算
+  const referenceDate =
+    residentForm.value.status === 'deceased' && residentForm.value.deathDate
+      ? parseResidentDate(residentForm.value.deathDate) || new Date()
+      : new Date()
+
+  let age = referenceDate.getFullYear() - birthDate.getFullYear()
+  const monthDiff = referenceDate.getMonth() - birthDate.getMonth()
+  if (monthDiff < 0 || (monthDiff === 0 && referenceDate.getDate() < birthDate.getDate())) {
     age--
   }
   return age.toString()
@@ -1162,15 +1187,11 @@ const handleDelete = async () => {
 
   const residentName = residentForm.value.name || ''
   try {
-    await ElMessageBox.confirm(
-      `确定删除居民【${residentName}】吗？删除后不可恢复。`,
-      '警告',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
+    await ElMessageBox.confirm(`确定删除居民【${residentName}】吗？删除后不可恢复。`, '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
     loading.value = true
     await deleteResident(currentResidentId.value.toString())
     ElMessage.success('删除成功')
