@@ -3,7 +3,6 @@ VITE_NODE_ENV=production
 
 # 接口前缀
 VITE_API_BASE_PATH=/api
-VITE_API_BASE_URL=/api
 
 # 打包路径
 VITE_BASE_PATH=/

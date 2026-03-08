@@ -1,0 +1,1 @@
+import{n as e}from"./index-CXquUmLR.js";const n=s=>e.get({url:"/disabled-persons",params:s}),a=s=>e.get({url:`/disabled-persons/${s}`}),o=s=>e.post({url:"/disabled-persons",data:s}),d=(s,r)=>e.put({url:`/disabled-persons/${s}`,data:r});export{a,o as b,n as g,d as u};

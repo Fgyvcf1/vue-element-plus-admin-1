@@ -1,0 +1,8 @@
+启动后端服务...
+
+检查端口 3001 是否被占用...
+✓ 端口 3001 已释放
+
+后端服务运行在 http://localhost:3001
+CORS配置: 允许来自 localhost:4000 和 localhost:5173 的请求
+居民查询API: http://localhost:3001/api/residents

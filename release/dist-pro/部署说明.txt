@@ -1,0 +1,60 @@
+村委会管理系统（Windows + 局域网 + Nginx + 后端3002）部署说明
+
+一、准备软件
+1) Windows 10/11 或 Windows Server
+2) Node.js（建议 LTS 版本）
+3) MariaDB 10.6+（安装版）
+4) Nginx for Windows（解压版）
+
+二、数据库（MariaDB）
+1) 创建库与用户（示例）：
+   CREATE DATABASE village DEFAULT CHARSET utf8mb4;
+   CREATE USER 'app_user'@'localhost' IDENTIFIED BY 'strongpass791002';
+   GRANT ALL PRIVILEGES ON village.* TO 'app_user'@'localhost';
+   FLUSH PRIVILEGES;
+
+2) 确认后端配置：
+   后端读取 backend\config.json（或环境变量），确保与上面一致。
+
+三、后端启动（端口 3002）
+1) 打开命令提示符，进入 backend 目录：
+   cd D:\你的项目路径\backend
+2) 首次安装依赖：
+   npm i
+3) 启动后端：
+   npm run start
+
+四、前端文件
+1) 本目录 release\dist-pro 即为前端产出物。
+2) 建议拷贝到固定目录，例如：
+   D:\village\www
+
+五、Nginx 配置与启动
+1) 编辑 deploy\nginx.conf：
+   - 将 root 改成你的前端目录（例：D:/village/www）
+   - 后端端口已固定为 3002，无需改动
+   - 如果 80 端口被占用，可改成 8080
+
+2) 修改 deploy\Start-Nginx.bat / Stop-Nginx.bat：
+   - 将 NGINX_HOME 改成你的 Nginx 解压目录（例：C:\nginx）
+
+3) 启动 / 停止：
+   - 双击 Start-Nginx.bat 启动
+   - 双击 Stop-Nginx.bat 停止
+
+六、局域网访问
+1) 访问地址：
+   http://服务器内网IP/
+   若改为 8080，则：http://服务器内网IP:8080/
+
+2) 防火墙放行：
+   - 放行 80（或 8080）端口给局域网
+   - 后端 3002 仅本机访问即可（Nginx 反代用 127.0.0.1）
+
+七、注意事项
+1) 若重新执行前端构建（pnpm build:pro），dist-pro 可能被覆盖。
+   建议在构建后把 deploy 目录与本说明重新复制进产出物目录。
+2) 若页面打不开，先确认：
+   - 后端是否已启动（3002）
+   - Nginx 是否已启动
+   - 防火墙端口是否放行

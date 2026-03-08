@@ -1,0 +1,1 @@
+import{l as e}from"./index-ChHTI33d.js";const a=s=>e.get({url:"/disabled-persons",params:s}),n=s=>e.get({url:`/disabled-persons/${s}`}),o=s=>e.post({url:"/disabled-persons",data:s}),d=(s,r)=>e.put({url:`/disabled-persons/${s}`,data:r});export{n as a,o as b,a as g,d as u};

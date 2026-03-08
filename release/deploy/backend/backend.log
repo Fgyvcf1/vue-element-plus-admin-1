@@ -1,0 +1,45 @@
+定时任务模块已加载
+后端服务运行在 http://localhost:3001
+成功连接到SQLite数据库
+定时任务已配置：每天 09:00 执行提醒任务
+Cron表达式: 0 0 9 * * *
+手动触发生日提醒...
+开始执行生日提醒任务...
+生日提醒配置: { days: 7, enabled: 1, time: '09:00:00' }
+找到 220 位有生日信息的居民
+未捕获的异常: Invalid time value
+RangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at Statement.<anonymous> (d:\vue-element-admin-master\backend\cron.js:130:54)
+    at Statement.replacement (d:\vue-element-admin-master\backend\node_modules\sqlite3\lib\trace.js:25:27)
+    at Statement.replacement (d:\vue-element-admin-master\backend\node_modules\sqlite3\lib\trace.js:25:27)
+居民 陈泽深 今天已发送过生日提醒
+未捕获的异常: Invalid time value
+RangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at Statement.<anonymous> (d:\vue-element-admin-master\backend\cron.js:130:54)
+    at Statement.replacement (d:\vue-element-admin-master\backend\node_modules\sqlite3\lib\trace.js:25:27)
+    at Statement.replacement (d:\vue-element-admin-master\backend\node_modules\sqlite3\lib\trace.js:25:27)
+居民 何守旺 今天已发送过生日提醒
+居民 莫坤隆 今天已发送过生日提醒
+居民 韦永好 今天已发送过生日提醒
+手动触发生日提醒...
+开始执行生日提醒任务...
+生日提醒配置: { days: 7, enabled: 1, time: '09:00:00' }
+找到 220 位有生日信息的居民
+未捕获的异常: Invalid time value
+RangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at Statement.<anonymous> (d:\vue-element-admin-master\backend\cron.js:130:54)
+    at Statement.replacement (d:\vue-element-admin-master\backend\node_modules\sqlite3\lib\trace.js:25:27)
+    at Statement.replacement (d:\vue-element-admin-master\backend\node_modules\sqlite3\lib\trace.js:25:27)
+居民 陈泽深 今天已发送过生日提醒
+居民 何守旺 今天已发送过生日提醒
+居民 韦永好 今天已发送过生日提醒
+居民 莫坤隆 今天已发送过生日提醒
+未捕获的异常: Invalid time value
+RangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at Statement.<anonymous> (d:\vue-element-admin-master\backend\cron.js:130:54)
+    at Statement.replacement (d:\vue-element-admin-master\backend\node_modules\sqlite3\lib\trace.js:25:27)
+    at Statement.replacement (d:\vue-element-admin-master\backend\node_modules\sqlite3\lib\trace.js:25:27)

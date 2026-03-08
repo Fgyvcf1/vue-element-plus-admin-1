@@ -3,7 +3,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // 打包目录
-const packageDir = path.join(__dirname, 'vue-element-plus-admin-package');
+const packageDir = path.join(__dirname, 'release', 'deploy');
 
 console.log('正在创建Vue Element Plus Admin安装包...');
 
@@ -23,78 +23,42 @@ for (const dir of subDirs) {
 
 // 2. 复制后端文件
 console.log('2. 复制后端文件...');
-const backendFiles = [
-  'app.js',
-  'db.js',
-  'init-db.js',
-  'package.json',
-  'routes/',
-  'controllers/',
-  'middleware/',
-  'services/',
-  'utils/',
-  'config.json', // 如果存在的话
-  // 部署脚本
-  'setup-portable-env.bat',
-  'start-mariadb.bat',
-  'robust-init-db.js',
-  'start-backend.bat',
-  'complete-deploy-en.bat', // 使用英文版部署脚本
-  'install-dependencies-and-start.bat', // 添加自动安装依赖的脚本
-  'check-and-setup-env.bat', // 添加环境检查脚本
-  'database-full-export-2026-02-23.sql',
-  'mariadb-config.ini' // 如果存在的话
-];
-
 const backendSrcDir = path.join(__dirname, 'backend');
 const backendDestDir = path.join(packageDir, 'backend');
 
-// 确保目标目录存在
-if (!fs.existsSync(backendDestDir)) {
-  fs.mkdirSync(backendDestDir, { recursive: true });
+// 清理旧目录，避免残留文件
+if (fs.existsSync(backendDestDir)) {
+  fs.rmSync(backendDestDir, { recursive: true, force: true });
 }
+fs.mkdirSync(backendDestDir, { recursive: true });
 
-// 复制backend目录中的必需文件
 if (fs.existsSync(backendSrcDir)) {
-  const files = fs.readdirSync(backendSrcDir);
-  
-  for (const file of files) {
-    const srcPath = path.join(backendSrcDir, file);
-    const destPath = path.join(backendDestDir, file);
-    
-    // 检查是否是我们需要复制的文件或目录
-    if (backendFiles.some(pattern => 
-      file === pattern || 
-      file.startsWith(pattern.replace('/', '')) ||
-      (pattern.endsWith('/') && fs.statSync(srcPath).isDirectory() && file === pattern.slice(0, -1))
-    )) {
-      const stats = fs.statSync(srcPath);
-      
-      if (stats.isDirectory()) {
-        // 复制整个目录
-        copyDir(srcPath, destPath);
-      } else {
-        // 复制文件
-        fs.copyFileSync(srcPath, destPath);
-      }
-    }
-  }
-  
-  console.log(`✓ 复制了 ${files.length} 个后端相关文件`);
+  copyDir(backendSrcDir, backendDestDir, ['node_modules']);
+  console.log('✓ 复制后端目录完成');
 } else {
   console.log('⚠ backend目录不存在，跳过后端文件复制');
 }
 
 // 3. 复制前端构建文件（如果存在）
 console.log('3. 准备前端文件...');
-const frontendDistDir = path.join(__dirname, 'dist');
+const frontendDistDir = path.join(__dirname, 'release', 'dist-pro');
+const legacyFrontendDistDir = path.join(__dirname, 'dist');
 const frontendDestDir = path.join(packageDir, 'frontend');
+
+// 清理旧目录，避免残留文件
+if (fs.existsSync(frontendDestDir)) {
+  fs.rmSync(frontendDestDir, { recursive: true, force: true });
+}
+fs.mkdirSync(frontendDestDir, { recursive: true });
 
 if (fs.existsSync(frontendDistDir)) {
   copyDir(frontendDistDir, frontendDestDir);
-  console.log('✓ 复制前端构建文件');
+  console.log('✓ 复制前端构建文件 (release/dist-pro)');
+} else if (fs.existsSync(legacyFrontendDistDir)) {
+  copyDir(legacyFrontendDistDir, frontendDestDir);
+  console.log('✓ 复制前端构建文件 (dist)');
 } else {
-  console.log('⚠ 前端构建文件不存在 (./dist)，需要先构建前端项目');
+  console.log('⚠ 前端构建文件不存在，需要先构建前端项目');
   console.log('  请运行: pnpm run build:pro');
 }
 
@@ -196,7 +160,7 @@ console.log('5. Wait for automatic completion of dependency installation and dep
 console.log('6. Browser will automatically open the application interface');
 
 // Helper function: Copy directory
-function copyDir(src, dest) {
+function copyDir(src, dest, exclude = []) {
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest, { recursive: true });
   }
@@ -204,11 +168,14 @@ function copyDir(src, dest) {
   const entries = fs.readdirSync(src, { withFileTypes: true });
   
   for (const entry of entries) {
+    if (exclude.includes(entry.name)) {
+      continue;
+    }
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
     
     if (entry.isDirectory()) {
-      copyDir(srcPath, destPath);
+      copyDir(srcPath, destPath, exclude);
     } else {
       fs.copyFileSync(srcPath, destPath);
     }

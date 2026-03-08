@@ -76,12 +76,14 @@
         :header-cell-style="{ textAlign: 'center', whiteSpace: 'normal', lineHeight: '1.4' }"
         @row-click="handleRowClick"
       >
-        <el-table-column type="index" width="30" align="center" />
-        <el-table-column prop="name" label="居民姓名" align="center" width="80" />
-        <el-table-column prop="idCard" label="身份证号" align="center" width="160" />
+        <el-table-column type="index" label="序号" width="60" align="center" />
+        <el-table-column prop="name" label="姓名" align="center" width="80" />
         <el-table-column prop="gender" label="性别" align="center" width="40" />
+        <el-table-column prop="ethnicity" label="民族" align="center" width="80" />
+        <el-table-column prop="idCard" label="身份证号" align="center" width="160" />
         <el-table-column prop="age" label="年龄" align="center" width="40" />
         <el-table-column prop="phoneNumber" label="联系电话" align="center" width="120" />
+        <el-table-column prop="villageGroup" label="村组" align="center" width="90" />
         <el-table-column prop="address" label="家庭地址" align="center" min-width="220" />
         <el-table-column prop="disabilityType" label="残疾类型" align="center" width="100" />
         <el-table-column prop="disabilityLevel" label="残疾等级" align="center" width="100" />

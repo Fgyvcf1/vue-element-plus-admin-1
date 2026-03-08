@@ -19,8 +19,11 @@ export interface DisabledPerson {
   idCard?: string
   id_card?: string
   gender?: string
+  ethnicity?: string
   age?: number | string
   phoneNumber?: string
+  villageGroup?: string
+  address?: string
   phone_number?: string
 }
 

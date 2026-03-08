@@ -988,6 +988,10 @@ const handleSave = async () => {
       originalMemberDetail.subsidyAmount !== memberDetail.subsidyAmount ||
       originalMemberDetail.enjoyPolicyType !== memberDetail.enjoyPolicyType ||
       originalMemberDetail.enjoyLevel !== memberDetail.enjoyLevel
+    const remarkValue =
+      typeof memberDetail.remark === 'string' && memberDetail.remark.trim() === ''
+        ? null
+        : memberDetail.remark || null
 
     if (hasKeyChanges && policyHistory.value.length > 0) {
       // 关键字段发生变化，需要结束旧记录并创建新记录
@@ -1015,11 +1019,7 @@ const handleSave = async () => {
           latestRecord.accountRelationship || latestRecord.account_relationship || null,
         has_subsidy: latestRecord.hasSubsidy ?? latestRecord.has_subsidy ?? null,
         status: latestRecord.status || null,
-        remark:
-          `${latestRecord.remark || ''}; 于${new Date().toISOString().slice(0, 10)}调整，新记录开始`.slice(
-            0,
-            255
-          )
+        remark: latestRecord.remark || null
       }
       console.log('【handleSave】更新旧记录的数据:', updateData)
       await updatePolicyRecord(latestRecord.id!, updateData)
@@ -1039,7 +1039,7 @@ const handleSave = async () => {
         bank_name: memberDetail.bankName,
         bank_account: memberDetail.bankAccount,
         status: memberDetail.status,
-        remark: `记录创建：${new Date().toISOString().slice(0, 10)}（调整后的新记录）`
+        remark: remarkValue
       }
       await addPolicyRecord(policyRecordData)
     } else if (policyHistory.value.length > 0) {
@@ -1061,11 +1061,7 @@ const handleSave = async () => {
         bank_name: memberDetail.bankName,
         bank_account: memberDetail.bankAccount,
         status: memberDetail.status,
-        remark:
-          `${latestRecord.remark || ''}; 信息更新：${new Date().toISOString().slice(0, 10)}`.slice(
-            0,
-            255
-          )
+        remark: remarkValue
       })
     } else {
       // 没有历史记录，创建第一条记录
@@ -1083,7 +1079,7 @@ const handleSave = async () => {
         bank_name: memberDetail.bankName,
         bank_account: memberDetail.bankAccount,
         status: memberDetail.status,
-        remark: `记录创建：${new Date().toISOString().slice(0, 10)}`
+        remark: remarkValue
       }
       await addPolicyRecord(policyRecordData)
     }
