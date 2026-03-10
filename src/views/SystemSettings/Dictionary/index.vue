@@ -124,7 +124,7 @@
           <el-input v-model="itemForm.value" placeholder="请输入字典值" />
         </el-form-item>
         <el-form-item v-if="categoryUsesCode(itemForm.category)" label="编码" prop="code">
-          <el-input v-model="itemForm.code" placeholder="请输入村组编码" />
+          <el-input v-model="itemForm.code" placeholder="请输入编码" />
         </el-form-item>
         <el-form-item label="排序序号" prop="display_order">
           <el-input-number
@@ -154,6 +154,9 @@
         <el-form-item label="字典值" prop="value">
           <el-input v-model="categoryForm.value" placeholder="请输入第一个字典值" />
         </el-form-item>
+        <el-form-item v-if="categoryUsesCode(categoryForm.category)" label="编码" prop="code">
+          <el-input v-model="categoryForm.code" placeholder="请输入编码" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="categoryDialogVisible = false">取消</el-button>
@@ -177,8 +180,9 @@ import {
   deleteDictionaryItem
 } from '@/api/dictionary'
 
+const codeEnabledCategories = ['村组', '使用单位']
 const categoryUsesCode = (category: string) => {
-  return ['村组'].includes(category)
+  return codeEnabledCategories.includes((category || '').trim())
 }
 
 const loading = ref(false)
@@ -201,7 +205,7 @@ const itemForm = reactive({
 
 const validateCode = (_rule: any, value: string, callback: (error?: Error) => void) => {
   if (categoryUsesCode(itemForm.category) && !value) {
-    callback(new Error('请输入村组编码'))
+    callback(new Error('请输入编码'))
     return
   }
   callback()
@@ -217,21 +221,52 @@ const categoryDialogVisible = ref(false)
 const categoryFormRef = ref<FormInstance>()
 const categoryForm = reactive({
   category: '',
-  value: ''
+  value: '',
+  code: ''
 })
+
+const validateCategoryCode = (_rule: any, value: string, callback: (error?: Error) => void) => {
+  if (categoryUsesCode(categoryForm.category) && !value) {
+    callback(new Error('请输入编码'))
+    return
+  }
+  callback()
+}
 
 const categoryRules: FormRules = {
   category: [{ required: true, message: '请输入分类名称', trigger: 'blur' }],
-  value: [{ required: true, message: '请输入字典值', trigger: 'blur' }]
+  value: [{ required: true, message: '请输入字典值', trigger: 'blur' }],
+  code: [{ validator: validateCategoryCode, trigger: 'blur' }]
 }
 
 const fetchCategories = async () => {
   try {
     const res = await getDictionaryCategories({ withCount: 1 })
     const data = res.data || []
-    categoryList.value = Array.isArray(data)
-      ? data.map((item: any) => (typeof item === 'string' ? { category: item, count: 0 } : item))
-      : []
+    if (!Array.isArray(data)) {
+      categoryList.value = []
+      return
+    }
+
+    const normalized = data
+      .map((item: any) => {
+        const rawCategory =
+          typeof item === 'string' ? item : (item?.category ?? item?.Category ?? item?.CATEGORY)
+        const category = String(rawCategory || '').trim()
+        const countRaw = typeof item === 'string' ? 0 : (item?.count ?? item?.COUNT ?? 0)
+        const count = Number(countRaw) || 0
+        return { category, count }
+      })
+      .filter((item) => item.category)
+
+    const merged = new Map<string, number>()
+    normalized.forEach((item) => {
+      merged.set(item.category, (merged.get(item.category) || 0) + item.count)
+    })
+
+    categoryList.value = Array.from(merged.entries())
+      .map(([category, count]) => ({ category, count }))
+      .sort((a, b) => a.category.localeCompare(b.category, 'zh-Hans-CN'))
   } catch (error) {
     console.error('获取字典分类失败:', error)
     ElMessage.error('获取字典分类失败')
@@ -340,7 +375,9 @@ const handleDeleteItem = async (row: any) => {
     await ElMessageBox.confirm('确认删除该字典项吗？删除后不可恢复！', '警告', {
       type: 'error'
     })
-    await deleteDictionaryItem(row.id ? row.id : { category: row.category, value: row.value, code: row.code })
+    await deleteDictionaryItem(
+      row.id ? row.id : { category: row.category, value: row.value, code: row.code }
+    )
     ElMessage.success('删除成功')
     fetchDictionaryItems()
     fetchCategories()
@@ -355,6 +392,7 @@ const handleDeleteItem = async (row: any) => {
 const handleAddCategory = () => {
   categoryForm.category = ''
   categoryForm.value = ''
+  categoryForm.code = ''
   categoryDialogVisible.value = true
   categoryFormRef.value?.clearValidate()
 }
@@ -365,6 +403,7 @@ const handleSubmitCategory = () => {
     try {
       await createDictionaryItem({
         category: categoryForm.category,
+        code: categoryUsesCode(categoryForm.category) ? categoryForm.code : undefined,
         value: categoryForm.value,
         display_order: 1
       })

@@ -106,6 +106,13 @@
           >
           <template v-else>
             <el-button type="primary" size="small" @click="handleSave">保存</el-button>
+            <el-button
+              v-hasPermi="'special:delete'"
+              type="danger"
+              size="small"
+              @click="handleDeleteDetail"
+              >删除</el-button
+            >
             <el-button size="small" @click="handleCancelEdit">取消</el-button>
           </template>
         </div>
@@ -311,6 +318,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   ElMessage,
+  ElMessageBox,
   ElInput,
   ElButton,
   ElSelect,
@@ -330,7 +338,12 @@ import {
 } from 'element-plus'
 import { Search, Refresh, Download } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
-import { getDisabledPersons, getDisabledPerson, updateDisabledPerson } from '@/api/disabled'
+import {
+  getDisabledPersons,
+  getDisabledPerson,
+  updateDisabledPerson,
+  deleteDisabledPerson
+} from '@/api/disabled'
 import { getDictionaryByCategory } from '@/api/dictionary'
 import ExcelJS from 'exceljs'
 import { useUserStore } from '@/store/modules/user'
@@ -535,6 +548,36 @@ const handleSave = async () => {
   } catch (error) {
     console.error('保存失败:', error)
     ElMessage.error('保存失败')
+  }
+}
+
+const handleDeleteDetail = async () => {
+  if (!userStore.hasPermission('special:delete')) {
+    ElMessage.warning('暂无删除权限')
+    return
+  }
+  if (!selectedDisabledPersonId.value) {
+    ElMessage.error('记录ID丢失，无法删除')
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm('确认删除该残疾人记录吗？删除后将不可恢复。', '删除确认', {
+      type: 'warning',
+      confirmButtonText: '确定删除',
+      cancelButtonText: '取消'
+    })
+
+    await deleteDisabledPerson(selectedDisabledPersonId.value)
+    ElMessage.success('删除成功')
+    dialogVisible.value = false
+    getList()
+  } catch (error: any) {
+    if (error === 'cancel' || error === 'close') {
+      return
+    }
+    console.error('删除残疾人失败:', error)
+    ElMessage.error('删除失败')
   }
 }
 

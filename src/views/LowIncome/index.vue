@@ -137,6 +137,13 @@
               @click="handleSave"
               >保存</el-button
             >
+            <el-button
+              v-hasPermi="'special:delete'"
+              type="danger"
+              size="small"
+              @click="handleDeleteDetail"
+              >删除</el-button
+            >
             <el-button size="small" @click="handleCancelEdit">取消</el-button>
           </template>
         </div>
@@ -593,6 +600,7 @@ import {
   addPolicyRecord,
   updatePolicyRecord,
   updateLowIncomePerson,
+  deleteLowIncomePerson,
   getTotalMonths,
   getHouseholdTotalSubsidy,
   type LowIncomePerson,
@@ -1120,6 +1128,39 @@ const handleSave = async () => {
   } catch (error) {
     console.error('保存修改失败:', error)
     ElMessage.error('保存修改失败')
+  } finally {
+    detailLoading.value = false
+  }
+}
+
+const handleDeleteDetail = async () => {
+  if (!userStore.hasPermission('special:delete')) {
+    ElMessage.warning('暂无删除权限')
+    return
+  }
+  if (!memberDetail.id) {
+    ElMessage.error('记录ID丢失，无法删除')
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm('确认删除该低收入人员吗？删除后将不可恢复。', '删除确认', {
+      type: 'warning',
+      confirmButtonText: '确定删除',
+      cancelButtonText: '取消'
+    })
+
+    detailLoading.value = true
+    await deleteLowIncomePerson(Number(memberDetail.id))
+    ElMessage.success('删除成功')
+    dialogVisible.value = false
+    getList()
+  } catch (error: any) {
+    if (error === 'cancel' || error === 'close') {
+      return
+    }
+    console.error('删除低收入人员失败:', error)
+    ElMessage.error('删除失败')
   } finally {
     detailLoading.value = false
   }
