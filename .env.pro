@@ -17,13 +17,13 @@ VITE_DROP_CONSOLE=true
 VITE_SOURCEMAP=false
 
 # 输出路径
-VITE_OUT_DIR=release/dist-pro
+VITE_OUT_DIR=deploy_bundle/dist-pro
 
 # 标题
 VITE_APP_TITLE=欢迎使用本系统
 
 # 是否包分析
-VITE_USE_BUNDLE_ANALYZER=true
+VITE_USE_BUNDLE_ANALYZER=false
 
 # 是否全量引入element-plus样式
 VITE_USE_ALL_ELEMENT_PLUS_STYLE=false

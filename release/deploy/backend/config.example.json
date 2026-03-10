@@ -1,7 +1,0 @@
-{
-  "host": "localhost",
-  "user": "app_user",
-  "password": "YOUR_DB_PASSWORD",
-  "database": "village",
-  "port": 3306
-}

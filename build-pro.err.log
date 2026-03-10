@@ -1,9 +1,0 @@
-
-Browserslist: browsers data (caniuse-lite) is 14 months old. Please run:
-  npx update-browserslist-db@latest
-  Why you should do it regularly: https://github.com/browserslist/update-db#readme
-Generated an empty chunk: "echarts".
-
-
-[36m[1mBuild successful. Please see dist-pro directory[22m[39m
-

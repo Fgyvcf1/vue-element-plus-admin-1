@@ -29,14 +29,11 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     /(?:material-symbols|material-symbols-light|ic|mdi|ph|solar|tabler|mingcute|ri|bi|carbon|iconamoon|iconoir|ion|lucide|uil|tdesign|teenyicons|clarity|bx|bxs|majesticons|ant-design|gg|octicon|memory|cil|mynaui|basil|pixelarticons|akar-icons|ci|system-uicons|typcn|radix-icons|zondicons|ep|circum|mdi-light|fe|eos-icons|charm|prime|humbleicons|uiw|uim|uit|uis|maki|gridicons|mi|quill|gala|lets-icons|fluent|icon-park-outline|icon-park-solid|icon-park-twotone|icon-park|vscode-icons|jam|heroicons|codicon|pajamas|pepicons-pop|pepicons-print|pepicons-pencil|bytesize|ei|streamline|guidance|fa6-solid|fa6-regular|ooui|nimbus|formkit|line-md|meteocons|svg-spinners|openmoji|twemoji|noto|fluent-emoji|fluent-emoji-flat|fluent-emoji-high-contrast|noto-v1|emojione|emojione-monotone|emojione-v1|fxemoji|streamline-emojis|bxl|logos|simple-icons|cib|fa6-brands|nonicons|arcticons|file-icons|devicon|devicon-plain|skill-icons|brandico|entypo-social|cryptocurrency|cryptocurrency-color|flag|circle-flags|flagpack|cif|gis|map|geo|game-icons|fad|academicons|wi|healthicons|medical-icon|covid|la|eva|dashicons|flat-color-icons|entypo|foundation|raphael|icons8|iwwa|heroicons-outline|heroicons-solid|fa-solid|fa-regular|fa-brands|fa|fluent-mdl2|fontisto|icomoon-free|subway|oi|wpf|simple-line-icons|et|el|vaadin|grommet-icons|whh|si-glyph|zmdi|ls|bpmn|flat-ui|vs|topcoat|il|websymbol|fontelico|ps|feather|mono-icons|pepicons):[\w\d-]+/g
   const iconifyCollectionCheckRe =
     /(?:material-symbols|material-symbols-light|ic|mdi|ph|solar|tabler|mingcute|ri|bi|carbon|iconamoon|iconoir|ion|lucide|uil|tdesign|teenyicons|clarity|bx|bxs|majesticons|ant-design|gg|octicon|memory|cil|mynaui|basil|pixelarticons|akar-icons|ci|system-uicons|typcn|radix-icons|zondicons|ep|circum|mdi-light|fe|eos-icons|charm|prime|humbleicons|uiw|uim|uit|uis|maki|gridicons|mi|quill|gala|lets-icons|fluent|icon-park-outline|icon-park-solid|icon-park-twotone|icon-park|vscode-icons|jam|heroicons|codicon|pajamas|pepicons-pop|pepicons-print|pepicons-pencil|bytesize|ei|streamline|guidance|fa6-solid|fa6-regular|ooui|nimbus|formkit|line-md|meteocons|svg-spinners|openmoji|twemoji|noto|fluent-emoji|fluent-emoji-flat|fluent-emoji-high-contrast|noto-v1|emojione|emojione-monotone|emojione-v1|fxemoji|streamline-emojis|bxl|logos|simple-icons|cib|fa6-brands|nonicons|arcticons|file-icons|devicon|devicon-plain|skill-icons|brandico|entypo-social|cryptocurrency|cryptocurrency-color|flag|circle-flags|flagpack|cif|gis|map|geo|game-icons|fad|academicons|wi|healthicons|medical-icon|covid|la|eva|dashicons|flat-color-icons|entypo|foundation|raphael|icons8|iwwa|heroicons-outline|heroicons-solid|fa-solid|fa-regular|fa-brands|fa|fluent-mdl2|fontisto|icomoon-free|subway|oi|wpf|simple-line-icons|et|el|vaadin|grommet-icons|whh|si-glyph|zmdi|ls|bpmn|flat-ui|vs|topcoat|il|websymbol|fontelico|ps|feather|mono-icons|pepicons):[\w\d-]+/
-  let env = {} as any
   const isBuild = command === 'build'
-
-  if (!isBuild) {
-    env = loadEnv(process.argv[3] === '--mode' ? process.argv[4] : process.argv[3], root)
-  } else {
-    env = loadEnv(mode, root)
-  }
+  const env = loadEnv(mode, root)
+  const devPort = Number(env.VITE_DEV_PORT || 4000)
+  const devHost = env.VITE_DEV_HOST || '127.0.0.1'
+  const hmrHost = env.VITE_HMR_HOST || '127.0.0.1'
 
   // 判断是否为开发环境，用于决定是否启用某些插件
   const isDevelopment = !isBuild;
@@ -148,7 +145,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     },
     build: {
       target: 'es2015',
-      outDir: env.VITE_OUT_DIR || 'dist',
+      outDir: env.VITE_OUT_DIR || 'deploy_bundle/dist',
       sourcemap: env.VITE_SOURCEMAP === 'true',
       // brotliSize: false,
       rollupOptions: {
@@ -167,11 +164,11 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       cssTarget: ['chrome31']
     },
     server: {
-      port: 4000,
+      port: devPort,
       strictPort: true, // Fail if port is already in use.
       watch: {
         // Avoid watching build output on Windows.
-        ignored: ['**/release/**', '**/dist/**', '**/dist-pro/**']
+        ignored: ['**/deploy_bundle/**', '**/release/**', '**/dist/**', '**/dist-pro/**']
       },
       proxy: {
         // Exclude mock paths from proxy.
@@ -191,9 +188,11 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         }
       },
       hmr: {
-        overlay: false
+        overlay: false,
+        host: hmrHost,
+        clientPort: devPort
       },
-      host: '0.0.0.0'
+      host: devHost
     },
     optimizeDeps: {
       entries: ['index.html', 'src/main.ts'],

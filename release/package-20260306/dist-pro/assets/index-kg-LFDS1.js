@@ -1,1 +1,0 @@
-import o from"./index-DetVVkmD.js";import{_ as e}from"./index-CXquUmLR.js";import{y as t,M as a,x as r}from"./vue-chunks-CB5ZdmW5.js";import"./element-plus-OjkWd4Ne.js";import"./wang-editor-BMDcf-HK.js";const s={class:"dashboard-container"},c={__name:"index",setup(_){return(n,d)=>(r(),t("div",s,[a(o)]))}},l=e(c,[["__scopeId","data-v-61af0bfe"]]);export{l as default};

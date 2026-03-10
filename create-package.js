@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// 打包目录
-const packageDir = path.join(__dirname, 'release', 'deploy');
+// 打包目录（与目标机部署结构保持一致）
+const packageDir = path.join(__dirname, 'deploy_bundle');
 
 console.log('正在创建Vue Element Plus Admin安装包...');
 
@@ -13,7 +13,7 @@ if (!fs.existsSync(packageDir)) {
   fs.mkdirSync(packageDir, { recursive: true });
 }
 
-const subDirs = ['backend', 'frontend', 'docs'];
+const subDirs = ['backend', 'frontend'];
 for (const dir of subDirs) {
   const dirPath = path.join(packageDir, dir);
   if (!fs.existsSync(dirPath)) {
@@ -41,8 +41,9 @@ if (fs.existsSync(backendSrcDir)) {
 
 // 3. 复制前端构建文件（如果存在）
 console.log('3. 准备前端文件...');
-const frontendDistDir = path.join(__dirname, 'release', 'dist-pro');
+const frontendDistDir = path.join(__dirname, 'deploy_bundle', 'dist-pro');
 const legacyFrontendDistDir = path.join(__dirname, 'dist');
+const legacyReleaseDistDir = path.join(__dirname, 'release', 'dist-pro');
 const frontendDestDir = path.join(packageDir, 'frontend');
 
 // 清理旧目录，避免残留文件
@@ -53,7 +54,10 @@ fs.mkdirSync(frontendDestDir, { recursive: true });
 
 if (fs.existsSync(frontendDistDir)) {
   copyDir(frontendDistDir, frontendDestDir);
-  console.log('✓ 复制前端构建文件 (release/dist-pro)');
+  console.log('✓ 复制前端构建文件 (deploy_bundle/dist-pro)');
+} else if (fs.existsSync(legacyReleaseDistDir)) {
+  copyDir(legacyReleaseDistDir, frontendDestDir);
+  console.log('✓ 复制前端构建文件 (release/dist-pro, legacy)');
 } else if (fs.existsSync(legacyFrontendDistDir)) {
   copyDir(legacyFrontendDistDir, frontendDestDir);
   console.log('✓ 复制前端构建文件 (dist)');
