@@ -131,18 +131,11 @@ const handleReset = () => {
   loadData()
 }
 
-  const getApiBaseUrl = () => {
-    const apiOrigin = import.meta.env.VITE_API_BASE_URL || window.location.origin
-    const apiBasePath = import.meta.env.VITE_API_BASE_PATH || '/api'
-    return `${apiOrigin}${apiBasePath}`
-  }
-
-  const handleView = (row: any) => {
-    // 使用后端API直接查看PDF
-    const baseUrl = getApiBaseUrl()
-    currentPdfUrl.value = `${baseUrl}/case-files/${row.archive_id}/view`
-    viewDialogVisible.value = true
-  }
+const handleView = (row: any) => {
+  // Use relative API path so LAN clients always request the same host they are visiting.
+  currentPdfUrl.value = `/api/case-files/${row.archive_id}/view`
+  viewDialogVisible.value = true
+}
 
 const handleDownload = async (row: any) => {
   try {

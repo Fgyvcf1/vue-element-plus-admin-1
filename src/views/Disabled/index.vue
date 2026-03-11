@@ -97,6 +97,7 @@
         v-model="dialogVisible"
         title="残疾人信息详情"
         width="70%"
+        class="disabled-person-detail-dialog"
         :close-on-click-modal="true"
         @close="handleDialogClose"
       >
@@ -145,122 +146,116 @@
           </el-form>
         </el-card>
 
-        <!-- 第二部分：残疾人个人信息 -->
+        <!-- 第二、三部分：残疾人个人信息 + 残疾信息（合并展示） -->
         <el-card shadow="hover" class="info-card" style="margin-bottom: 16px">
           <template #header>
             <div class="clearfix">
-              <span>残疾人个人信息</span>
+              <span>残疾人个人信息与残疾信息</span>
             </div>
           </template>
-          <el-form :model="personInfo" label-width="100px" size="small">
-            <el-row :gutter="12">
-              <el-col :span="8">
-                <el-form-item label="姓名">
-                  <el-input v-model="personInfo.name" disabled />
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="性别">
-                  <el-input v-model="personInfo.gender" disabled />
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="年龄">
-                  <el-input v-model="personInfo.age" disabled />
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="身份证号">
-                  <el-input v-model="personInfo.idCard" disabled />
-                </el-form-item>
-              </el-col>
-              <el-col :span="16">
-                <el-form-item label="家庭住址">
-                  <el-input v-model="personInfo.address" disabled />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-        </el-card>
+          <div class="combined-info-section">
+            <el-form :model="personInfo" label-width="100px" size="small">
+              <el-row :gutter="12">
+                <el-col :span="8">
+                  <el-form-item label="姓名">
+                    <el-input v-model="personInfo.name" disabled />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="性别">
+                    <el-input v-model="personInfo.gender" disabled />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="年龄">
+                    <el-input v-model="personInfo.age" disabled />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="身份证号">
+                    <el-input v-model="personInfo.idCard" disabled />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="16">
+                  <el-form-item label="家庭住址">
+                    <el-input v-model="personInfo.address" disabled />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-form>
 
-        <!-- 第三部分：残疾信息 -->
-        <el-card shadow="hover" class="info-card" style="margin-bottom: 16px">
-          <template #header>
-            <div class="clearfix">
-              <span>残疾信息</span>
-            </div>
-          </template>
-          <el-form :model="disabilityInfo" label-width="100px" size="small">
-            <el-row :gutter="12">
-              <el-col :span="8">
-                <el-form-item label="残疾类型">
-                  <el-select
-                    v-model="disabilityInfo.disabilityType"
-                    :disabled="!isEditing"
-                    style="width: 100%"
-                  >
-                    <el-option
-                      v-for="item in disabilityTypeOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
+            <el-form :model="disabilityInfo" label-width="100px" size="small">
+              <el-row :gutter="12">
+                <el-col :span="8">
+                  <el-form-item label="残疾类型">
+                    <el-select
+                      v-model="disabilityInfo.disabilityType"
+                      :disabled="!isEditing"
+                      style="width: 100%"
+                    >
+                      <el-option
+                        v-for="item in disabilityTypeOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="残疾等级">
+                    <el-select
+                      v-model="disabilityInfo.disabilityLevel"
+                      :disabled="!isEditing"
+                      style="width: 100%"
+                    >
+                      <el-option label="一级" value="一级" />
+                      <el-option label="二级" value="二级" />
+                      <el-option label="三级" value="三级" />
+                      <el-option label="四级" value="四级" />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="持证状态">
+                    <el-select
+                      v-if="isEditing"
+                      v-model="disabilityInfo.certificateStatus"
+                      placeholder="请选择持证状态"
+                      style="width: 100%"
+                    >
+                      <el-option label="在持" value="在持" />
+                      <el-option label="注销" value="注销" />
+                    </el-select>
+                    <el-tag
+                      v-else
+                      :type="disabilityInfo.certificateStatus === '在持' ? 'success' : 'info'"
+                      size="default"
+                    >
+                      {{ disabilityInfo.certificateStatus }}
+                    </el-tag>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="残疾证号">
+                    <el-input v-model="disabilityInfo.certificateNumber" :disabled="!isEditing" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="初次发证日期">
+                    <el-date-picker
+                      v-model="disabilityInfo.issueDate"
+                      type="date"
+                      placeholder="选择日期"
+                      value-format="YYYY-MM-DD"
+                      :disabled="!isEditing"
+                      style="width: 100%"
                     />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="残疾等级">
-                  <el-select
-                    v-model="disabilityInfo.disabilityLevel"
-                    :disabled="!isEditing"
-                    style="width: 100%"
-                  >
-                    <el-option label="一级" value="一级" />
-                    <el-option label="二级" value="二级" />
-                    <el-option label="三级" value="三级" />
-                    <el-option label="四级" value="四级" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="持证状态">
-                  <el-select
-                    v-if="isEditing"
-                    v-model="disabilityInfo.certificateStatus"
-                    placeholder="请选择持证状态"
-                    style="width: 100%"
-                  >
-                    <el-option label="在持" value="在持" />
-                    <el-option label="注销" value="注销" />
-                  </el-select>
-                  <el-tag
-                    v-else
-                    :type="disabilityInfo.certificateStatus === '在持' ? 'success' : 'info'"
-                    size="default"
-                  >
-                    {{ disabilityInfo.certificateStatus }}
-                  </el-tag>
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="残疾证号">
-                  <el-input v-model="disabilityInfo.certificateNumber" :disabled="!isEditing" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="初次发证日期">
-                  <el-date-picker
-                    v-model="disabilityInfo.issueDate"
-                    type="date"
-                    placeholder="选择日期"
-                    value-format="YYYY-MM-DD"
-                    :disabled="!isEditing"
-                    style="width: 100%"
-                  />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-form>
+          </div>
         </el-card>
 
         <!-- 第四部分：监护人信息 -->
@@ -607,6 +602,12 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
+.combined-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .clearfix {
   display: flex;
   justify-content: space-between;
@@ -616,5 +617,20 @@ onMounted(() => {
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
+}
+
+:deep(.disabled-person-detail-dialog .el-input.is-disabled .el-input__wrapper),
+:deep(.disabled-person-detail-dialog .el-select .el-select__wrapper.is-disabled),
+:deep(.disabled-person-detail-dialog .el-date-editor.is-disabled .el-input__wrapper),
+:deep(.disabled-person-detail-dialog .el-textarea.is-disabled .el-textarea__inner) {
+  background-color: #fff;
+}
+
+:deep(.disabled-person-detail-dialog .el-input.is-disabled .el-input__inner),
+:deep(.disabled-person-detail-dialog .el-select .el-select__selected-item),
+:deep(.disabled-person-detail-dialog .el-textarea.is-disabled .el-textarea__inner),
+:deep(.disabled-person-detail-dialog .el-date-editor.is-disabled .el-input__inner) {
+  color: var(--el-text-color-regular);
+  -webkit-text-fill-color: var(--el-text-color-regular);
 }
 </style>

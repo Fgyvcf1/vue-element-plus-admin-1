@@ -22,7 +22,7 @@ router.get('/category', async (req, res) => {
     }
 
     const sql =
-      "SELECT id, category, code, value, display_order, status, created_at, updated_at FROM dictionaries WHERE category = ? AND status = 'active' ORDER BY display_order ASC, id ASC"
+      "SELECT id, category, code, value, display_order, status, created_at, updated_at FROM dictionaries WHERE TRIM(category) = TRIM(?) AND (status = 'active' OR status IS NULL OR status = '') ORDER BY display_order ASC, id ASC"
     const [rows] = await db.pool.execute(sql, [category])
     const formatted = rows.map((r) => ({ ...r, label: r.value }))
     res.json({ code: 20000, message: 'success', data: formatted })
@@ -79,10 +79,10 @@ router.get('/', async (req, res) => {
 
     const includeAll = String(include_all || '') === '1'
     let sql =
-      'SELECT id, category, code, value, display_order, status, created_at, updated_at FROM dictionaries WHERE category = ?'
+      'SELECT id, category, code, value, display_order, status, created_at, updated_at FROM dictionaries WHERE TRIM(category) = TRIM(?)'
     const params = [category]
     if (!includeAll) {
-      sql += " AND status = 'active'"
+      sql += " AND (status = 'active' OR status IS NULL OR status = '')"
     }
     sql += ' ORDER BY display_order ASC, id ASC'
 

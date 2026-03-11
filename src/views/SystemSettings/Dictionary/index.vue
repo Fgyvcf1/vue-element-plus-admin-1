@@ -181,6 +181,7 @@ import {
 } from '@/api/dictionary'
 
 const codeEnabledCategories = ['村组', '使用单位']
+const requiredCategories = ['使用单位']
 const categoryUsesCode = (category: string) => {
   return codeEnabledCategories.includes((category || '').trim())
 }
@@ -267,6 +268,13 @@ const fetchCategories = async () => {
     categoryList.value = Array.from(merged.entries())
       .map(([category, count]) => ({ category, count }))
       .sort((a, b) => a.category.localeCompare(b.category, 'zh-Hans-CN'))
+
+    requiredCategories.forEach((category) => {
+      if (!categoryList.value.some((item) => item.category === category)) {
+        categoryList.value.push({ category, count: 0 })
+      }
+    })
+    categoryList.value.sort((a, b) => a.category.localeCompare(b.category, 'zh-Hans-CN'))
   } catch (error) {
     console.error('获取字典分类失败:', error)
     ElMessage.error('获取字典分类失败')

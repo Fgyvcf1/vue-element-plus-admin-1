@@ -5,6 +5,42 @@ import { SUCCESS_CODE, TRANSFORM_REQUEST_DATA } from '@/constants'
 import { useUserStoreWithOut } from '@/store/modules/user'
 import { objToFormData } from '@/utils'
 
+const LOCALHOST_HOST_RE = /^(localhost|127(?:\.\d{1,3}){3})$/i
+
+const normalizeAssetUrl = (value: string) => {
+  if (!value || typeof window === 'undefined') return value
+  if (!/^https?:\/\//i.test(value)) return value
+  try {
+    const parsed = new URL(value)
+    if (!LOCALHOST_HOST_RE.test(parsed.hostname)) return value
+    const path = parsed.pathname || ''
+    const isAssetPath =
+      path.startsWith('/uploads/') ||
+      path.startsWith('/archives/') ||
+      path.startsWith('/logo') ||
+      path.startsWith('/favicon')
+    if (!isAssetPath) return value
+    return `${window.location.origin}${parsed.pathname}${parsed.search}${parsed.hash}`
+  } catch {
+    return value
+  }
+}
+
+const normalizeResponseAssets = (payload: any): any => {
+  if (typeof payload === 'string') {
+    return normalizeAssetUrl(payload)
+  }
+  if (Array.isArray(payload)) {
+    return payload.map((item) => normalizeResponseAssets(item))
+  }
+  if (payload && typeof payload === 'object') {
+    Object.keys(payload).forEach((key) => {
+      payload[key] = normalizeResponseAssets(payload[key])
+    })
+  }
+  return payload
+}
+
 const defaultRequestInterceptors = (config: InternalAxiosRequestConfig) => {
   // 添加用户ID到请求头（用于后端权限验证）
   const userStore = useUserStoreWithOut()
@@ -47,7 +83,7 @@ const defaultResponseInterceptors = (response: AxiosResponse) => {
     // 如果是文件流，直接过
     return response
   } else if (response.data.code === SUCCESS_CODE) {
-    return response.data
+    return normalizeResponseAssets(response.data)
   } else {
     if (response?.data?.code === 403) {
       ElMessage.warning('当前账号没有权限')

@@ -34,7 +34,7 @@
         </el-table-column>
         <el-table-column label="任职时长" width="100" align="center">
           <template #default="{ row }">{{
-            calculateServiceTime(row.term_start_date, row.term_end_date)
+            calculateServiceTime(row.term_start_date, row.term_end_date, row.status)
           }}</template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="80" align="center">
@@ -92,7 +92,7 @@ const calculateStats = () => {
 
   for (const item of historyList.value) {
     const start = new Date(String(item.term_start_date))
-    const end = item.term_end_date ? new Date(String(item.term_end_date)) : now
+    const end = resolveEffectiveEndDate(item, now)
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end) continue
     intervals.push({ start, end })
   }
@@ -108,6 +108,18 @@ const calculateStats = () => {
     }
   }
   stats.totalYears = Math.round(totalDays / 365)
+}
+
+const resolveEffectiveEndDate = (item: any, now = new Date()) => {
+  const rawEnd = item.term_end_date ? new Date(String(item.term_end_date)) : new Date(now)
+  if (Number.isNaN(rawEnd.getTime())) {
+    return rawEnd
+  }
+  // 现任任期结束若晚于今天，累计年数只统计到今天，避免计算未来时间
+  if (item.status === 'current' && rawEnd.getTime() > now.getTime()) {
+    return new Date(now)
+  }
+  return rawEnd
 }
 
 const mergeOverlappingIntervals = (intervals: Array<{ start: Date; end: Date }>) => {
@@ -156,11 +168,14 @@ watch(
   { immediate: true }
 )
 
-const calculateServiceTime = (startDateStr?: string, endDateStr?: string) => {
+const calculateServiceTime = (startDateStr?: string, endDateStr?: string, status?: string) => {
   if (!startDateStr) return '-'
   const start = new Date(startDateStr)
-  const end = endDateStr ? new Date(endDateStr) : new Date()
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end) return '-'
+  const now = new Date()
+  const rawEnd = endDateStr ? new Date(endDateStr) : now
+  if (Number.isNaN(start.getTime()) || Number.isNaN(rawEnd.getTime())) return '-'
+  const end = status === 'current' && rawEnd.getTime() > now.getTime() ? now : rawEnd
+  if (start > end) return '-'
   const years = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 365))
   return `${years}年`
 }

@@ -2,80 +2,131 @@
   <div class="resident-query-container">
     <!-- 搜索表单 -->
     <el-card class="search-card" shadow="never">
-      <el-form :model="searchForm" label-width="70px" class="search-form" size="small">
+      <el-form :model="searchForm" label-width="64px" class="search-form" size="small">
         <div class="search-form-content">
           <div class="search-fields">
-            <el-form-item label="居民姓名" class="compact-form-item">
-              <el-autocomplete
-                v-model="searchForm.name"
-                placeholder="姓名"
-                clearable
-                :fetch-suggestions="fetchResidentNameSuggestions"
-                value-key="value"
-                :trigger-on-focus="false"
-                :debounce="300"
-                @select="handleSearch"
-              />
-            </el-form-item>
-            <el-form-item label="身份证号" class="compact-form-item">
-              <el-input
-                v-model="searchForm.idCard"
-                placeholder="身份证"
-                clearable
-                @keyup.enter="handleSearch"
-              />
-            </el-form-item>
-            <el-form-item label="户主姓名" class="compact-form-item">
-              <el-autocomplete
-                v-model="searchForm.householderName"
-                placeholder="户主"
-                clearable
-                :fetch-suggestions="fetchHouseholdHeadNameSuggestions"
-                value-key="value"
-                :trigger-on-focus="false"
-                :debounce="300"
-                @select="handleSearch"
-              />
-            </el-form-item>
-            <el-form-item label="性别" class="compact-form-item">
-              <el-select v-model="searchForm.gender" placeholder="性别" clearable>
-                <el-option label="男" value="男" />
-                <el-option label="女" value="女" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="村组" class="compact-form-item">
-              <el-select v-model="searchForm.villageGroup" placeholder="村组" clearable>
-                <el-option
-                  v-for="item in villageGroupOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+            <div class="search-fields-row short-row">
+              <el-form-item label="居民姓名" class="compact-form-item short-form-item">
+                <el-autocomplete
+                  v-model="searchForm.name"
+                  placeholder="姓名"
+                  clearable
+                  :fetch-suggestions="fetchResidentNameSuggestions"
+                  value-key="value"
+                  :trigger-on-focus="false"
+                  :debounce="300"
+                  @select="handleSearch"
                 />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="出生年份" class="compact-form-item">
-              <el-date-picker
-                v-model="searchForm.birthYear"
-                type="year"
-                placeholder="年份"
-                value-format="YYYY"
-              />
-            </el-form-item>
-            <el-form-item label="联系电话" class="compact-form-item">
-              <el-input v-model="searchForm.phoneNumber" placeholder="电话" clearable />
-            </el-form-item>
-            <el-form-item label="状态" class="compact-form-item">
-              <el-select v-model="searchForm.status" placeholder="状态" clearable>
-                <el-option label="正常" value="active" />
-                <el-option label="迁出" value="migrated_out" />
-                <el-option label="死亡" value="deceased" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label-width="0" class="compact-form-item action-form-item">
-              <el-button type="primary" plain @click="handlePopulationDeathReport">
-                人口增减上报
-              </el-button>
-            </el-form-item>
+              </el-form-item>
+              <el-form-item label="户主姓名" class="compact-form-item short-form-item">
+                <el-autocomplete
+                  v-model="searchForm.householderName"
+                  placeholder="户主"
+                  clearable
+                  :fetch-suggestions="fetchHouseholdHeadNameSuggestions"
+                  value-key="value"
+                  :trigger-on-focus="false"
+                  :debounce="300"
+                  @select="handleSearch"
+                />
+              </el-form-item>
+              <el-form-item label="性别" class="compact-form-item short-form-item">
+                <el-select v-model="searchForm.gender" placeholder="性别" clearable>
+                  <el-option label="男" value="男" />
+                  <el-option label="女" value="女" />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="村组" class="compact-form-item short-form-item">
+                <el-select v-model="searchForm.villageGroup" placeholder="村组" clearable>
+                  <el-option
+                    v-for="item in villageGroupOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="政治面貌" class="compact-form-item short-form-item">
+                <el-select v-model="searchForm.politicalStatus" placeholder="政治面貌" clearable>
+                  <el-option
+                    v-for="item in politicalStatusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="状态" class="compact-form-item short-form-item">
+                <el-select v-model="searchForm.status" placeholder="状态" clearable>
+                  <el-option label="正常" value="active" />
+                  <el-option label="迁出" value="migrated_out" />
+                  <el-option label="死亡" value="deceased" />
+                </el-select>
+              </el-form-item>
+            </div>
+
+            <div class="search-fields-row long-row">
+              <el-form-item label="身份证号" class="compact-form-item long-form-item id-card-item">
+                <el-input
+                  v-model="searchForm.idCard"
+                  placeholder="身份证"
+                  clearable
+                  @keyup.enter="handleSearch"
+                />
+              </el-form-item>
+              <el-form-item label="联系电话" class="compact-form-item long-form-item phone-item">
+                <el-input
+                  v-model="searchForm.phoneNumber"
+                  placeholder="电话"
+                  clearable
+                  @keyup.enter="handleSearch"
+                />
+              </el-form-item>
+              <el-form-item label="家庭地址" class="compact-form-item long-form-item address-item">
+                <el-input
+                  v-model="searchForm.address"
+                  placeholder="家庭地址"
+                  clearable
+                  @keyup.enter="handleSearch"
+                />
+              </el-form-item>
+              <el-form-item
+                label="年龄段"
+                class="compact-form-item long-form-item age-range-form-item age-item"
+              >
+                <div class="age-range-inputs">
+                  <el-input
+                    v-model="searchForm.minAge"
+                    placeholder="最小"
+                    clearable
+                    inputmode="numeric"
+                    @input="(val) => handleAgeInput('minAge', String(val ?? ''))"
+                    @keyup.enter="handleSearch"
+                  />
+                  <span class="age-range-separator">-</span>
+                  <el-input
+                    v-model="searchForm.maxAge"
+                    placeholder="最大"
+                    clearable
+                    inputmode="numeric"
+                    @input="(val) => handleAgeInput('maxAge', String(val ?? ''))"
+                    @keyup.enter="handleSearch"
+                  />
+                  <span class="age-range-unit">岁</span>
+                </div>
+              </el-form-item>
+              <el-form-item
+                label="出生年份"
+                class="compact-form-item long-form-item birth-year-item"
+              >
+                <el-date-picker
+                  v-model="searchForm.birthYear"
+                  type="year"
+                  placeholder="年份"
+                  value-format="YYYY"
+                />
+              </el-form-item>
+            </div>
           </div>
           <div class="search-buttons">
             <el-button type="primary" @click="handleSearch" size="small">
@@ -98,6 +149,9 @@
             >
               <Icon icon="ep:upload" class="mr-1" />
               导入
+            </el-button>
+            <el-button @click="handlePopulationDeathReport" size="small">
+              人口增减上报
             </el-button>
           </div>
         </div>
@@ -265,12 +319,70 @@ const searchForm = reactive({
   name: '',
   idCard: '',
   householderName: '',
+  minAge: '',
+  maxAge: '',
   gender: '',
   villageGroup: '',
+  politicalStatus: '',
   birthYear: '',
+  address: '',
   phoneNumber: '',
   status: 'active' // 默认状态为正常
 })
+
+const AGE_MIN_BOUNDARY = 0
+const AGE_MAX_BOUNDARY = 150
+
+const normalizeAgeInput = (value: string) => String(value || '').replace(/[^\d]/g, '').slice(0, 3)
+
+const handleAgeInput = (field: 'minAge' | 'maxAge', value: string) => {
+  searchForm[field] = normalizeAgeInput(value)
+}
+
+const parseAgeValue = (value: string): number | null => {
+  const normalized = normalizeAgeInput(value)
+  if (!normalized) return null
+  return Number(normalized)
+}
+
+const validateAgeRange = (showError: boolean) => {
+  const minAge = parseAgeValue(searchForm.minAge)
+  const maxAge = parseAgeValue(searchForm.maxAge)
+
+  if (minAge !== null && (minAge < AGE_MIN_BOUNDARY || minAge > AGE_MAX_BOUNDARY)) {
+    if (showError) {
+      ElMessage.warning(`最小年龄需在${AGE_MIN_BOUNDARY}-${AGE_MAX_BOUNDARY}之间`)
+    }
+    return false
+  }
+
+  if (maxAge !== null && (maxAge < AGE_MIN_BOUNDARY || maxAge > AGE_MAX_BOUNDARY)) {
+    if (showError) {
+      ElMessage.warning(`最大年龄需在${AGE_MIN_BOUNDARY}-${AGE_MAX_BOUNDARY}之间`)
+    }
+    return false
+  }
+
+  if (minAge !== null && maxAge !== null && minAge > maxAge) {
+    if (showError) {
+      ElMessage.warning('年龄段起始值不能大于结束值')
+    }
+    return false
+  }
+
+  return true
+}
+
+const buildSearchParams = (extraParams: Record<string, any> = {}) => {
+  const minAge = parseAgeValue(searchForm.minAge)
+  const maxAge = parseAgeValue(searchForm.maxAge)
+  return {
+    ...searchForm,
+    minAge: minAge === null ? '' : String(minAge),
+    maxAge: maxAge === null ? '' : String(maxAge),
+    ...extraParams
+  }
+}
 
 // 是否已经执行过首次查询
 const hasSearched = ref(false)
@@ -289,6 +401,9 @@ watch(
         if (searchForm.phoneNumber && searchForm.phoneNumber.length < 4) {
           return // 电话号码少于4位，不触发查询
         }
+        if (!validateAgeRange(false)) {
+          return
+        }
         fetchList()
       }, 300)
     }
@@ -301,6 +416,8 @@ let searchTimer: ReturnType<typeof setTimeout> | null = null
 
 // 村组选项（从字典表获取）
 const villageGroupOptions = ref<{ label: string; value: string }[]>([])
+// 政治面貌选项（从字典表获取）
+const politicalStatusOptions = ref<{ label: string; value: string }[]>([])
 
 // 获取村组字典数据
 const fetchVillageGroups = async () => {
@@ -325,6 +442,29 @@ const fetchVillageGroups = async () => {
       { label: '三组', value: '三组' },
       { label: '四组', value: '四组' },
       { label: '五组', value: '五组' }
+    ]
+  }
+}
+
+// 获取政治面貌字典数据
+const fetchPoliticalStatusOptions = async () => {
+  try {
+    const res = await request.get({
+      url: '/dictionaries',
+      params: { category: '政治面貌' }
+    })
+    if (res.data && Array.isArray(res.data)) {
+      politicalStatusOptions.value = res.data.map((item: any) => ({
+        label: item.label || item.value,
+        value: item.value || item.label
+      }))
+    }
+  } catch (error) {
+    console.error('获取政治面貌列表失败:', error)
+    politicalStatusOptions.value = [
+      { label: '群众', value: '群众' },
+      { label: '共青团员', value: '共青团员' },
+      { label: '中共党员', value: '中共党员' }
     ]
   }
 }
@@ -404,11 +544,10 @@ const handlePopulationDeathReport = () => {
 const fetchList = async () => {
   loading.value = true
   try {
-    const params = {
+    const params = buildSearchParams({
       pageNum: pagination.page,
-      pageSize: pagination.limit,
-      ...searchForm
-    }
+      pageSize: pagination.limit
+    })
     const res = await getResidentList(params)
     console.log('获取居民列表响应:', res)
     // 适配后端返回的数据结构
@@ -432,6 +571,9 @@ const handleSearch = () => {
     ElMessage.warning('联系电话至少需要输入4位数')
     return
   }
+  if (!validateAgeRange(true)) {
+    return
+  }
   pagination.page = 1
   hasSearched.value = true // 标记已执行过首次查询
   fetchList()
@@ -442,8 +584,8 @@ const handleReset = () => {
   Object.keys(searchForm).forEach((key) => {
     searchForm[key as keyof typeof searchForm] = ''
   })
-  // 状态默认为空，查询所有状态
-  searchForm.status = ''
+  // 状态保持默认“正常”
+  searchForm.status = 'active'
   pagination.page = 1
   hasSearched.value = false // 重置搜索标志
   tableData.value = [] // 清空数据
@@ -455,11 +597,10 @@ const handleReset = () => {
 // 导出
 const handleExport = async () => {
   try {
-    const allParams = {
+    const allParams = buildSearchParams({
       pageNum: 1,
-      pageSize: 999999,
-      ...searchForm
-    }
+      pageSize: 999999
+    })
     const res = await getResidentList(allParams)
     const allData = res.data || []
 
@@ -638,8 +779,9 @@ const formatStatus = (status: string) => {
 
 // 初始化 - 默认不查询数据，保护隐私
 onMounted(() => {
-  // 只加载村组字典数据，不加载居民列表
+  // 只加载查询字典数据，不加载居民列表
   fetchVillageGroups()
+  fetchPoliticalStatusOptions()
   // 清空表格数据
   tableData.value = []
   pagination.total = 0
@@ -667,44 +809,115 @@ onUnmounted(() => {
     .search-form {
       .search-form-content {
         display: flex;
-        align-items: flex-start;
-        gap: 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
 
         .search-fields {
           display: flex;
-          flex-wrap: wrap;
-          gap: 8px 16px;
+          flex-direction: column;
+          gap: 8px;
           flex: 1;
 
-          .compact-form-item {
-            margin-bottom: 0;
-            width: calc(25% - 12px);
-            min-width: 180px;
+          .search-fields-row {
+            display: grid;
+            gap: 8px 10px;
 
-            :deep(.el-form-item__label) {
-              font-size: 12px;
-              padding-right: 4px;
+            &.short-row {
+              grid-template-columns: repeat(6, minmax(0, 1fr));
             }
 
-            :deep(.el-input__inner),
-            :deep(.el-select .el-input__inner) {
-              font-size: 12px;
+            &.long-row {
+              grid-template-columns: repeat(12, minmax(0, 1fr));
             }
 
-            :deep(.el-autocomplete),
-            :deep(.el-input),
-            :deep(.el-select),
-            :deep(.el-date-editor) {
-              width: 100%;
-            }
-
-            &.action-form-item {
-              width: auto;
-              min-width: auto;
-
-              :deep(.el-form-item__content) {
-                margin-left: 0 !important;
+            &.long-row {
+              .id-card-item {
+                grid-column: span 3;
               }
+
+              .phone-item {
+                grid-column: span 2;
+              }
+
+              .address-item {
+                grid-column: span 3;
+              }
+
+              .age-item {
+                grid-column: span 2;
+              }
+
+              .birth-year-item {
+                grid-column: span 2;
+              }
+            }
+
+            .compact-form-item {
+              margin-bottom: 0;
+              width: 100%;
+              min-width: 0;
+
+              :deep(.el-form-item__label) {
+                font-size: 12px;
+                padding-right: 4px;
+                white-space: nowrap;
+              }
+
+              :deep(.el-input__inner),
+              :deep(.el-select .el-input__inner) {
+                font-size: 12px;
+              }
+
+              :deep(.el-autocomplete),
+              :deep(.el-input),
+              :deep(.el-select),
+              :deep(.el-date-editor) {
+                width: 100%;
+              }
+
+              &.age-range-form-item {
+                .age-range-inputs {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                }
+
+                .age-range-separator,
+                .age-range-unit {
+                  flex: none;
+                  color: #909399;
+                  font-size: 12px;
+                  line-height: 1;
+                }
+
+                :deep(.el-input) {
+                  flex: 1 1 0;
+                  min-width: 0;
+                }
+              }
+            }
+          }
+
+          @media (max-width: 1200px) {
+            .search-fields-row.short-row {
+              grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .search-fields-row.long-row {
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+
+              .compact-form-item {
+                grid-column: auto !important;
+              }
+            }
+          }
+
+          @media (max-width: 1024px) {
+            .search-fields-row.short-row,
+            .search-fields-row.long-row {
+              grid-template-columns: 1fr;
             }
           }
         }
@@ -712,9 +925,10 @@ onUnmounted(() => {
         .search-buttons {
           display: flex;
           flex-wrap: wrap;
+          width: 100%;
+          justify-content: flex-start;
           gap: 8px;
           padding-top: 0;
-          min-width: fit-content;
 
           .el-button {
             margin-left: 0;

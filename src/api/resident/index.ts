@@ -147,3 +147,10 @@ export const addHousehold = (data: any) => {
     data
   })
 }
+
+// 获取家庭成员（含户主）
+export const getHouseholdMembers = (householdId: string | number) => {
+  return request.get({
+    url: `/households/${householdId}/members`
+  })
+}

@@ -265,7 +265,7 @@ import {
   ElInputNumber
 } from 'element-plus'
 import type { FormInstance } from 'element-plus'
-import { getResidents, getResident } from '@/api/resident'
+import { getResidents, getResident, getHouseholdMembers } from '@/api/resident'
 import {
   addLowIncomePersonWithPolicy,
   updateLowIncomePerson,
@@ -319,6 +319,16 @@ const residentInfo = reactive({
   bank_name: '',
   household_id: '' as string | number
 })
+
+const pickHouseholdHead = (members: any[]) => {
+  if (!Array.isArray(members) || members.length === 0) return null
+  const findByRelation = members.find((member) => {
+    const relation = String(member.relationship_to_head || member.relationshipToHead || '').trim()
+    return relation === '本人' || relation === '户主'
+  })
+  if (findByRelation) return findByRelation
+  return members.find((member) => String(member.status || '').trim() === 'active') || members[0]
+}
 
 // 加载字典数据
 const loadDictionaries = async () => {
@@ -405,12 +415,30 @@ const loadResidentInfo = async (residentId: number) => {
       formData.age = String(resident.age || '')
       formData.phoneNumber = resident.phoneNumber || resident.phone_number || ''
 
-      // 自动填充银行信息
-      formData.bankName = resident.bankName || resident.bank_name || ''
-      formData.bankAccount = resident.bankCard || resident.bank_card || ''
-      formData.accountName = resident.name || ''
+      // 默认使用户主银行信息（可手工修改）
+      let accountHolder = resident
+      if (residentInfo.household_id) {
+        try {
+          const membersRes = await getHouseholdMembers(residentInfo.household_id)
+          const members = Array.isArray(membersRes?.data) ? membersRes.data : []
+          const headMember = pickHouseholdHead(members)
+          if (headMember) {
+            accountHolder = headMember
+          }
+        } catch (error) {
+          console.warn('获取户成员失败，继续使用当前居民默认账户信息:', error)
+        }
+      }
+
+      const relationToHead = resident.relationshipToHead || resident.relationship_to_head || ''
+      formData.accountName = accountHolder.name || resident.name || ''
+      formData.bankName =
+        accountHolder.bankName || accountHolder.bank_name || resident.bankName || resident.bank_name || ''
+      formData.bankAccount =
+        accountHolder.bankCard || accountHolder.bank_card || resident.bankCard || resident.bank_card || ''
       formData.accountRelationship =
-        resident.relationshipToHead || resident.relationship_to_head || ''
+        relationToHead ||
+        (accountHolder.id && resident.id && accountHolder.id === resident.id ? '本人' : '')
     }
   } catch (error) {
     console.error('获取居民信息失败:', error)

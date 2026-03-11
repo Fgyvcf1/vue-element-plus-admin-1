@@ -132,13 +132,13 @@ const listLowIncome = async (req, res) => {
           AND l2.status = 'active'
       ) AS lowIncomeHouseholdMembers,
       (
-        SELECT COALESCE(SUM(
+        SELECT ROUND(COALESCE(SUM(
           CASE
             WHEN lp2.subsidy_cycle = 'quarterly' THEN COALESCE(lp2.subsidy_amount, 0) / 3
             WHEN lp2.subsidy_cycle = 'yearly' THEN COALESCE(lp2.subsidy_amount, 0) / 12
             ELSE COALESCE(lp2.subsidy_amount, 0)
           END
-        ), 0)
+        ), 0), 2)
         FROM low_income_persons l2
         JOIN residents r2 ON l2.resident_id = r2.id
         LEFT JOIN low_income_policy_records lp2 ON lp2.id = (
@@ -157,7 +157,7 @@ const listLowIncome = async (req, res) => {
       p.has_subsidy,
       p.start_date,
       p.end_date,
-      p.subsidy_amount,
+      CASE WHEN p.subsidy_amount IS NULL THEN NULL ELSE ROUND(p.subsidy_amount, 2) END AS subsidy_amount,
       p.subsidy_cycle,
       p.account_name,
       p.account_relationship,
@@ -246,13 +246,13 @@ const getLowIncomeDetail = async (req, res) => {
           AND l2.status = 'active'
       ) AS lowIncomeHouseholdMembers,
       (
-        SELECT COALESCE(SUM(
+        SELECT ROUND(COALESCE(SUM(
           CASE
             WHEN lp2.subsidy_cycle = 'quarterly' THEN COALESCE(lp2.subsidy_amount, 0) / 3
             WHEN lp2.subsidy_cycle = 'yearly' THEN COALESCE(lp2.subsidy_amount, 0) / 12
             ELSE COALESCE(lp2.subsidy_amount, 0)
           END
-        ), 0)
+        ), 0), 2)
         FROM low_income_persons l2
         JOIN residents r2 ON l2.resident_id = r2.id
         LEFT JOIN low_income_policy_records lp2 ON lp2.id = (
@@ -271,7 +271,7 @@ const getLowIncomeDetail = async (req, res) => {
       p.has_subsidy,
       p.start_date,
       p.end_date,
-      p.subsidy_amount,
+      CASE WHEN p.subsidy_amount IS NULL THEN NULL ELSE ROUND(p.subsidy_amount, 2) END AS subsidy_amount,
       p.subsidy_cycle,
       p.account_name,
       p.account_relationship,
@@ -831,7 +831,7 @@ router.get('/low-income-persons/:id/household-total-subsidy', checkPermission('s
       `
         SELECT
           COALESCE(SUM(TIMESTAMPDIFF(MONTH, p.start_date, COALESCE(p.end_date, CURDATE())) + 1), 0) AS totalMonths,
-          COALESCE(SUM(
+          ROUND(COALESCE(SUM(
             (
               CASE
                 WHEN p.subsidy_cycle = 'quarterly' THEN COALESCE(p.subsidy_amount, 0) / 3
@@ -840,7 +840,7 @@ router.get('/low-income-persons/:id/household-total-subsidy', checkPermission('s
               END
             ) *
             (TIMESTAMPDIFF(MONTH, p.start_date, COALESCE(p.end_date, CURDATE())) + 1)
-          ), 0) AS totalSubsidy
+          ), 0), 2) AS totalSubsidy
         FROM low_income_persons l
         JOIN residents r ON l.resident_id = r.id
         JOIN low_income_policy_records p ON p.low_income_person_id = l.id

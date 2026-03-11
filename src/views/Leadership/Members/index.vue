@@ -62,6 +62,7 @@
       <el-table :data="members" size="small" border style="width: 100%" @row-click="handleEdit">
         <el-table-column type="index" width="50" align="center" label="序号" />
         <el-table-column prop="name" label="姓名" align="center" width="90" />
+        <el-table-column prop="ethnicity" label="民族" align="center" width="90" />
         <el-table-column prop="gender" label="性别" align="center" width="60" />
         <el-table-column prop="id_card" label="身份证号码" align="center" width="180" />
         <el-table-column prop="date_of_birth" label="出生日期" align="center" width="110" />
@@ -74,6 +75,7 @@
         />
         <el-table-column prop="phone_number" label="联系电话" align="center" width="120" />
         <el-table-column prop="position" label="职务" align="center" width="120" />
+        <el-table-column prop="political_status" label="政治面貌" align="center" width="100" />
         <el-table-column prop="term_number" label="届数" align="center" width="90">
           <template #default="scope">{{
             formatTermLabel(scope && scope.row ? scope.row.term_number : '')
@@ -186,7 +188,10 @@ const isCollectiveOrg = computed(() => {
     'village_committee',
     'economic_council',
     'economic_supervisor',
-    'supervisory_committee'
+    'supervisory_committee',
+    'group_leader',
+    'village_representative',
+    'youth_women_org'
   ].includes(filters.organizationType)
 })
 
@@ -331,12 +336,14 @@ const handleExport = async () => {
   worksheet.columns = [
     { header: '序号', key: 'index', width: 8 },
     { header: '姓名', key: 'name', width: 12 },
+    { header: '民族', key: 'ethnicity', width: 12 },
     { header: '性别', key: 'gender', width: 8 },
     { header: '身份证号码', key: 'idCard', width: 24 },
     { header: '出生日期', key: 'birthday', width: 14 },
     { header: '家庭住址', key: 'address', width: 30 },
     { header: '联系电话', key: 'phone', width: 16 },
     { header: '职务', key: 'position', width: 14 },
+    { header: '政治面貌', key: 'politicalStatus', width: 14 },
     { header: '届数', key: 'term', width: 10 },
     { header: '任期开始', key: 'start', width: 14 },
     { header: '任期结束', key: 'end', width: 14 },
@@ -347,12 +354,14 @@ const handleExport = async () => {
     worksheet.addRow({
       index: idx + 1,
       name: item.name || '',
+      ethnicity: item.ethnicity || '',
       gender: item.gender || '',
       idCard: item.id_card || '',
       birthday: item.date_of_birth || '',
       address: item.address || '',
       phone: item.phone_number || '',
       position: item.position || '',
+      politicalStatus: item.political_status || item.politicalStatus || '',
       term: item.term_number ? `第${item.term_number}届` : '',
       start: item.term_start_date || '',
       end: item.term_end_date || '当前',

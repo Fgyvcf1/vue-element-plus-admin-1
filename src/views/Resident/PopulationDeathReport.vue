@@ -118,7 +118,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { getDictionaryByCategory } from '@/api/dictionary'
+import { getDictionaryByCategory, getDictionaryItems } from '@/api/dictionary'
 import { getResidentDeathReport, getSearchSuggestions } from '@/api/resident'
 import type { ResidentDeathReportItem } from '@/api/resident/types'
 
@@ -209,11 +209,27 @@ function formatDate(date: Date) {
 
 const fetchUsageUnit = async () => {
   try {
+    const pickVillageCode = (rawCode: string, rawValue: string) => {
+      if (rawCode) return rawCode
+      const match = rawValue.match(/[\u4e00-\u9fa5A-Za-z0-9]+村/)
+      if (match && match[0]) return match[0]
+      return rawValue
+    }
+
     const res: any = await getDictionaryByCategory('使用单位')
-    const list = Array.isArray(res?.data) ? res.data : []
+    let list = Array.isArray(res?.data) ? res.data : []
+    if (list.length === 0) {
+      const allRes: any = await getDictionaryItems({
+        category: '使用单位',
+        include_all: 1
+      })
+      list = Array.isArray(allRes?.data) ? allRes.data : []
+    }
     const first = list[0] || {}
-    usageUnitCode.value = first.code || ''
-    usageUnitValue.value = first.value || ''
+    const rawCode = first.code || ''
+    const rawValue = first.value || first.label || ''
+    usageUnitCode.value = pickVillageCode(rawCode, rawValue)
+    usageUnitValue.value = rawValue || usageUnitCode.value
   } catch (error) {
     console.error('获取使用单位失败:', error)
   }
@@ -295,15 +311,16 @@ onMounted(async () => {
     min-width: 0;
     color: #000;
     font-size: 14px;
+    font-weight: 400;
     display: flex;
     flex-direction: column;
     align-items: center;
 
     .report-title {
-      font-size: 36px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 400;
       text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 18px;
     }
 
     .report-meta {
@@ -409,7 +426,7 @@ onMounted(async () => {
       }
 
       th {
-        font-weight: 700;
+        font-weight: 400;
       }
     }
   }

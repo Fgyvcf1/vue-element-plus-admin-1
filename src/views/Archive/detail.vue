@@ -1038,9 +1038,22 @@ const formatFileSize = (size?: number) => {
 
 const resolveFileUrl = (filePath?: string) => {
   if (!filePath) return ''
-  if (/^https?:\/\//i.test(filePath)) return filePath
-  const baseUrl = getApiOrigin()
-  return `${baseUrl}${filePath}`
+  if (/^https?:\/\//i.test(filePath)) {
+    try {
+      const url = new URL(filePath)
+      const currentHost = window.location.hostname
+      const isCurrentLocal = ['localhost', '127.0.0.1', '::1'].includes(currentHost)
+      const isUrlLocal = ['localhost', '127.0.0.1', '::1'].includes(url.hostname)
+      // If historical data stored localhost URLs, rewrite to current origin for LAN clients.
+      if (isUrlLocal && !isCurrentLocal) {
+        return `${window.location.origin}${url.pathname}${url.search}${url.hash}`
+      }
+      return filePath
+    } catch {
+      return filePath
+    }
+  }
+  return filePath.startsWith('/') ? filePath : `/${filePath}`
 }
 
 const openFilePreview = (url: string, type: 'image' | 'pdf') => {
@@ -1235,10 +1248,6 @@ const canPreview = (fileName?: string) => {
   return previewTypes.some((type) => lowerFileName.endsWith(type))
 }
 
-const getApiOrigin = () => {
-  return import.meta.env.VITE_API_BASE_URL || window.location.origin
-}
-
 const handlePreview = (file: any) => {
   const imageTypes = ['.jpg', '.jpeg', '.png', '.gif']
   const fileName = file.file_name?.toLowerCase() || ''
@@ -1252,7 +1261,6 @@ const handlePreview = (file: any) => {
 }
 
 const handleDownload = (file: any) => {
-  const baseUrl = getApiOrigin()
   const a = document.createElement('a')
   a.href = resolveFileUrl(file.file_path)
   a.download = file.file_name

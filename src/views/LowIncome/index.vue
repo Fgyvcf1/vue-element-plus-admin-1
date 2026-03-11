@@ -94,7 +94,11 @@
         <el-table-column prop="relationshipToHead" label="与户主关系" align="center" width="80" />
         <el-table-column prop="enjoyPolicyType" label="享受政策类型" align="center" width="130" />
         <el-table-column prop="enjoyLevel" label="享受档次" align="center" width="90" />
-        <el-table-column prop="subsidyAmount" label="补贴金额" align="center" width="80" />
+        <el-table-column prop="subsidyAmount" label="补贴金额" align="center" width="80">
+          <template #default="scope">
+            {{ formatMoney(scope.row.subsidyAmount) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="subsidyCycle" label="补贴周期" align="center" width="80" />
         <el-table-column prop="startDate" label="开始时间" align="center" width="80" />
         <el-table-column label="结束时间" align="center" width="80">
@@ -109,7 +113,11 @@
           align="center"
           width="80"
         />
-        <el-table-column prop="monthlyHouseholdAmount" label="户月金额" align="center" width="80" />
+        <el-table-column prop="monthlyHouseholdAmount" label="户月金额" align="center" width="80">
+          <template #default="scope">
+            {{ formatMoney(scope.row.monthlyHouseholdAmount) }}
+          </template>
+        </el-table-column>
       </el-table>
 
       <!-- 成员详情和历史记录模态框 -->
@@ -117,6 +125,7 @@
         v-model="dialogVisible"
         title="低收入人员详情"
         width="80%"
+        class="low-income-detail-dialog"
         :close-on-click-modal="true"
         @close="handleDialogClose"
       >
@@ -151,27 +160,13 @@
           <!-- 成员基本信息 -->
           <el-tab-pane label="详细信息" name="info">
             <el-form v-loading="detailLoading" label-width="120px" size="small">
-              <div
-                style="
-                  margin-bottom: 10px;
-                  padding: 10px;
-                  background-color: #f0f9ff;
-                  border-radius: 4px;
-                "
-              >
+              <div class="detail-tip">
                 <strong>说明：</strong>
                 <span style="margin-left: 10px">享受人数：该成员全部家庭成员享受政策的人数</span>
                 <span style="margin-left: 20px">户月金额：每名家庭成员享受月补助金额的总和</span>
               </div>
               <!-- 第一行：户主姓名、全户人数、享受人数 -->
-              <div
-                style="
-                  margin-bottom: 20px;
-                  padding: 15px;
-                  background-color: #f9fafc;
-                  border-radius: 4px;
-                "
-              >
+              <div class="detail-summary-block">
                 <el-row :gutter="20">
                   <el-col :span="8">
                     <el-form-item label="户主姓名">
@@ -440,7 +435,7 @@
                 <el-col :span="8">
                   <div class="stat-item">
                     <span class="stat-label">该户所有成员享受总金额：</span>
-                    <span class="stat-value">{{ stats.totalSubsidy || 0 }}元</span>
+                    <span class="stat-value">{{ formatMoney(stats.totalSubsidy) }}元</span>
                   </div>
                 </el-col>
               </el-row>
@@ -492,7 +487,7 @@
                           <span class="label">补贴金额：</span>
                           <span class="value">{{
                             record.subsidyAmount
-                              ? record.subsidyAmount + '元/' + record.subsidyCycle
+                              ? formatMoney(record.subsidyAmount) + '元/' + record.subsidyCycle
                               : '无补贴'
                           }}</span>
                         </div>
@@ -656,6 +651,24 @@ const ethnicityOptions = ref<{ label: string; value: string }[]>([])
 const relationshipOptions = ref<{ label: string; value: string }[]>([])
 const bankOptions = ref<{ label: string; value: string }[]>([])
 
+const normalizeMoneyValue = (value: any) => {
+  if (value === '' || value === null || value === undefined) return ''
+  const num = Number(value)
+  if (!Number.isFinite(num)) return ''
+  return Number(num.toFixed(2))
+}
+
+const normalizeMoneyWithDefault = (value: any, fallback = 0) => {
+  const normalized = normalizeMoneyValue(value)
+  return normalized === '' ? fallback : normalized
+}
+
+const formatMoney = (value: any) => {
+  const normalized = normalizeMoneyValue(value)
+  if (normalized === '') return ''
+  return normalized.toFixed(2)
+}
+
 // 加载字典数据
 const loadDictionaries = async () => {
   try {
@@ -739,13 +752,13 @@ const getList = async () => {
         item.policyType || item.policy_type,
         item.enjoyLevel || item.enjoy_level
       ),
-      subsidyAmount: item.subsidyAmount || item.subsidy_amount || '',
+      subsidyAmount: normalizeMoneyValue(item.subsidyAmount ?? item.subsidy_amount),
       subsidyCycle: item.subsidyCycle || item.subsidy_cycle || '',
       startDate: item.startDate || item.start_date || '',
       endDate: item.endDate || item.end_date || '',
       totalHouseholdMembers: item.totalHouseholdMembers || 0,
       lowIncomeHouseholdMembers: item.lowIncomeHouseholdMembers || 0,
-      monthlyHouseholdAmount: item.monthlyHouseholdAmount || 0,
+      monthlyHouseholdAmount: normalizeMoneyWithDefault(item.monthlyHouseholdAmount, 0),
       status: item.status
     }))
     total.value = response.total || 0
@@ -810,14 +823,14 @@ const handleRowClick = async (row: LowIncomePerson) => {
         enjoyPolicyType: data.policyType || data.policy_type || '',
         enjoyLevel: data.enjoyLevel || data.enjoy_level || '',
         _enjoyLevel: data.enjoyLevel || data.enjoy_level || '',
-        subsidyAmount: data.subsidyAmount || data.subsidy_amount || '',
+        subsidyAmount: normalizeMoneyValue(data.subsidyAmount ?? data.subsidy_amount),
         subsidyCycle: data.subsidyCycle || data.subsidy_cycle || '',
         startDate: data.startDate || data.start_date || '',
         endDate: data.endDate || data.end_date || '',
         status: data.status || '',
         totalHouseholdMembers: data.totalHouseholdMembers || 0,
         lowIncomeHouseholdMembers: data.lowIncomeHouseholdMembers || 0,
-        monthlyHouseholdAmount: data.monthlyHouseholdAmount || 0,
+        monthlyHouseholdAmount: normalizeMoneyWithDefault(data.monthlyHouseholdAmount, 0),
         accountName: data.accountName || data.account_name || '',
         bankName: data.bankName || data.bank_name || '',
         bankAccount: data.bankAccount || data.bank_account || '',
@@ -834,7 +847,7 @@ const handleRowClick = async (row: LowIncomePerson) => {
         policyType: item.policyType || item.policy_type,
         startDate: item.startDate || item.start_date,
         endDate: item.endDate || item.end_date,
-        subsidyAmount: item.subsidyAmount || item.subsidy_amount,
+        subsidyAmount: normalizeMoneyValue(item.subsidyAmount ?? item.subsidy_amount),
         subsidyCycle: item.subsidyCycle || item.subsidy_cycle,
         enjoyLevel: item.enjoyLevel || item.enjoy_level,
         subsidyAccount: item.bankAccount || item.bank_account,
@@ -901,7 +914,7 @@ const getStatsData = async (id: number) => {
     }
 
     if (subsidyResponse.data) {
-      stats.totalSubsidy = Number(subsidyResponse.data.totalSubsidy) || 0
+      stats.totalSubsidy = normalizeMoneyWithDefault(subsidyResponse.data.totalSubsidy, 0)
       stats.totalMonths = Number(subsidyResponse.data.totalMonths) || 0
     }
   } catch (error) {
@@ -956,6 +969,8 @@ const handleSave = async () => {
     ElMessage.warning('暂无编辑权限')
     return
   }
+  memberDetail.subsidyAmount = normalizeMoneyValue(memberDetail.subsidyAmount)
+  memberDetail.monthlyHouseholdAmount = normalizeMoneyWithDefault(memberDetail.monthlyHouseholdAmount, 0)
   try {
     detailLoading.value = true
 
@@ -973,14 +988,15 @@ const handleSave = async () => {
       policy_type: memberDetail.enjoyPolicyType || '未指定',
       low_income_type: memberDetail.enjoyPolicyType || '未指定',
       enjoy_level: memberDetail.enjoyLevel,
-      subsidy_amount: memberDetail.subsidyAmount,
+      subsidy_amount:
+        memberDetail.subsidyAmount === '' ? null : normalizeMoneyWithDefault(memberDetail.subsidyAmount, 0),
       subsidy_cycle: memberDetail.subsidyCycle,
       start_date: memberDetail.startDate,
       end_date: memberDetail.endDate,
       status: memberDetail.status,
       totalHouseholdMembers: memberDetail.totalHouseholdMembers,
       lowIncomeHouseholdMembers: memberDetail.lowIncomeHouseholdMembers,
-      monthlyHouseholdAmount: memberDetail.monthlyHouseholdAmount,
+      monthlyHouseholdAmount: normalizeMoneyWithDefault(memberDetail.monthlyHouseholdAmount, 0),
       account_name: memberDetail.accountName,
       bank_name: memberDetail.bankName,
       bank_account: memberDetail.bankAccount,
@@ -1040,7 +1056,8 @@ const handleSave = async () => {
         has_subsidy: !!memberDetail.subsidyAmount,
         start_date: memberDetail.startDate,
         end_date: memberDetail.endDate,
-        subsidy_amount: memberDetail.subsidyAmount,
+        subsidy_amount:
+          memberDetail.subsidyAmount === '' ? null : normalizeMoneyWithDefault(memberDetail.subsidyAmount, 0),
         subsidy_cycle: memberDetail.subsidyCycle,
         account_name: memberDetail.accountName,
         account_relationship: '本人',
@@ -1062,7 +1079,8 @@ const handleSave = async () => {
         has_subsidy: !!memberDetail.subsidyAmount,
         start_date: memberDetail.startDate,
         end_date: memberDetail.endDate,
-        subsidy_amount: memberDetail.subsidyAmount,
+        subsidy_amount:
+          memberDetail.subsidyAmount === '' ? null : normalizeMoneyWithDefault(memberDetail.subsidyAmount, 0),
         subsidy_cycle: memberDetail.subsidyCycle,
         account_name: memberDetail.accountName,
         account_relationship: '本人',
@@ -1080,7 +1098,8 @@ const handleSave = async () => {
         has_subsidy: !!memberDetail.subsidyAmount,
         start_date: memberDetail.startDate,
         end_date: memberDetail.endDate,
-        subsidy_amount: memberDetail.subsidyAmount,
+        subsidy_amount:
+          memberDetail.subsidyAmount === '' ? null : normalizeMoneyWithDefault(memberDetail.subsidyAmount, 0),
         subsidy_cycle: memberDetail.subsidyCycle,
         account_name: memberDetail.accountName,
         account_relationship: '本人',
@@ -1107,7 +1126,7 @@ const handleSave = async () => {
         policyType: item.policyType || item.policy_type,
         startDate: item.startDate || item.start_date,
         endDate: item.endDate || item.end_date,
-        subsidyAmount: item.subsidyAmount || item.subsidy_amount,
+        subsidyAmount: normalizeMoneyValue(item.subsidyAmount ?? item.subsidy_amount),
         subsidyCycle: item.subsidyCycle || item.subsidy_cycle,
         enjoyLevel: item.enjoyLevel || item.enjoy_level,
         subsidyAccount: item.bankAccount || item.bank_account,
@@ -1224,13 +1243,13 @@ const handleExport = async () => {
       relationshipToHead: row.relationshipToHead,
       enjoyPolicyType: row.enjoyPolicyType,
       enjoyLevel: row.enjoyLevel,
-      subsidyAmount: row.subsidyAmount,
+      subsidyAmount: formatMoney(row.subsidyAmount),
       subsidyCycle: row.subsidyCycle,
       startDate: row.startDate,
       endDate: endDate,
       totalHouseholdMembers: row.totalHouseholdMembers,
       lowIncomeHouseholdMembers: row.lowIncomeHouseholdMembers,
-      monthlyHouseholdAmount: row.monthlyHouseholdAmount
+      monthlyHouseholdAmount: formatMoney(row.monthlyHouseholdAmount)
     })
   })
 
@@ -1261,6 +1280,24 @@ onMounted(() => {
 
 .timeline-card {
   margin-bottom: 16px;
+}
+
+.detail-tip {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #606266;
+}
+
+.detail-summary-block {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
 }
 
 .card-header {
@@ -1332,5 +1369,18 @@ onMounted(() => {
 :deep(.el-table td.el-table__cell > .cell) {
   white-space: nowrap !important;
   word-break: keep-all;
+}
+
+:deep(.low-income-detail-dialog .el-input.is-disabled .el-input__wrapper),
+:deep(.low-income-detail-dialog .el-select .el-select__wrapper.is-disabled),
+:deep(.low-income-detail-dialog .el-textarea.is-disabled .el-textarea__inner) {
+  background-color: #fff;
+}
+
+:deep(.low-income-detail-dialog .el-input.is-disabled .el-input__inner),
+:deep(.low-income-detail-dialog .el-select .el-select__selected-item),
+:deep(.low-income-detail-dialog .el-textarea.is-disabled .el-textarea__inner) {
+  color: var(--el-text-color-regular);
+  -webkit-text-fill-color: var(--el-text-color-regular);
 }
 </style>

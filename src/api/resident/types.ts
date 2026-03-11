@@ -10,7 +10,13 @@ export interface ResidentListParams {
   householderName?: string
   gender?: string
   villageGroup?: string
+  politicalStatus?: string
   birthYear?: string
+  address?: string
+  minAge?: string | number
+  maxAge?: string | number
+  ageMin?: string | number
+  ageMax?: string | number
   phone?: string
   phoneNumber?: string
   status?: string

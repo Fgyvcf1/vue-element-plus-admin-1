@@ -2587,6 +2587,16 @@ const generateHouseholdId = async (villageGroup, idCard) => {
 router.get('/residents', checkPermission('resident:view'), (req, res) => {
   console.log('收到/residents请求，查询参数:', req.query)
 
+  const parseAgeParam = (value) => {
+    if (value === undefined || value === null) return null
+    const text = String(value).trim()
+    if (!text) return null
+    if (!/^\d{1,3}$/.test(text)) return NaN
+    const num = parseInt(text, 10)
+    if (num < 0 || num > 150) return NaN
+    return num
+  }
+
   // 构建SQL查询 - 关联households表获取家庭地址和户主信息
   let sql = `SELECT 
               r.id, 
@@ -2654,6 +2664,35 @@ router.get('/residents', checkPermission('resident:view'), (req, res) => {
     sql += ` AND YEAR(r.date_of_birth) = ?`
     params.push(req.query.birthYear)
   }
+  const politicalStatus = (req.query.politicalStatus || req.query.political_status || '').trim()
+  if (politicalStatus !== '') {
+    sql += ` AND COALESCE(r.political_status, '') LIKE ?`
+    params.push(`%${politicalStatus}%`)
+  }
+  const addressKeyword = (req.query.address || '').trim()
+  if (addressKeyword !== '') {
+    sql += ` AND (COALESCE(h.address, '') LIKE ? OR COALESCE(r.Home_address, '') LIKE ?)`
+    const likeAddress = `%${addressKeyword}%`
+    params.push(likeAddress, likeAddress)
+  }
+
+  const minAge = parseAgeParam(req.query.minAge ?? req.query.ageMin)
+  const maxAge = parseAgeParam(req.query.maxAge ?? req.query.ageMax)
+  if (Number.isNaN(minAge) || Number.isNaN(maxAge)) {
+    return res.status(400).json({ code: 400, message: '年龄段参数不正确，范围应为0-150' })
+  }
+  if (minAge !== null && maxAge !== null && minAge > maxAge) {
+    return res.status(400).json({ code: 400, message: '年龄段参数不正确，最小值不能大于最大值' })
+  }
+  if (minAge !== null) {
+    sql += ` AND ${buildResidentAgeExpr('r')} >= ?`
+    params.push(minAge)
+  }
+  if (maxAge !== null) {
+    sql += ` AND ${buildResidentAgeExpr('r')} <= ?`
+    params.push(maxAge)
+  }
+
   if (req.query.phoneNumber) {
     sql += ` AND r.phone_number LIKE ?`
     params.push(`%${req.query.phoneNumber}%`)
@@ -3170,6 +3209,7 @@ router.get('/residents/death-report', checkPermission('resident:view'), async (r
                 ) rs ON rs.id = logs.resident_id
                 LEFT JOIN households h ON h.household_number = rs.household_id
                 WHERE logs.parsed_death_date IS NOT NULL
+                  AND rs.status = 'deceased'
                   AND YEAR(logs.parsed_death_date) = ?
                   AND MONTH(logs.parsed_death_date) = ?
                 ORDER BY logs.parsed_death_date ASC, rs.village_group ASC, rs.name ASC`
